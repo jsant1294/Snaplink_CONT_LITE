@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to SnapLink Contractor / Bienvenido a SnapLink Contractor</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SnapLink Contractor">
+<meta property="og:title" content="Welcome to SnapLink Contractor">
+<meta property="og:description" content="Your setup guide: get your leads organized and your estimates out the door. By Southline One Digital Media.">
+<meta property="og:image" content="https://YOUR-DOMAIN.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SnapLink Contractor by Southline One Digital Media — Alpharetta, GA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Welcome to SnapLink Contractor">
+<meta name="twitter:description" content="Your setup guide: get your leads organized and your estimates out the door. By Southline One Digital Media.">
+<meta name="twitter:image" content="https://YOUR-DOMAIN.com/og-image.png">
+<meta name="theme-color" content="#0A0A0A">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#0A0A0A; --charcoal:#141416; --gold:#D4AF37; --gold-light:#E8CE7E;
+    --gold-dim:rgba(212,175,55,.35); --bone:#F2EEE6; --muted:#8E8E99;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--obsidian);color:var(--bone);font-family:'Inter',system-ui,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .display{font-family:'Cormorant Garamond',Georgia,serif}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  .eyebrow{font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .gold-rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold-light) 50%,var(--gold) 80%,transparent);margin:8px 0 0}
+
+  .bar{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.94);border-bottom:1px solid rgba(255,255,255,.06)}
+  .bar .wrap{display:flex;justify-content:space-between;align-items:center;padding:12px 24px}
+  .bar .b{font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+  .toggle{display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:999px;overflow:hidden}
+  .toggle button{background:none;border:0;color:var(--muted);font:600 12px 'Inter';padding:7px 15px;cursor:pointer}
+  .toggle button.on{background:var(--gold);color:var(--obsidian)}
+  .print-btn{background:none;border:1px solid var(--gold-dim);color:var(--gold-light);border-radius:10px;padding:7px 14px;font:600 12px 'Inter';cursor:pointer;margin-left:10px}
+  body.es .lang-en{display:none}
+  body:not(.es) .lang-es{display:none}
+
+  header.top{text-align:center;padding:64px 0 40px}
+  header.top h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(36px,6vw,58px);line-height:1.08;margin:16px 0 14px}
+  header.top p{color:var(--muted);max-width:520px;margin:0 auto;font-size:16px}
+
+  section{padding:34px 0}
+  h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;margin:8px 0 12px}
+  p, li{color:var(--muted);font-size:15px}
+  b{color:var(--bone)}
+  .card{background:var(--charcoal);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:26px 28px;box-shadow:0 1px 0 var(--gold-dim),0 10px 26px rgba(0,0,0,.45)}
+
+  /* fill-in keys card */
+  .keys .row{display:grid;grid-template-columns:190px 1fr;gap:10px;align-items:baseline;padding:12px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
+  .keys .row:last-child{border-bottom:0}
+  .keys .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .fill{display:inline-block;min-width:220px;border-bottom:1px solid var(--gold-dim);color:var(--gold-light);font-family:ui-monospace,Menlo,monospace;font-size:15px;padding:2px 4px;outline:none}
+  .fill:empty::before{content:attr(data-ph);color:rgba(212,175,55,.4)}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:14px;font-style:italic}
+
+  ol.steps{counter-reset:s;list-style:none;margin-top:10px}
+  ol.steps li{counter-increment:s;display:flex;gap:16px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{content:counter(s);flex:0 0 30px;height:30px;border:1px solid var(--gold-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-weight:700;font-size:13px}
+
+  .tip{border-left:2px solid var(--gold);padding:4px 0 4px 18px;margin:18px 0}
+  .tip p{font-size:14.5px}
+
+  .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px}
+
+  footer{padding:56px 0 44px;text-align:center}
+  footer .brand{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-light)}
+  footer p{font-size:12.5px;margin-top:6px}
+
+  /* PRINT: white handout, keep gold accents */
+  @media print{
+    .bar{display:none}
+    body{background:#fff;color:#151515}
+    p,li{color:#3d3d44}
+    b{color:#111}
+    .card{background:#fbf9f4;border:1px solid #e5d9b3;box-shadow:none;break-inside:avoid}
+    header.top{padding:24px 0 16px}
+    section{padding:16px 0}
+    .fill{color:#8a6d1c;border-bottom-color:#c9b06a}
+    ol.steps li{border-color:#eee}
+    a{color:#8a6d1c}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap">
+    <span class="b">SnapLink Contractor</span>
+    <span>
+      <span class="toggle" role="group" aria-label="Language">
+        <button id="btn-en" class="on" onclick="setLang('en')">English</button>
+        <button id="btn-es" onclick="setLang('es')">Español</button>
+      </span>
+      <button class="print-btn" onclick="window.print()"><span class="lang-en">🖨 Print / PDF</span><span class="lang-es">🖨 Imprimir / PDF</span></button>
+    </span>
+  </div>
+</div>
+
+<header class="top wrap">
+  <span class="eyebrow lang-en">Welcome aboard</span>
+  <span class="eyebrow lang-es">Bienvenido a bordo</span>
+  <h1 class="lang-en">Thank you for your purchase.<br>Let's get you paid faster.</h1>
+  <h1 class="lang-es">Gracias por tu compra.<br>Vamos a hacer que te paguen más rápido.</h1>
+  <p class="lang-en">This guide is everything you need to run SnapLink Contractor day to day. Keep it in your folder — and remember, support is always one phone call away.</p>
+  <p class="lang-es">Esta guía es todo lo que necesitas para usar SnapLink Contractor en el día a día. Guárdala en tu carpeta — y recuerda, el soporte siempre está a una llamada de distancia.</p>
+  <div class="gold-rule"></div>
+</header>
+
+<!-- YOUR KEYS -->
+<section class="wrap">
+  <span class="eyebrow lang-en">Your keys · fill in & keep safe</span>
+  <span class="eyebrow lang-es">Tus llaves · llénalo y guárdalo</span>
+  <h2 class="display lang-en">The three things that are yours</h2>
+  <h2 class="display lang-es">Las tres cosas que son tuyas</h2>
+  <div class="card keys">
+    <div class="row">
+      <span class="k lang-en">Business</span><span class="k lang-es">Negocio</span>
+      <span class="fill" contenteditable="true" data-ph="Your business name / Tu negocio"></span>
+    </div>
+    <div class="row">
+      <span class="k lang-en">Public page</span><span class="k lang-es">Página pública</span>
+      <span class="fill" contenteditable="true" data-ph="yourdomain.com/contractor/your-name"></span>
+    </div>
+    <div class="row">
+      <span class="k lang-en">Your dashboard</span><span class="k lang-es">Tu tablero</span>
+      <span class="fill" contenteditable="true" data-ph="yourdomain.com/contractor-admin/your-name"></span>
+    </div>
+    <div class="row">
+      <span class="k">PIN</span>
+      <span class="fill" contenteditable="true" data-ph="• • • • • •"></span>
+    </div>
+    <div class="row">
+      <span class="k lang-en">Support</span><span class="k lang-es">Soporte</span>
+      <span class="fill" contenteditable="true" data-ph="Southline One · phone / teléfono"></span>
+    </div>
+  </div>
+  <p class="hint lang-en">Tap any line to type before printing. The <b>public page</b> is for your clients — it goes on your NFC card, truck, and business cards. The <b>dashboard</b> is private — only you, with your PIN.</p>
+  <p class="hint lang-es">Toca cualquier línea para escribir antes de imprimir. La <b>página pública</b> es para tus clientes — va en tu tarjeta NFC, tu troca y tus tarjetas de presentación. El <b>tablero</b> es privado — solo tú, con tu PIN.</p>
+</section>
+
+<!-- SETUP -->
+<section class="wrap">
+  <span class="eyebrow lang-en">One-time setup · 2 minutes</span>
+  <span class="eyebrow lang-es">Configuración única · 2 minutos</span>
+  <h2 class="display lang-en">Put it on your phone like an app</h2>
+  <h2 class="display lang-es">Ponlo en tu teléfono como una app</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><div><span class="lang-en">Open your <b>dashboard link</b> in Safari (iPhone) or Chrome (Android).</span><span class="lang-es">Abre tu <b>link del tablero</b> en Safari (iPhone) o Chrome (Android).</span></div></li>
+      <li><div><span class="lang-en">Enter your <b>6-digit PIN</b>. It stays unlocked while you work.</span><span class="lang-es">Ingresa tu <b>PIN de 6 dígitos</b>. Se queda abierto mientras trabajas.</span></div></li>
+      <li><div><span class="lang-en">Tap <b>Share → Add to Home Screen</b>. Now SnapLink sits next to WhatsApp — one tap to your leads.</span><span class="lang-es">Toca <b>Compartir → Agregar a pantalla de inicio</b>. Ahora SnapLink queda junto a WhatsApp — un toque y ves tus clientes.</span></div></li>
+      <li><div><span class="lang-en">Top-right of your board: flip <b>English / Español</b> anytime. Your whole dashboard follows.</span><span class="lang-es">Arriba a la derecha de tu tablero: cambia <b>English / Español</b> cuando quieras. Todo tu tablero te sigue.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- DAILY USE -->
+<section class="wrap">
+  <span class="eyebrow lang-en">Daily use</span>
+  <span class="eyebrow lang-es">Uso diario</span>
+  <h2 class="display lang-en">When a lead comes in</h2>
+  <h2 class="display lang-es">Cuando llega un cliente</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><div><span class="lang-en">A client taps your card or link, answers questions <b>built for your trade</b>, uploads photos, and sends. It appears on your board instantly as a <b>New</b> card with everything: phone, address, timeline, budget, photos.</span><span class="lang-es">Un cliente toca tu tarjeta o link, contesta preguntas <b>hechas para tu oficio</b>, sube fotos y envía. Aparece al instante en tu tablero como tarjeta <b>Nueva</b> con todo: teléfono, dirección, plazo, presupuesto, fotos.</span></div></li>
+      <li><div><span class="lang-en">Tap <b>✦ Generate AI summary</b>. In seconds you get: a clean summary, scope notes, questions to ask at the walkthrough, and a follow-up text — <b>written in the client's language</b>, ready to send.</span><span class="lang-es">Toca <b>✦ Generar resumen IA</b>. En segundos tienes: resumen limpio, notas de alcance, preguntas para la visita y un mensaje de seguimiento — <b>escrito en el idioma del cliente</b>, listo para enviar.</span></div></li>
+      <li><div><span class="lang-en"><b>Respond in 5 minutes.</b> Tap Call, Text, or WhatsApp right on the card. Speed is what wins the job.</span><span class="lang-es"><b>Responde en 5 minutos.</b> Toca Llamar, Texto o WhatsApp ahí mismo en la tarjeta. La velocidad es lo que gana el trabajo.</span></div></li>
+      <li><div><span class="lang-en">Move the status as it progresses: New → Needs Call → Walkthrough Scheduled → Estimate Sent → Approved → In Progress → Completed. Your board becomes your pipeline.</span><span class="lang-es">Mueve el estado conforme avanza: Nuevo → Llamar → Visita agendada → Presupuesto enviado → Aprobado → En progreso → Completado. Tu tablero se vuelve tu pipeline.</span></div></li>
+    </ol>
+  </div>
+  <div class="tip">
+    <p class="lang-en"><b>The AI never invents your numbers.</b> No made-up measurements, no made-up prices. Anything missing shows under "Needs Confirmation" — that's your walkthrough checklist.</p>
+    <p class="lang-es"><b>La IA nunca inventa tus números.</b> Nada de medidas inventadas ni precios inventados. Lo que falte aparece en "Por Confirmar" — esa es tu lista para la visita.</p>
+  </div>
+</section>
+
+<!-- ESTIMATES -->
+<section class="wrap">
+  <span class="eyebrow lang-en">The money part</span>
+  <span class="eyebrow lang-es">La parte del dinero</span>
+  <h2 class="display lang-en">Build an estimate in two minutes</h2>
+  <h2 class="display lang-es">Arma un presupuesto en dos minutos</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><div><span class="lang-en">On the lead card, tap <b>Build estimate → PDF</b>.</span><span class="lang-es">En la tarjeta del cliente, toca <b>Crear presupuesto → PDF</b>.</span></div></li>
+      <li><div><span class="lang-en">Add items from the <b>library</b> (110+ common line items for your trade) or create custom ones. Enter <b>your</b> quantity and <b>your</b> rate — the system never guesses prices.</span><span class="lang-es">Agrega partidas de la <b>biblioteca</b> (más de 110 partidas comunes de tu oficio) o crea las tuyas. Pon <b>tu</b> cantidad y <b>tu</b> tarifa — el sistema nunca adivina precios.</span></div></li>
+      <li><div><span class="lang-en">Set tax %, discount, and — most important — your <b>deposit %</b>. The PDF shows "Deposit due to schedule," so signing and scheduling happen in the same moment.</span><span class="lang-es">Pon el impuesto %, descuento y — lo más importante — tu <b>% de depósito</b>. El PDF muestra "Depósito para agendar," así la firma y la fecha suceden en el mismo momento.</span></div></li>
+      <li><div><span class="lang-en">Tap <b>Save + PDF (English)</b> or <b>(Spanish)</b> — the same numbers, either language. Send the client theirs; keep the other for your file.</span><span class="lang-es">Toca <b>Guardar + PDF (inglés)</b> o <b>(español)</b> — los mismos números, en cualquier idioma. Mándale al cliente el suyo; guarda el otro en tu archivo.</span></div></li>
+    </ol>
+  </div>
+  <div class="two">
+    <div class="card">
+      <p class="lang-en"><b>Every estimate protects you:</b> written scope, "Needs Confirmation" items, change-order terms, validity window, and a client signature line.</p>
+      <p class="lang-es"><b>Cada presupuesto te protege:</b> alcance por escrito, puntos "Por Confirmar", términos de órdenes de cambio, vigencia y línea de firma del cliente.</p>
+    </div>
+    <div class="card">
+      <p class="lang-en"><b>Proposal PDFs too:</b> before pricing, send a professional project proposal (EN or ES buttons on the lead card) to look like the biggest company that showed up.</p>
+      <p class="lang-es"><b>También propuestas en PDF:</b> antes de poner precio, manda una propuesta profesional del proyecto (botones EN o ES en la tarjeta) para verte como la empresa más seria que llegó.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GOLDEN RULES -->
+<section class="wrap">
+  <span class="eyebrow lang-en">Golden rules</span>
+  <span class="eyebrow lang-es">Reglas de oro</span>
+  <h2 class="display lang-en">How the pros run it</h2>
+  <h2 class="display lang-es">Cómo lo usan los profesionales</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><div><span class="lang-en"><b>Tap fast.</b> Answer new leads within 5 minutes whenever you can — even a one-line text holds the door.</span><span class="lang-es"><b>Responde rápido.</b> Contesta clientes nuevos en 5 minutos cuando puedas — hasta un texto de una línea mantiene la puerta abierta.</span></div></li>
+      <li><div><span class="lang-en"><b>Put the link everywhere.</b> NFC card, truck decal, yard signs, invoices, WhatsApp status, Facebook page. Every surface is a lead source.</span><span class="lang-es"><b>Pon el link en todos lados.</b> Tarjeta NFC, calcomanía de la troca, letreros, facturas, estado de WhatsApp, página de Facebook. Cada superficie es una fuente de clientes.</span></div></li>
+      <li><div><span class="lang-en"><b>Always send the PDF.</b> A signed estimate with a deposit line beats a number said out loud — every single time.</span><span class="lang-es"><b>Siempre manda el PDF.</b> Un presupuesto firmado con línea de depósito le gana a un número dicho de palabra — todas las veces.</span></div></li>
+      <li><div><span class="lang-en"><b>Work your statuses.</b> Check "Follow Up" and "Needs Call" every morning with your coffee. That's your day, already organized.</span><span class="lang-es"><b>Trabaja tus estados.</b> Revisa "Seguimiento" y "Llamar" cada mañana con tu café. Ese es tu día, ya organizado.</span></div></li>
+      <li><div><span class="lang-en"><b>Forgot your PIN?</b> Call us. We reset it in 15 seconds and read you the new one. That's it.</span><span class="lang-es"><b>¿Se te olvidó el PIN?</b> Llámanos. Lo cambiamos en 15 segundos y te leemos el nuevo. Ya está.</span></div></li>
+    </ol>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="gold-rule" style="margin-bottom:28px"></div>
+  <div class="brand">Southline One Digital Media</div>
+  <p class="lang-en">SnapLink Contractor · Built in Alpharetta, Georgia · Support: one call, hablamos español</p>
+  <p class="lang-es">SnapLink Contractor · Hecho en Alpharetta, Georgia · Soporte: una llamada, we speak English</p>
+</footer>
+
+<script>
+  function setLang(l){
+    document.body.classList.toggle('es', l==='es');
+    document.documentElement.lang = l;
+    document.getElementById('btn-en').classList.toggle('on', l==='en');
+    document.getElementById('btn-es').classList.toggle('on', l==='es');
+  }
+</script>
+</body>
+</html>

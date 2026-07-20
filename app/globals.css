@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+body {
+  @apply bg-obsidian text-bone font-body antialiased;
+}
+
+.gold-rule {
+  background: linear-gradient(90deg, transparent, #C9A24B 20%, #E4C879 50%, #C9A24B 80%, transparent);
+  height: 1px;
+}
+
+.btn-gold {
+  @apply bg-gold text-obsidian font-semibold rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
+}
+.btn-outline {
+  @apply border border-gold/50 text-goldlight rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
+}
+.card {
+  @apply bg-charcoal border border-white/5 rounded-2xl shadow-card;
+}
+.input {
+  @apply w-full bg-slateink border border-white/10 rounded-xl px-4 py-3 text-bone placeholder:text-muted focus:outline-none focus:border-gold/60;
+}
+.label {
+  @apply block text-sm font-medium text-muted mb-1.5;
+}
