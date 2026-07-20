@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SnapLink Contractor — Stop Losing Leads / Deja de Perder Clientes</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SnapLink Contractor">
+<meta property="og:title" content="SnapLink Contractor — Stop losing leads. Get paid faster.">
+<meta property="og:description" content="Client intake, AI summaries, and estimate PDFs — in English & Español. Built by Southline One Digital Media, Alpharetta GA.">
+<meta property="og:image" content="https://snaplink-contractor.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SnapLink Contractor by Southline One Digital Media — Alpharetta, GA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SnapLink Contractor — Stop losing leads. Get paid faster.">
+<meta name="twitter:description" content="Client intake, AI summaries, and estimate PDFs — in English & Español. Built by Southline One Digital Media, Alpharetta GA.">
+<meta name="twitter:image" content="https://snaplink-contractor.vercel.app/og-image.png">
+<meta name="theme-color" content="#0A0A0A">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#0A0A0A; --charcoal:#141416; --ink:#1D1D22;
+    --gold:#D4AF37; --gold-light:#E8CE7E; --gold-dim:rgba(212,175,55,.35);
+    --bone:#F2EEE6; --muted:#8E8E99; --danger:#C4554D; --success:#3E9B6E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--obsidian);color:var(--bone);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .display{font-family:'Cormorant Garamond',Georgia,serif}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px}
+  .eyebrow{font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .gold-rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold-light) 50%,var(--gold) 80%,transparent)}
+
+  /* language toggle */
+  .lang-bar{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .lang-bar .wrap{display:flex;justify-content:space-between;align-items:center;padding:12px 24px}
+  .lang-brand{font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+  .toggle{display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:999px;overflow:hidden}
+  .toggle button{background:none;border:0;color:var(--muted);font:600 12px 'Inter';padding:8px 16px;cursor:pointer;transition:.15s}
+  .toggle button.on{background:var(--gold);color:var(--obsidian)}
+  body.es .lang-en{display:none}
+  body:not(.es) .lang-es{display:none}
+
+  /* hero */
+  .hero{padding:96px 0 72px;text-align:center;position:relative}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(42px,7vw,76px);line-height:1.05;margin:18px 0 22px}
+  .hero h1 em{font-style:italic;color:var(--gold-light)}
+  .hero p.sub{max-width:620px;margin:0 auto 36px;color:var(--muted);font-size:18px}
+  .cta{display:inline-block;background:var(--gold);color:var(--obsidian);font-weight:700;padding:16px 34px;border-radius:14px;text-decoration:none;font-size:16px;transition:.15s}
+  .cta:hover{transform:translateY(-1px);background:var(--gold-light)}
+  .cta.ghost{background:none;border:1px solid var(--gold-dim);color:var(--gold-light)}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  /* the lead rail — signature element */
+  .rail{position:relative;padding:40px 0}
+  .rail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--gold) 8%,var(--gold) 92%,transparent)}
+  .step{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;margin:56px 0}
+  .step .dot{grid-column:2;width:14px;height:14px;border-radius:50%;background:var(--obsidian);border:2px solid var(--gold);margin:0 auto;position:relative;z-index:1}
+  .step .card{background:var(--charcoal);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:26px 28px;box-shadow:0 1px 0 var(--gold-dim),0 12px 32px rgba(0,0,0,.5)}
+  .step:nth-child(odd) .card{grid-column:1;text-align:right}
+  .step:nth-child(even) .card{grid-column:3}
+  .step h3{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:8px}
+  .step p{color:var(--muted);font-size:15px}
+  .step .tag{display:inline-block;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:700}
+
+  section{padding:72px 0}
+  h2.sec{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(30px,4.5vw,44px);margin:14px 0 18px}
+  .lead-p{color:var(--muted);max-width:640px;font-size:17px}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:36px}
+  .panel{background:var(--charcoal);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:26px}
+  .panel h4{font-size:16px;font-weight:600;margin-bottom:8px;color:var(--gold-light)}
+  .panel p{color:var(--muted);font-size:14.5px}
+
+  .money{background:linear-gradient(180deg,var(--charcoal),#101012);border:1px solid var(--gold-dim);border-radius:22px;padding:44px 36px;text-align:center;margin-top:40px}
+  .money .big{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,7vw,72px);font-weight:700;color:var(--gold-light);line-height:1}
+  .money .lbl{color:var(--muted);font-size:14px;margin-top:10px}
+  .money .row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-top:28px}
+  .money .row div span{display:block}
+  .money .row .n{font-weight:700;font-size:22px;color:var(--bone)}
+  .money .row .l{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+
+  .built li{list-style:none;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:16px;align-items:flex-start}
+  .built li::before{content:"—";color:var(--gold);font-weight:700;flex-shrink:0}
+  .built b{color:var(--bone)}
+  .built span{color:var(--muted)}
+
+  .math{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:32px}
+  .math .m{background:var(--ink);border-radius:16px;padding:22px;text-align:center}
+  .math .m .v{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--gold-light)}
+  .math .m .k{font-size:12px;color:var(--muted);margin-top:6px}
+
+  footer{padding:64px 0 48px;text-align:center;border-top:1px solid rgba(255,255,255,.06);margin-top:40px}
+  footer .brand{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-light)}
+  footer p{color:var(--muted);font-size:13px;margin-top:8px}
+
+  @media(max-width:720px){
+    .rail::before{left:18px}
+    .step{grid-template-columns:40px 1fr;margin:36px 0}
+    .step .dot{grid-column:1;grid-row:1}
+    .step .card,.step:nth-child(odd) .card{grid-column:2;text-align:left}
+  }
+  @media(prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.in{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <div class="wrap">
+    <span class="lang-brand">SnapLink Contractor</span>
+    <div class="toggle" role="group" aria-label="Language">
+      <button id="btn-en" class="on" onclick="setLang('en')">English</button>
+      <button id="btn-es" onclick="setLang('es')">Español</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <span class="eyebrow lang-en">Built in Atlanta for working contractors</span>
+  <span class="eyebrow lang-es">Hecho en Atlanta para contratistas que trabajan</span>
+
+  <h1 class="lang-en">Every lead you lose<br>was <em>money in your truck.</em></h1>
+  <h1 class="lang-es">Cada cliente que pierdes<br>era <em>dinero en tu troca.</em></h1>
+
+  <p class="sub lang-en">SnapLink Contractor turns one link — on your card, your truck, your NFC tag — into organized project requests with photos, an AI summary, a signed-ready estimate, and a scan-to-pay invoice. In English and Spanish. Money straight to you.</p>
+  <p class="sub lang-es">SnapLink Contractor convierte un solo link — en tu tarjeta, tu troca, tu chip NFC — en solicitudes organizadas con fotos, resumen de IA, un presupuesto listo para firmar y una factura de escanear-para-pagar. En inglés y español. El dinero directo a ti.</p>
+
+  <div class="cta-row">
+    <a class="cta lang-en" href="#pitch">See how it works</a>
+    <a class="cta lang-es" href="#pitch">Mira cómo funciona</a>
+    <a class="cta ghost lang-en" href="https://wa.me/14049925807" target="_blank">WhatsApp us today</a>
+    <a class="cta ghost lang-es" href="https://wa.me/14049925807" target="_blank">Escríbenos por WhatsApp</a>
+  </div>
+</header>
+<div class="gold-rule wrap"></div>
+
+<!-- THE PROBLEM -->
+<section class="wrap reveal" id="pitch">
+  <span class="eyebrow lang-en">The problem you already know</span>
+  <span class="eyebrow lang-es">El problema que ya conoces</span>
+
+  <h2 class="sec display lang-en">Your leads are dying in your voicemail.</h2>
+  <h2 class="sec display lang-es">Tus clientes se están muriendo en tu buzón de voz.</h2>
+
+  <p class="lead-p lang-en">A homeowner calls while you're on a roof. They text photos that get buried under 200 messages. They fill out a Facebook form you check twice a week. By the time you call back, another contractor already gave them a number. You didn't lose that job on price — you lost it on <b>speed and organization</b>.</p>
+  <p class="lead-p lang-es">Un cliente llama mientras estás arriba de un techo. Manda fotos que se pierden entre 200 mensajes. Llena un formulario de Facebook que revisas dos veces por semana. Para cuando le regresas la llamada, otro contratista ya le dio un número. No perdiste ese trabajo por precio — lo perdiste por <b>velocidad y organización</b>.</p>
+
+  <div class="grid2">
+    <div class="panel">
+      <h4 class="lang-en">The old way</h4><h4 class="lang-es">Como se hace ahora</h4>
+      <p class="lang-en">Missed calls. Photo threads in three apps. "What was your address again?" Estimates scribbled on paper, retyped at 11pm, sent as a blurry photo of an invoice pad.</p>
+      <p class="lang-es">Llamadas perdidas. Fotos regadas en tres aplicaciones. "¿Cuál era tu dirección?" Presupuestos garabateados en papel, pasados a limpio a las 11 de la noche, enviados como foto borrosa de una libreta.</p>
+    </div>
+    <div class="panel">
+      <h4 class="lang-en">The SnapLink way</h4><h4 class="lang-es">Con SnapLink</h4>
+      <p class="lang-en">The client taps your link, answers questions built for your trade, uploads photos, and hits send. It lands on your board — sorted, summarized, and ready to quote from your phone.</p>
+      <p class="lang-es">El cliente toca tu link, contesta preguntas hechas para tu oficio, sube fotos y envía. Llega a tu tablero — ordenado, resumido y listo para cotizar desde tu teléfono.</p>
+    </div>
+  </div>
+</section>
+
+<!-- THE LEAD RAIL — signature -->
+<section class="wrap">
+  <span class="eyebrow lang-en">Follow one lead through the machine</span>
+  <span class="eyebrow lang-es">Sigue un cliente por la máquina</span>
+  <h2 class="sec display lang-en">From tap to paid.</h2>
+  <h2 class="sec display lang-es">Del tap al pago.</h2>
+
+  <div class="rail">
+    <div class="step reveal">
+      <div class="card">
+        <span class="tag lang-en">1 · The tap</span><span class="tag lang-es">1 · El tap</span>
+        <h3 class="lang-en">Susan taps your card</h3><h3 class="lang-es">Susan toca tu tarjeta</h3>
+        <p class="lang-en">Your NFC card, QR sticker, or link opens your page: Request Estimate, Call, Text, WhatsApp, photos, reviews. English or Español — her choice, one tap.</p>
+        <p class="lang-es">Tu tarjeta NFC, tu QR o tu link abre tu página: Solicitar Presupuesto, Llamar, Texto, WhatsApp, fotos, reseñas. English o Español — ella elige, con un toque.</p>
+      </div><div class="dot"></div>
+    </div>
+    <div class="step reveal">
+      <div class="dot"></div>
+      <div class="card">
+        <span class="tag lang-en">2 · Trade-smart intake</span><span class="tag lang-es">2 · Preguntas de tu oficio</span>
+        <h3 class="lang-en">Questions built for the trade</h3><h3 class="lang-es">Preguntas hechas para el oficio</h3>
+        <p class="lang-en">Roofing asks about leaks, stories, insurance claims. Flooring asks square footage and who supplies material. 55+ services, 16 trade-specific question sets — she uploads photos of the actual job.</p>
+        <p class="lang-es">Techos pregunta por goteras, pisos y reclamos de seguro. Pisos pregunta pies cuadrados y quién pone el material. Más de 55 servicios, 16 juegos de preguntas por oficio — y sube fotos del trabajo real.</p>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="card">
+        <span class="tag lang-en">3 · Your board</span><span class="tag lang-es">3 · Tu tablero</span>
+        <h3 class="lang-en">It lands organized, not buried</h3><h3 class="lang-es">Llega ordenado, no enterrado</h3>
+        <p class="lang-en">Name, phone, address, timeline, budget, photos — one card on your private board. Statuses from New to Completed. Call, text, or WhatsApp her in one tap.</p>
+        <p class="lang-es">Nombre, teléfono, dirección, plazo, presupuesto, fotos — una tarjeta en tu tablero privado. Estados de Nuevo a Completado. Llámala, textéale o mándale WhatsApp con un toque.</p>
+      </div><div class="dot"></div>
+    </div>
+    <div class="step reveal">
+      <div class="dot"></div>
+      <div class="card">
+        <span class="tag lang-en">4 · The AI works for you</span><span class="tag lang-es">4 · La IA trabaja para ti</span>
+        <h3 class="lang-en">Summary, scope, follow-up — written</h3><h3 class="lang-es">Resumen, alcance, seguimiento — ya escritos</h3>
+        <p class="lang-en">One button: a clean project summary, scope notes, the questions to ask at the walkthrough, and a ready-to-send follow-up text. It reads to you in <b>your</b> language and writes to the client in <b>theirs</b>. And it never invents measurements or prices — anything unknown goes under "Needs Confirmation."</p>
+        <p class="lang-es">Un botón: resumen limpio del proyecto, notas de alcance, las preguntas para la visita y un mensaje de seguimiento listo para enviar. Te lee a ti en <b>tu</b> idioma y le escribe al cliente en <b>el suyo</b>. Y nunca inventa medidas ni precios — lo que no se sabe va en "Por Confirmar."</p>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="card">
+        <span class="tag lang-en">5 · The money moment</span><span class="tag lang-es">5 · El momento del dinero</span>
+        <h3 class="lang-en">Estimate built in two minutes</h3><h3 class="lang-es">Presupuesto armado en dos minutos</h3>
+        <p class="lang-en">A library of 110+ line items for GC and handyman work — your rates, never guessed. Tax, discount, deposit percent, terms, signature line. One tap: a professional branded PDF, in English or Spanish, from the same numbers.</p>
+        <p class="lang-es">Una biblioteca de más de 110 partidas para contratista general y reparaciones — tus tarifas, nunca inventadas. Impuesto, descuento, porcentaje de depósito, términos y línea de firma. Un toque: un PDF profesional con tu marca, en inglés o español, con los mismos números.</p>
+      </div><div class="dot"></div>
+    </div>
+    <div class="step reveal">
+      <div class="dot"></div>
+      <div class="card">
+        <span class="tag lang-en">6 · You get paid</span><span class="tag lang-es">6 · Te pagan</span>
+        <h3 class="lang-en">Deposit collected at the door</h3><h3 class="lang-es">Depósito cobrado en la puerta</h3>
+        <p class="lang-en">The invoice shows exactly how to pay — Zelle, Cash App, Venmo, PayPal, card — with a scan-to-pay QR the homeowner scans right there. You mark it received and the invoice stamps <b>PAID</b>. And the money goes <b>straight to your account, never ours</b> — no fees skimmed, no waiting on a payout.</p>
+        <p class="lang-es">La factura muestra exactamente cómo pagar — Zelle, Cash App, Venmo, PayPal, tarjeta — con un código QR de escanear-para-pagar que el cliente escanea ahí mismo. Lo marcas recibido y la factura sella <b>PAGADO</b>. Y el dinero llega <b>directo a tu cuenta, nunca a la nuestra</b> — sin comisiones, sin esperar un depósito.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="money reveal">
+    <span class="eyebrow lang-en">A real estimate from the system</span>
+    <span class="eyebrow lang-es">Un presupuesto real del sistema</span>
+    <div class="big">$4,611.00</div>
+    <div class="lbl lang-en">300 sq ft paver patio · itemized · 6% tax applied</div>
+    <div class="lbl lang-es">Patio de adoquín de 300 pies² · desglosado · 6% de impuesto</div>
+    <div class="row">
+      <div><span class="n">$1,844.40</span><span class="l lang-en">Deposit due to schedule (40%)</span><span class="l lang-es">Depósito para agendar (40%)</span></div>
+      <div><span class="n">$2,766.60</span><span class="l lang-en">Balance on completion</span><span class="l lang-es">Saldo al terminar</span></div>
+    </div>
+    <p class="lbl lang-en" style="margin-top:22px">That deposit line is the whole point: the client signs, you schedule, money moves. Same PDF available in Spanish — <i>Depósito para agendar</i> — with identical math.</p>
+    <p class="lbl lang-es" style="margin-top:22px">Esa línea de depósito es todo el punto: el cliente firma, tú agendas, el dinero se mueve. El mismo PDF disponible en inglés — con las mismas matemáticas exactas.</p>
+  </div>
+</section>
+
+<!-- BILINGUAL EDGE -->
+<section class="wrap reveal">
+  <span class="eyebrow lang-en">The edge nobody else has</span>
+  <span class="eyebrow lang-es">La ventaja que nadie más tiene</span>
+  <h2 class="sec display lang-en">Truly bilingual — not translated as an afterthought.</h2>
+  <h2 class="sec display lang-es">Bilingüe de verdad — no traducido al aventón.</h2>
+  <p class="lead-p lang-en">The big CRMs treat Spanish like a checkbox. SnapLink was designed around two languages from the first line of code, because that's how Atlanta's trades actually work.</p>
+  <p class="lead-p lang-es">Los CRMs grandes tratan el español como una casilla. SnapLink se diseñó alrededor de dos idiomas desde la primera línea de código, porque así trabaja de verdad el oficio en Atlanta.</p>
+  <div class="grid2">
+    <div class="panel"><h4 class="lang-en">The homeowner picks</h4><h4 class="lang-es">El cliente elige</h4>
+      <p class="lang-en">One toggle on your public page — the whole intake flips to their language, so they answer accurately.</p>
+      <p class="lang-es">Un botón en tu página pública — toda la solicitud cambia a su idioma, y contesta con precisión.</p></div>
+    <div class="panel"><h4 class="lang-en">You pick, separately</h4><h4 class="lang-es">Tú eliges, por separado</h4>
+      <p class="lang-en">Your dashboard, estimator, and AI notes run in your language — flip it yourself anytime, one tap.</p>
+      <p class="lang-es">Tu tablero, tu cotizador y tus notas de IA corren en tu idioma — cámbialo tú mismo cuando quieras, con un toque.</p></div>
+    <div class="panel"><h4 class="lang-en">Documents in both</h4><h4 class="lang-es">Documentos en ambos</h4>
+      <p class="lang-en">Every proposal and estimate PDF generates in English AND Spanish from the same data. Client reads one, your file keeps the other.</p>
+      <p class="lang-es">Cada propuesta y presupuesto PDF se genera en inglés Y español con los mismos datos. El cliente lee uno, tu archivo guarda el otro.</p></div>
+    <div class="panel"><h4 class="lang-en">Never mixed</h4><h4 class="lang-es">Nunca revuelto</h4>
+      <p class="lang-en">A Spanish-dominant contractor reads Spanish scope notes about an English-speaking client, and sends them a perfect English text. Each document in the reader's language.</p>
+      <p class="lang-es">Un contratista que domina el español lee notas en español sobre un cliente que habla inglés, y le manda un texto perfecto en inglés. Cada documento en el idioma de quien lo lee.</p></div>
+  </div>
+</section>
+
+<!-- WHY IT'S SMART -->
+<section class="wrap reveal">
+  <span class="eyebrow lang-en">Why this is the smart move</span>
+  <span class="eyebrow lang-es">Por qué es la jugada inteligente</span>
+  <h2 class="sec display lang-en">Do the math on one saved job.</h2>
+  <h2 class="sec display lang-es">Haz la cuenta de un solo trabajo salvado.</h2>
+  <p class="lead-p lang-en">You don't need this to work miracles. You need it to save the leads you're already generating and cut your quoting time. Both pay for it many times over.</p>
+  <p class="lead-p lang-es">No necesitas que esto haga milagros. Necesitas que salve los clientes que ya estás generando y que recorte tu tiempo de cotización. Las dos cosas lo pagan muchas veces.</p>
+  <div class="math">
+    <div class="m"><div class="v">1</div><div class="k lang-en">saved job per year covers the subscription many times over</div><div class="k lang-es">trabajo salvado al año paga la suscripción muchas veces</div></div>
+    <div class="m"><div class="v">2 min</div><div class="k lang-en">to build a professional estimate instead of an evening at the kitchen table</div><div class="k lang-es">para armar un presupuesto profesional en vez de una noche en la mesa de la cocina</div></div>
+    <div class="m"><div class="v">5 min</div><div class="k lang-en">response beats a same-day callback — speed wins jobs</div><div class="k lang-es">de respuesta le gana a devolver la llamada en el día — la velocidad gana trabajos</div></div>
+    <div class="m"><div class="v">2×</div><div class="k lang-en">your reachable market when Spanish-speaking homeowners can actually submit</div><div class="k lang-es">tu mercado alcanzable cuando los clientes hispanohablantes de verdad pueden solicitar</div></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h4 class="lang-en">It also makes you look bigger</h4><h4 class="lang-es">También te hace ver más grande</h4>
+      <p class="lang-en">A branded intake page, an organized process, and a clean PDF with a signature line and deposit terms reads like a company — not a guy with a truck. Homeowners pay more for confidence.</p>
+      <p class="lang-es">Una página con tu marca, un proceso ordenado y un PDF limpio con línea de firma y términos de depósito se ve como una empresa — no como un señor con una troca. Los clientes pagan más por confianza.</p></div>
+    <div class="panel"><h4 class="lang-en">And it protects you</h4><h4 class="lang-es">Y te protege</h4>
+      <p class="lang-en">Written scope, "Needs Confirmation" items, change-order terms, and a client signature — on every estimate, in the client's language. Fewer misunderstandings, fewer unpaid extras.</p>
+      <p class="lang-es">Alcance por escrito, puntos "Por Confirmar", términos de órdenes de cambio y firma del cliente — en cada presupuesto, en el idioma del cliente. Menos malentendidos, menos extras sin cobrar.</p></div>
+    <div class="panel"><h4 class="lang-en">A deposit at the door beats "let me think about it"</h4><h4 class="lang-es">Un depósito en la puerta le gana a "déjame pensarlo"</h4>
+      <p class="lang-en">The scan-to-pay QR turns a maybe into a booked job right on the porch. Collect the deposit while you're standing there — that's the difference between a scheduled job and a lead that goes cold.</p>
+      <p class="lang-es">El código QR de escanear-para-pagar convierte un "tal vez" en un trabajo agendado ahí mismo en la puerta. Cobra el depósito mientras estás parado enfrente — esa es la diferencia entre un trabajo agendado y un cliente que se enfría.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WAS BUILT -->
+<section class="wrap reveal">
+  <span class="eyebrow lang-en">How it was built</span>
+  <span class="eyebrow lang-es">Cómo fue construido</span>
+  <h2 class="sec display lang-en">Built like a kitchen line: tested before it serves.</h2>
+  <h2 class="sec display lang-es">Construido como una línea de cocina: probado antes de servir.</h2>
+  <p class="lead-p lang-en">SnapLink Contractor was built by Southline One in Alpharetta — by a founder with 38 years running professional kitchens, where a system either holds during the rush or it doesn't exist. The same standard applies here.</p>
+  <p class="lead-p lang-es">SnapLink Contractor fue construido por Southline One en Alpharetta — por un fundador con 38 años dirigiendo cocinas profesionales, donde un sistema aguanta la hora pico o no existe. Aquí aplica el mismo estándar.</p>
+  <ul class="built">
+    <li><div><b class="lang-en">Your data is yours alone.</b><b class="lang-es">Tus datos son solo tuyos.</b> <span class="lang-en">Every contractor gets a private, PIN-protected board. Cross-access between contractors is rejected at the server — tested, not promised.</span><span class="lang-es">Cada contratista tiene un tablero privado protegido con PIN. El acceso cruzado entre contratistas se rechaza en el servidor — probado, no prometido.</span></div></li>
+    <li><div><b class="lang-en">The AI never invents your numbers.</b><b class="lang-es">La IA nunca inventa tus números.</b> <span class="lang-en">No made-up measurements, no made-up prices. Rates come from you; unknowns are flagged for the walkthrough.</span><span class="lang-es">Nada de medidas inventadas ni precios inventados. Las tarifas las pones tú; lo desconocido se marca para la visita.</span></div></li>
+    <li><div><b class="lang-en">The money is yours — every cent.</b><b class="lang-es">El dinero es tuyo — hasta el último centavo.</b> <span class="lang-en">SnapLink never touches your payments. It shows your methods, generates the pay QR, and keeps the tally — the deposit and balance go straight to your Zelle, Cash App, or bank account. No fees skimmed, no payout delay.</span><span class="lang-es">SnapLink nunca toca tus pagos. Muestra tus métodos, genera el QR de pago y lleva la cuenta — el depósito y el saldo llegan directo a tu Zelle, Cash App o cuenta bancaria. Sin comisiones, sin retrasos de depósito.</span></div></li>
+    <li><div><b class="lang-en">Verified to the penny.</b><b class="lang-es">Verificado al centavo.</b> <span class="lang-en">Estimate math — subtotals, tax, deposits, balances — is tested against real database infrastructure before any client touches it.</span><span class="lang-es">Las matemáticas del presupuesto — subtotales, impuesto, depósitos, saldos — se prueban contra infraestructura de base de datos real antes de que un cliente la toque.</span></div></li>
+    <li><div><b class="lang-en">Modern, fast, mobile-first.</b><b class="lang-es">Moderno, rápido, primero-móvil.</b> <span class="lang-en">Built on the same web stack used by leading tech companies (Next.js + Postgres), designed for a phone in a work glove.</span><span class="lang-es">Construido con la misma tecnología web que usan las empresas líderes (Next.js + Postgres), diseñado para un teléfono en una mano con guante de trabajo.</span></div></li>
+    <li><div><b class="lang-en">Backed by a real local operator.</b><b class="lang-es">Respaldado por un operador local real.</b> <span class="lang-en">When you call, you get the person who built it — not a ticket queue. PIN resets and support are a phone call to Southline One.</span><span class="lang-es">Cuando llamas, contesta la persona que lo construyó — no una fila de tickets. Los cambios de PIN y el soporte son una llamada a Southline One.</span></div></li>
+  </ul>
+</section>
+
+<!-- FINAL CTA -->
+<section class="wrap reveal" style="text-align:center">
+  <div class="gold-rule" style="margin-bottom:56px"></div>
+  <h2 class="sec display lang-en">Your next lead is already reaching for their phone.</h2>
+  <h2 class="sec display lang-es">Tu próximo cliente ya está agarrando su teléfono.</h2>
+  <p class="lead-p lang-en" style="margin:0 auto 34px">Get your page live this week: your services, your brand, your NFC card, your private board. Set up and onboarded personally by Southline One.</p>
+  <p class="lead-p lang-es" style="margin:0 auto 34px">Ten tu página activa esta semana: tus servicios, tu marca, tu tarjeta NFC, tu tablero privado. Instalado y configurado personalmente por Southline One.</p>
+  <div class="cta-row">
+    <a class="cta lang-en" href="https://wa.me/14049925807" target="_blank">Get my SnapLink — WhatsApp</a>
+    <a class="cta lang-es" href="https://wa.me/14049925807" target="_blank">Quiero mi SnapLink — WhatsApp</a>
+    <a class="cta ghost" href="tel:+14708358620">📞 470-835-8620</a>
+  </div>
+</section>
+
+<footer>
+  <div class="brand">Southline One Digital Media</div>
+  <p class="lang-en">SnapLink Contractor · Built in Alpharetta, Georgia · Hablamos español</p>
+  <p class="lang-es">SnapLink Contractor · Hecho en Alpharetta, Georgia · We speak English</p>
+</footer>
+
+<script>
+  function setLang(l){
+    document.body.classList.toggle('es', l==='es');
+    document.documentElement.lang = l;
+    document.getElementById('btn-en').classList.toggle('on', l==='en');
+    document.getElementById('btn-es').classList.toggle('on', l==='es');
+  }
+  // scroll reveals (respects reduced motion via CSS gating)
+  const io = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
