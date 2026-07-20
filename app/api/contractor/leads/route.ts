@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { leadStore, newId } from "@/lib/store";
 import { contractorStore } from "@/lib/store";
 import { pinFromRequest, isOperator, canAccessContractor } from "@/lib/auth";
+import { notifyNewLead } from "@/lib/notify";
 import type { Lead, Photo } from "@/lib/types";
 
 export async function GET(req: NextRequest) {
@@ -68,5 +69,6 @@ export async function POST(req: NextRequest) {
   };
 
   await leadStore.create(lead);
+  after(() => notifyNewLead(contractor, lead));
   return NextResponse.json({ ok: true, leadId: lead.id });
 }
