@@ -14,7 +14,7 @@ export const metadata: Metadata = {
       "Client intake, AI summaries, and estimate PDFs — in English & Español. Built by Southline One Digital Media, Alpharetta GA.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "SnapLink Contractor by Southline One Digital Media — Alpharetta, GA",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SnapLink Contractor — Stop losing leads. Get paid faster.",
     description: "Client intake, AI summaries, and estimate PDFs — in English & Español.",
-    images: ["/og-image.png"],
+    images: ["/og-image.jpg"],
   },
 };
 
