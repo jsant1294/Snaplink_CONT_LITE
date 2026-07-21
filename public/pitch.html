@@ -54,6 +54,13 @@
   .cta.ghost{background:none;border:1px solid var(--gold-dim);color:var(--gold-light)}
   .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
+  .hero-visual{margin-top:56px;border-radius:24px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,.08);box-shadow:0 1px 0 var(--gold-dim),0 24px 60px rgba(0,0,0,.55)}
+  .hero-visual img{width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover;object-position:68% 38%}
+  .hero-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,0) 60%,rgba(10,10,10,.5) 100%);pointer-events:none}
+  @media(max-width:640px){
+    .hero-visual img{aspect-ratio:3/4;object-position:75% 28%}
+  }
+
   /* the lead rail — signature element */
   .rail{position:relative;padding:40px 0}
   .rail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--gold) 8%,var(--gold) 92%,transparent)}
@@ -137,6 +144,11 @@
     <a class="cta lang-es" href="#pitch">Mira cómo funciona</a>
     <a class="cta ghost lang-en" href="https://wa.me/14049925807" target="_blank">WhatsApp us today</a>
     <a class="cta ghost lang-es" href="https://wa.me/14049925807" target="_blank">Escríbenos por WhatsApp</a>
+  </div>
+
+  <div class="hero-visual reveal">
+    <img src="/hero-contractor.jpg" width="1672" height="941" loading="eager" fetchpriority="high"
+      alt="Contractor checking a new SnapLink lead on his phone at a job site">
   </div>
 </header>
 <div class="gold-rule wrap"></div>
