@@ -100,7 +100,22 @@ export default function Estimator({ leadId }: { leadId: string }) {
     })();
   }, [leadId]);
 
-  const lang: Lang = contractor?.preferredLanguage ?? "en";
+  const [lang, setLang] = useState<Lang>("en");
+  useEffect(() => {
+    if (contractor) setLang(contractor.preferredLanguage);
+  }, [contractor]);
+
+  function switchLanguage(next: Lang) {
+    setLang(next); // flips this page instantly
+    if (contractor && pin) {
+      // Persist so the dashboard + future visits follow. Best-effort.
+      fetch("/api/contractor/profiles", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-snaplink-pin": pin },
+        body: JSON.stringify({ contractorId: contractor.id, preferredLanguage: next }),
+      }).catch(() => {});
+    }
+  }
 
   const results = useMemo(() => searchItems(query, category).slice(0, 24), [query, category]);
   const totals = useMemo(
@@ -204,6 +219,22 @@ export default function Estimator({ leadId }: { leadId: string }) {
             </p>
           )}
         </div>
+        {contractor && (
+          <div className="inline-flex rounded-full border border-white/15 overflow-hidden text-xs">
+            <button
+              onClick={() => switchLanguage("en")}
+              className={`px-3 py-1.5 ${lang === "en" ? "bg-gold text-obsidian font-semibold" : "text-muted"}`}
+            >
+              English
+            </button>
+            <button
+              onClick={() => switchLanguage("es")}
+              className={`px-3 py-1.5 ${lang === "es" ? "bg-gold text-obsidian font-semibold" : "text-muted"}`}
+            >
+              Español
+            </button>
+          </div>
+        )}
       </div>
 
       {error && <div className="card border-danger/40 p-3 mb-4 text-sm text-danger">{error}</div>}
