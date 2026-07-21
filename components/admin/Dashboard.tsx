@@ -80,7 +80,13 @@ export function PinGate({
 
   useEffect(() => {
     const saved = storedPin(username);
-    if (saved) verify(saved, true);
+    if (saved) {
+      verify(saved, true);
+      return;
+    }
+    // ?pin= lets a shared link (demo, PDF, etc.) open straight into the dashboard.
+    const urlPin = new URLSearchParams(window.location.search).get("pin");
+    if (urlPin && /^\d{6}$/.test(urlPin)) verify(urlPin, true);
     else setRestored(true);
   }, [username, verify]);
 
