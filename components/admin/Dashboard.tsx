@@ -250,6 +250,17 @@ export default function Dashboard({
             + New Contractor
           </a>
         )}
+        {mode === "master" && (
+          <a
+            href="/pitch"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline !py-2 text-sm"
+            title="The bilingual sales page you hand to prospects"
+          >
+            Pitch page ↗
+          </a>
+        )}
         {mode === "scoped" && contractor && (
           <a
             href={`/contractor-admin/${contractor.username}/money`}
