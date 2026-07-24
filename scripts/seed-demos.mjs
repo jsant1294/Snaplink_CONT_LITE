@@ -1,6 +1,13 @@
 // Optional: seed the two demo contractors into Postgres.
 //   DATABASE_URL=... node scripts/seed-demos.mjs
+import "dotenv/config";
 import pg from "pg";
+
+const DB_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
+if (!DB_URL) {
+  console.error("No DATABASE_URL (or POSTGRES_URL) set. Add it to .env or pass it inline.");
+  process.exit(1);
+}
 
 const demos = [
   ["ctr_demo", "demo", "111111", "es", "Alpharetta Pro Remodeling", "Miguel Torres", "+16785550142", "+16785550142", "estimates@alpharettapro.com", "Alpharetta · Roswell · Cumming · Johns Creek", JSON.stringify(["Kitchen Remodel","Bathroom Remodel","Flooring","Interior Painting","Countertops","Tile Work","Drywall Install / Repair","Handyman Repair"]), "Licensed & insured. Free estimates. Hablamos español.", "GA Lic. #RBQA-004512 · Fully insured"],
@@ -8,8 +15,8 @@ const demos = [
 ];
 
 const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes("localhost") ? undefined : { rejectUnauthorized: false },
+  connectionString: DB_URL,
+  ssl: /localhost|127\.0\.0\.1/.test(DB_URL) ? undefined : { rejectUnauthorized: false },
 });
 for (const d of demos) {
   await pool.query(

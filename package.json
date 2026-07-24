@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push",
-    "db:seed": "node scripts/seed-demos.mjs"
+    "db:seed": "node scripts/seed-demos.mjs",
+    "db:seed:categories": "node scripts/seed-categories.mjs",
+    "db:seed:demo": "node scripts/seed-demo-ridgeline.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.5.0",

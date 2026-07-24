@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Contractor, Lead, LeadStatus } from "@/lib/types";
 import { LEAD_STATUSES } from "@/lib/types";
 import { serviceLabel } from "@/lib/services";
-import { at, statusLabel, type Lang } from "@/lib/i18n";
+import { at, mt, statusLabel, type Lang } from "@/lib/i18n";
 import { totalPaid } from "@/lib/types";
 
 const STATUS_COLORS: Record<LeadStatus, string> = {
@@ -248,6 +248,14 @@ export default function Dashboard({
         {mode === "master" && (
           <a href="/contractor-admin/new-contractor" className="btn-gold !py-2 text-sm">
             + New Contractor
+          </a>
+        )}
+        {mode === "scoped" && contractor && (
+          <a
+            href={`/contractor-admin/${contractor.username}/money`}
+            className="btn-outline !py-2 text-sm"
+          >
+            {mt("moneyTab", lang)}
           </a>
         )}
         {mode === "scoped" && (

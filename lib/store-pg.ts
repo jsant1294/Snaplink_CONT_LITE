@@ -10,14 +10,15 @@ import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { eq, desc } from "drizzle-orm";
 import { contractors, leads, photos, estimates } from "./db/schema";
 import type { Lead, LeadStatus, AiSummary, Contractor, Estimate, Photo, Payment, PaymentMethods } from "./types";
+import { databaseUrl, sslConfig } from "./db-url";
 
 let _db: NodePgDatabase | null = null;
 
 function db(): NodePgDatabase {
   if (!_db) {
     const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DATABASE_URL?.includes("localhost") ? undefined : { rejectUnauthorized: false },
+      connectionString: databaseUrl,
+      ssl: sslConfig,
       max: 5,
     });
     _db = drizzle(pool);
@@ -25,7 +26,7 @@ function db(): NodePgDatabase {
   return _db;
 }
 
-async function maybeUploadToBlob(photo: { dataUrl: string; filename: string }, leadId: string): Promise<string> {
+export async function maybeUploadToBlob(photo: { dataUrl: string; filename: string }, leadId: string): Promise<string> {
   if (!process.env.BLOB_READ_WRITE_TOKEN || !photo.dataUrl.startsWith("data:")) {
     return photo.dataUrl;
   }

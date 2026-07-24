@@ -219,3 +219,249 @@ export const STATUS_LABELS_ES: Record<string, string> = {
 export function statusLabel(status: string, lang: Lang): string {
   return lang === "es" ? STATUS_LABELS_ES[status] ?? status : status;
 }
+
+// --- Lucio Financial Copilot (money module) ---------------------------------
+// Contractor-facing. Renders in the contractor's preferredLanguage.
+
+export const MONEY = {
+  moneyTab: { en: "Money", es: "Dinero" },
+  moneyTitle: { en: "Money", es: "Dinero" },
+  poweredByLfc: { en: "Powered by Lucio Financial Copilot", es: "Con tecnología de Lucio Financial Copilot" },
+  backToLeads: { en: "← Leads", es: "← Prospectos" },
+  thisYear: { en: "Year", es: "Año" },
+
+  // Summary
+  incomeYtd: { en: "Income received", es: "Ingreso recibido" },
+  overheadYtd: { en: "Business expenses", es: "Gastos del negocio" },
+  materialsYtd: { en: "Job materials", es: "Materiales de trabajos" },
+  netYtd: { en: "Net", es: "Neto" },
+  setAside: { en: "Suggested set-aside", es: "Apartado sugerido" },
+  setAsideHelp: { en: "You choose this percent. Confirm it with your tax professional.", es: "Tú eliges este porcentaje. Confírmalo con tu profesional de impuestos." },
+  unbilledMaterials: { en: "Materials not yet billed", es: "Materiales sin cobrar" },
+  unbilledHelp: { en: "Job materials you may still need to charge the client.", es: "Materiales que quizá aún debes cobrarle al cliente." },
+  byCategory: { en: "By category", es: "Por categoría" },
+
+  // Add expense
+  addExpense: { en: "Add expense", es: "Agregar gasto" },
+  amount: { en: "Amount", es: "Monto" },
+  date: { en: "Date", es: "Fecha" },
+  vendor: { en: "Vendor / store", es: "Proveedor / tienda" },
+  vendorPlaceholder: { en: "e.g. Home Depot", es: "ej. Home Depot" },
+  category: { en: "Category", es: "Categoría" },
+  note: { en: "Note", es: "Nota" },
+  notePlaceholder: { en: "Optional", es: "Opcional" },
+  receipt: { en: "Receipt photo", es: "Foto del recibo" },
+  takePhoto: { en: "Tap to take or choose a photo", es: "Toca para tomar o elegir una foto" },
+  removePhoto: { en: "Remove photo", es: "Quitar foto" },
+  jobOrOverhead: { en: "What kind of expense?", es: "¿Qué tipo de gasto?" },
+  jobMaterial: { en: "Job material (bill the client)", es: "Material de trabajo (se le cobra al cliente)" },
+  overhead: { en: "Business expense (deduction)", es: "Gasto del negocio (deducción)" },
+  whichJob: { en: "Which job?", es: "¿Cuál trabajo?" },
+  pickJob: { en: "Pick a job", es: "Elige un trabajo" },
+  save: { en: "Save expense", es: "Guardar gasto" },
+  saving: { en: "Saving…", es: "Guardando…" },
+  saved: { en: "Expense saved", es: "Gasto guardado" },
+  cancel: { en: "Cancel", es: "Cancelar" },
+
+  // List
+  expenses: { en: "Expenses", es: "Gastos" },
+  noExpenses: { en: "No expenses logged yet. Add your first one above.", es: "Aún no hay gastos. Agrega el primero arriba." },
+  loading: { en: "Loading…", es: "Cargando…" },
+  deleteExpense: { en: "Delete", es: "Borrar" },
+  confirmDelete: { en: "Delete this expense?", es: "¿Borrar este gasto?" },
+  deleted: { en: "Expense deleted", es: "Gasto borrado" },
+  billedToClient: { en: "Billed", es: "Cobrado" },
+  notBilled: { en: "Not billed", es: "Sin cobrar" },
+  markBilled: { en: "Mark billed", es: "Marcar cobrado" },
+  markUnbilled: { en: "Mark not billed", es: "Marcar sin cobrar" },
+  viewReceipt: { en: "Receipt", es: "Recibo" },
+
+  // Tax settings
+  taxSettings: { en: "Tax settings", es: "Ajustes de impuestos" },
+  entityType: { en: "Business type", es: "Tipo de negocio" },
+  soleProp: { en: "Sole proprietor", es: "Propietario único" },
+  llcSingle: { en: "LLC — single owner", es: "LLC — un solo dueño" },
+  llcMulti: { en: "LLC — multiple owners", es: "LLC — varios dueños" },
+  sCorp: { en: "S-Corp", es: "S-Corp" },
+  setAsidePercent: { en: "Set-aside percent", es: "Porcentaje a apartar" },
+  businessLegalName: { en: "Legal business name", es: "Nombre legal del negocio" },
+  settingsSaved: { en: "Settings saved", es: "Ajustes guardados" },
+
+  // Disclaimer — required, both languages
+  disclaimerTitle: { en: "Record-keeping, not tax advice", es: "Registro de gastos, no asesoría fiscal" },
+  disclaimerBody: {
+    en: "This organizes your records and estimates what to set aside. It does not file taxes and is not tax advice. Confirm your numbers with a licensed tax professional.",
+    es: "Esto organiza tus registros y estima cuánto apartar. No presenta impuestos y no es asesoría fiscal. Confirma tus números con un profesional de impuestos con licencia.",
+  },
+} as const;
+
+export function mt(key: keyof typeof MONEY, lang: Lang): string {
+  return MONEY[key][lang];
+}
+
+// --- LFC: batch receipt capture ---------------------------------------------
+
+export const BATCH = {
+  batchReceipts: { en: "Batch receipts", es: "Recibos en lote" },
+  batchTitle: { en: "Catch up on your receipt pile", es: "Ponte al día con tu montón de recibos" },
+  batchIntro: {
+    en: "Pick all your receipt photos at once. We'll read each one and fill in what we can — you check the numbers and save.",
+    es: "Elige todas las fotos de tus recibos de una vez. Leemos cada una y llenamos lo que podamos — tú revisas los números y guardas.",
+  },
+  choosePhotos: { en: "Choose receipt photos", es: "Elegir fotos de recibos" },
+  addMore: { en: "Add more photos", es: "Agregar más fotos" },
+  scanning: { en: "Reading…", es: "Leyendo…" },
+  readyToConfirm: { en: "Check & save", es: "Revisa y guarda" },
+  savedItem: { en: "Saved", es: "Guardado" },
+  couldNotRead: { en: "Couldn't read it — type the fields", es: "No se pudo leer — escribe los datos" },
+  readBy: { en: "Read by", es: "Leído por" },
+  alwaysCheck: {
+    en: "Always check the amount before saving. The reader can be wrong.",
+    es: "Siempre revisa el monto antes de guardar. El lector se puede equivocar.",
+  },
+  saveThis: { en: "Save", es: "Guardar" },
+  skipThis: { en: "Remove", es: "Quitar" },
+  saveAllReady: { en: "Save all checked", es: "Guardar todos los revisados" },
+  batchDone: { en: "receipts saved", es: "recibos guardados" },
+  queueEmpty: { en: "No receipts in the queue yet.", es: "Aún no hay recibos en la fila." },
+  closeBatch: { en: "Done", es: "Listo" },
+  needAmount: { en: "Amount required", es: "Falta el monto" },
+  ofCount: { en: "of", es: "de" },
+} as const;
+
+export function bt(key: keyof typeof BATCH, lang: Lang): string {
+  return BATCH[key][lang];
+}
+
+// --- LFC Delivery 2: 1099s & subcontractors ---------------------------------
+
+export const FORMS = {
+  subs1099: { en: "Subs & 1099s", es: "Subs y 1099" },
+  title: { en: "Subcontractors & 1099s", es: "Subcontratistas y 1099" },
+  intro: {
+    en: "Track who you pay and who pays you, so January isn't a scramble.",
+    es: "Lleva cuenta de a quién le pagas y quién te paga, para que enero no sea una carrera.",
+  },
+  // Payees
+  whoIPay: { en: "Who I pay", es: "A quién le pago" },
+  addPayee: { en: "Add subcontractor", es: "Agregar subcontratista" },
+  payeeName: { en: "Name", es: "Nombre" },
+  payeeNamePh: { en: "Person or company", es: "Persona o empresa" },
+  payeeType: { en: "Type", es: "Tipo" },
+  individual: { en: "Individual", es: "Persona física" },
+  business: { en: "Business", es: "Empresa" },
+  legalName: { en: "Legal name (if different)", es: "Nombre legal (si es distinto)" },
+  address: { en: "Address", es: "Dirección" },
+  tinType: { en: "ID type", es: "Tipo de identificación" },
+  ssn: { en: "SSN", es: "SSN" },
+  ein: { en: "EIN", es: "EIN" },
+  unknown: { en: "Not sure", es: "No sé" },
+  tinLast4: { en: "Last 4 digits only", es: "Solo los últimos 4 dígitos" },
+  tinWarning: {
+    en: "Never type a full SSN or EIN here. Only the last 4 digits are stored — upload the W-9 for the full number.",
+    es: "Nunca escribas un SSN o EIN completo aquí. Solo se guardan los últimos 4 dígitos — sube el W-9 para el número completo.",
+  },
+  w9: { en: "W-9", es: "W-9" },
+  w9OnFile: { en: "W-9 on file", es: "W-9 en archivo" },
+  w9Missing: { en: "No W-9", es: "Sin W-9" },
+  uploadW9: { en: "Upload W-9 photo", es: "Subir foto del W-9" },
+  viewW9: { en: "View W-9", es: "Ver W-9" },
+  paidThisYear: { en: "Paid this year", es: "Pagado este año" },
+  needsW9Alert: { en: "Over threshold, no W-9", es: "Pasa el umbral, sin W-9" },
+  needsW9Help: {
+    en: "You've paid this person enough that a 1099 is likely required. Get a W-9 before January.",
+    es: "Le has pagado lo suficiente para que probablemente se requiera un 1099. Consigue un W-9 antes de enero.",
+  },
+  thresholdLabel: { en: "1099 alert at", es: "Alerta de 1099 a partir de" },
+  thresholdHelp: {
+    en: "You set this amount. Confirm the current filing threshold with your accountant.",
+    es: "Tú defines este monto. Confirma el umbral actual con tu contador.",
+  },
+  noPayees: { en: "No subcontractors added yet.", es: "Aún no hay subcontratistas." },
+  // 1099s received
+  whoPaysMe: { en: "1099s I received", es: "1099 que recibí" },
+  add1099: { en: "Add a 1099 I received", es: "Agregar un 1099 que recibí" },
+  issuer: { en: "Who issued it", es: "Quién lo emitió" },
+  issuerPh: { en: "Company or GC name", es: "Nombre de la empresa o contratista" },
+  formType: { en: "Form type", es: "Tipo de forma" },
+  taxYear: { en: "Tax year", es: "Año fiscal" },
+  amountOnForm: { en: "Amount on the form", es: "Monto en la forma" },
+  uploadForm: { en: "Upload photo of the form", es: "Subir foto de la forma" },
+  viewForm: { en: "View form", es: "Ver forma" },
+  no1099s: { en: "No 1099s recorded for this year.", es: "No hay 1099 registrados para este año." },
+  // Reconciliation
+  reconcile: { en: "Does it match your records?", es: "¿Cuadra con tus registros?" },
+  total1099s: { en: "Total on 1099s received", es: "Total en los 1099 recibidos" },
+  yourRecords: { en: "Income you recorded", es: "Ingreso que registraste" },
+  difference: { en: "Difference", es: "Diferencia" },
+  matchOk: { en: "These line up.", es: "Esto cuadra." },
+  matchOff: {
+    en: "These don't match. Find out why before you file — bring it to your accountant.",
+    es: "Esto no cuadra. Averigua por qué antes de declarar — llévalo a tu contador.",
+  },
+  // shared
+  save: { en: "Save", es: "Guardar" },
+  saving: { en: "Saving…", es: "Guardando…" },
+  cancel: { en: "Cancel", es: "Cancelar" },
+  remove: { en: "Remove", es: "Quitar" },
+  confirmRemove: { en: "Remove this entry?", es: "¿Quitar este registro?" },
+  notes: { en: "Notes", es: "Notas" },
+  optional: { en: "Optional", es: "Opcional" },
+  close: { en: "Done", es: "Listo" },
+} as const;
+
+export function ft(key: keyof typeof FORMS, lang: Lang): string {
+  return FORMS[key][lang];
+}
+
+// --- LFC Delivery 3: quarterly + year-end -----------------------------------
+
+export const QTR = {
+  quarterlyTab: { en: "Quarterly & year-end", es: "Trimestral y fin de año" },
+  title: { en: "Staying current", es: "Mantenerte al corriente" },
+  intro: {
+    en: "What you made each quarter, what to set aside, and what you actually moved.",
+    es: "Lo que ganaste cada trimestre, cuánto apartar y cuánto realmente moviste.",
+  },
+  quarter: { en: "Quarter", es: "Trimestre" },
+  period: { en: "Period", es: "Periodo" },
+  income: { en: "Income", es: "Ingreso" },
+  expenses: { en: "Expenses", es: "Gastos" },
+  net: { en: "Net", es: "Neto" },
+  suggested: { en: "Suggested", es: "Sugerido" },
+  actuallySetAside: { en: "You set aside", es: "Apartaste" },
+  shortfall: { en: "Short", es: "Falta" },
+  caughtUp: { en: "Caught up", es: "Al corriente" },
+  typicalDue: { en: "Typical date", es: "Fecha típica" },
+  dueDateWarning: {
+    en: "Dates shown are typical federal estimated-payment dates and can shift. Confirm your actual dates and amounts with your tax professional.",
+    es: "Las fechas mostradas son las típicas de pagos estimados federales y pueden cambiar. Confirma tus fechas y montos reales con tu profesional de impuestos.",
+  },
+  logSetAside: { en: "Log money set aside", es: "Registrar dinero apartado" },
+  amount: { en: "Amount", es: "Monto" },
+  whichQuarter: { en: "Which quarter", es: "Cuál trimestre" },
+  dateMoved: { en: "Date moved", es: "Fecha que lo moviste" },
+  note: { en: "Note", es: "Nota" },
+  save: { en: "Save", es: "Guardar" },
+  saving: { en: "Saving…", es: "Guardando…" },
+  cancel: { en: "Cancel", es: "Cancelar" },
+  history: { en: "Set-aside history", es: "Historial de apartados" },
+  noSetAsides: { en: "Nothing logged yet.", es: "Aún no hay registros." },
+  remove: { en: "Remove", es: "Quitar" },
+  confirmRemove: { en: "Remove this entry?", es: "¿Quitar este registro?" },
+  yearTotals: { en: "Year totals", es: "Totales del año" },
+  yearEnd: { en: "Year-end pack for your accountant", es: "Paquete de fin de año para tu contador" },
+  yearEndNote: {
+    en: "A summary of your records plus a spreadsheet of every expense. Hand both to your accountant.",
+    es: "Un resumen de tus registros más una hoja de cálculo con cada gasto. Entrega ambos a tu contador.",
+  },
+  downloadPdfEn: { en: "Summary PDF (English)", es: "PDF resumen (inglés)" },
+  downloadPdfEs: { en: "Summary PDF (Spanish)", es: "PDF resumen (español)" },
+  downloadCsv: { en: "Expenses spreadsheet (CSV)", es: "Hoja de gastos (CSV)" },
+  close: { en: "Done", es: "Listo" },
+  loading: { en: "Loading…", es: "Cargando…" },
+} as const;
+
+export function qt(key: keyof typeof QTR, lang: Lang): string {
+  return QTR[key][lang];
+}
