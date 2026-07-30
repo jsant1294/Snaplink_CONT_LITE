@@ -14,6 +14,8 @@ import {
   jsonb,
   uniqueIndex,
   index,
+  boolean,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const contractors = pgTable(
@@ -113,6 +115,86 @@ export const estimates = pgTable(
       .defaultNow(),
   },
   (t) => [uniqueIndex("estimates_lead_idx").on(t.leadId)]
+);
+
+// ---------------------------------------------------------------------------
+// SnapLink Real Estate — Phase 2 property management.
+//
+// Tenant/organization/brokerage/agent parent tables are intentionally not
+// part of this migration. Their IDs are indexed relationship fields until
+// those approved modules introduce the owning tables. Property media has a
+// real FK because its parent exists in this migration.
+// ---------------------------------------------------------------------------
+
+export const realEstateProperties = pgTable(
+  "real_estate_properties",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    organizationId: text("organization_id").notNull(),
+    brokerageId: text("brokerage_id").notNull(),
+    listingAgentId: text("listing_agent_id").notNull(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull(),
+    propertyType: text("property_type").notNull(),
+    propertyStatus: text("property_status").notNull().default("draft"),
+    addressLine1: text("address_line_1").notNull(),
+    addressLine2: text("address_line_2"),
+    city: text("city").notNull(),
+    state: text("state").notNull(),
+    postalCode: text("postal_code").notNull(),
+    country: text("country").notNull().default("US"),
+    priceCents: integer("price_cents").notNull().default(0),
+    bedrooms: real("bedrooms").notNull().default(0),
+    bathrooms: real("bathrooms").notNull().default(0),
+    squareFeet: integer("square_feet").notNull().default(0),
+    lotSize: text("lot_size"),
+    yearBuilt: integer("year_built"),
+    shortDescription: text("short_description").notNull().default(""),
+    description: text("description").notNull().default(""),
+    amenities: jsonb("amenities").$type<string[]>().notNull().default([]),
+    features: jsonb("features").$type<string[]>().notNull().default([]),
+    heroImage: text("hero_image"),
+    publishedAt: timestamp("published_at", { withTimezone: true, mode: "string" }),
+    isPublished: boolean("is_published").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    unique("real_estate_properties_tenant_slug_unique").on(t.tenantId, t.slug),
+    index("real_estate_properties_tenant_idx").on(t.tenantId),
+    index("real_estate_properties_org_idx").on(t.organizationId),
+    index("real_estate_properties_brokerage_idx").on(t.brokerageId),
+    index("real_estate_properties_agent_idx").on(t.listingAgentId),
+    index("real_estate_properties_published_idx").on(t.isPublished),
+    index("real_estate_properties_status_idx").on(t.propertyStatus),
+    index("real_estate_properties_deleted_idx").on(t.deletedAt),
+  ]
+);
+
+export const realEstatePropertyMedia = pgTable(
+  "real_estate_property_media",
+  {
+    id: text("id").primaryKey(),
+    propertyId: text("property_id").notNull().references(() => realEstateProperties.id, { onDelete: "cascade" }),
+    tenantId: text("tenant_id").notNull(),
+    mediaType: text("media_type").notNull().default("image"),
+    url: text("url").notNull(),
+    filename: text("filename").notNull().default("property-image.jpg"),
+    altText: text("alt_text").notNull().default(""),
+    sortOrder: integer("sort_order").notNull().default(0),
+    isHero: boolean("is_hero").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    index("real_estate_property_media_property_idx").on(t.propertyId),
+    index("real_estate_property_media_tenant_idx").on(t.tenantId),
+    index("real_estate_property_media_sort_idx").on(t.propertyId, t.sortOrder),
+    index("real_estate_property_media_deleted_idx").on(t.deletedAt),
+  ]
 );
 
 // ---------------------------------------------------------------------------

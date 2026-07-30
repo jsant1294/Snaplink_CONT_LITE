@@ -10,6 +10,7 @@ import TrendingSection from "@/components/southline/TrendingSection";
 import Footer from "@/components/southline/Footer";
 import FeaturedProfessionals from "@/components/southline/FeaturedProfessionals";
 import CommunitySpotlight from "@/components/southline/CommunitySpotlight";
+import RealEstateDiscovery from "@/components/southline/RealEstateDiscovery";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,7 @@ export default async function HomePage() {
           <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
         )}
         {(!sections || sections.trending) && <TrendingSection lang={lang} />}
+        <RealEstateDiscovery lang={lang} />
 
         {settings?.spotlight && settings.spotlight.length > 0 && (
           <CommunitySpotlight lang={lang} items={settings.spotlight} />

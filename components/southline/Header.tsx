@@ -16,6 +16,7 @@ interface NavItem {
 
 const DEFAULT_NAV: NavItem[] = [
   { key: "navHome", href: "/" },
+  { key: "navHomes", href: "/homes", labelEs: "Casas", labelEn: "Homes" },
   { key: "navIdeas", href: "/#categories" },
   { key: "navProjects", href: "/planner" },
   { key: "navDIY", href: "/diy" },
