@@ -4,4 +4,4 @@ export const PUBLIC_API_RESOURCES=["properties","leads","buyers","sellers","tran
 export type PublicApiResource=typeof PUBLIC_API_RESOURCES[number];
 export const OUTBOUND_EVENTS=["transaction.created","transaction.updated","offer.accepted","closing.completed","document.uploaded","portal.invitation","ai.review.completed"]as const;
 export const API_SCOPES=PUBLIC_API_RESOURCES.flatMap(r=>[`${r}:read`,`${r}:write`]);
-export type ApiPrincipal={tenantId:string;organizationId:string;apiKeyId:string;scopes:string[]};
+export type ApiPrincipal={tenantId:string;organizationId:string;scopes:string[];apiKeyId?:string;oauthGrantId?:string};

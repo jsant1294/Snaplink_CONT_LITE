@@ -1,0 +1,2 @@
+import{NextRequest,NextResponse}from"next/server";import{revokeToken}from"@/lib/real-estate/enterprise/oauth";
+export async function POST(req:NextRequest){try{const body=await req.json();return NextResponse.json(await revokeToken({clientId:String(body.client_id||""),clientSecret:String(body.client_secret||""),token:String(body.token||"")}),{headers:{"cache-control":"no-store"}})}catch{return NextResponse.json({error:"invalid_request"},{status:400,headers:{"cache-control":"no-store"}})}}
