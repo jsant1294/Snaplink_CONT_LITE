@@ -1,0 +1,47 @@
+# Phase 10 Marketplace, MLS/IDX, White-Label & Enterprise Ecosystem
+
+Phase 10 adds a provider plugin architecture, a provider-neutral MLS/IDX sync foundation, white-label branding and custom domains, per-tenant feature licensing, and platform administration (tenant lifecycle, incidents, feature rollouts, announcements) on top of the Phase 9 enterprise hierarchy and integration tables. It does not change membership, ownership, tenant isolation, AI, jobs, portal, documents, messaging, commissions, audit, or the public API v1/OAuth/webhook systems.
+
+## Provider plugin architecture (provider SDK guide)
+
+`lib/real-estate/marketplace/types.ts` defines `PROVIDER_CATALOG`: a versioned, code-owned registry of provider definitions across seven categories — `mls`, `idx`, `esignature`, `accounting`, `crm`, `marketing`, `analytics`. Each entry declares a `key`, `version`, `capabilities`, `requiredScopes`, and `configFields`. The catalog ships only generic, vendor-neutral entries (`generic_mls`, `generic_esignature`, …); no named MLS/IDX/e-signature/accounting/CRM vendor is coupled into the platform.
+
+To build a real adapter: implement the relevant TypeScript interface (`MlsSyncAdapter` in `lib/real-estate/marketplace/mls.ts` for MLS/IDX), register it at process start with `registerMlsAdapter(providerKey, adapter)`, and add a catalog entry (or extend an existing one) with the provider's real capabilities and required scopes. Installations without a registered adapter fall back safely to a no-op sync — this is the platform default, not an error state.
+
+Health checks (`checkInstallationHealth`, `refreshMarketplaceHealth` in `lib/real-estate/marketplace/providers.ts`) write into the same `real_estate_provider_health_checks` table Phase 6 integrations already use, so provider health surfaces through the existing `provider_health` bucket in `/api/real-estate/enterprise/observability` without any change to Phase 6/9 code. An installation with no live credential reports `unconfigured` rather than attempting an unauthenticated network call.
+
+## MLS/IDX foundation
+
+`lib/real-estate/marketplace/mls.ts` provides provider-neutral sync orchestration: `real_estate_mls_sync_cursors` tracks one opaque cursor per installation/sync-type (`listing`, `media`, `status`, `agent`, `office`) for incremental sync, and `real_estate_mls_entity_mappings` tracks internal↔external ID mapping per entity (`listing`, `agent`, `office`) with conflict detection. A conflict is recorded (not silently overwritten) when an incoming record's external `updatedAt` is older than what is already stored for a previously-synced mapping; conflicts are queryable via `listConflicts` and resolved explicitly via `resolveConflict`. Sync runs as the `marketplace.mls.sync` background job (queued through the existing job system, `POST /api/real-estate/marketplace/mls`), so retries/backoff/dead-lettering reuse Phase 6 job infrastructure unchanged.
+
+## Marketplace
+
+`lib/real-estate/marketplace/marketplace.ts` builds discover/install/configure/disable/uninstall on the Phase 9 `real_estate_integration_installations` table (no new install-state table was needed). Install validates the requested scopes against the provider's `requiredScopes`, stores only the catalog fields the provider declares (`configFields`) plus a version tag, and — if an API key is supplied — encrypts it with the existing `REAL_ESTATE_INTEGRATION_ENCRYPTION_KEY` envelope (`lib/real-estate/integrations/crypto.ts`) before persisting it as `credentialReference`. The raw key and the stored reference are never returned by any marketplace endpoint. `permissionReview(providerKey)` surfaces the capabilities/scopes an install will request before the tenant approves it. `checkVersionCompatibility` compares an installation's stored catalog version against the current registry (major-version match) so a marketplace UI can flag drift after a provider catalog update. Marketplace routes require both the `settings:manage` membership permission and an active `marketplace` tenant license.
+
+## White-label branding and custom domains
+
+`lib/real-estate/marketplace/branding.ts` stores per-tenant/organization branding (logo, favicon, primary/secondary/accent colors, font, email-from name and logo, login and portal headlines, PWA name/theme color) in `real_estate_tenant_branding`, validated for hex-color fields. Custom domains (`real_estate_custom_domains`) are registered with a random verification token; ownership is proven by an authoritative DNS TXT lookup at `_snaplink-verify.<domain>` performed server-side (`verifyCustomDomain`) — the caller's claimed verification state is never trusted, consistent with the platform's "never trust client-provided scope" posture.
+
+## Tenant feature licensing
+
+`real_estate_tenant_licenses` gates platform surfaces per tenant across `crm`, `transactions`, `ai`, `portal`, `documents`, `reporting`, `apis`, `marketplace`, `enterprise`. Features that predate Phase 10 (`crm`, `transactions`, `ai`, `portal`, `documents`, `reporting`, `apis`) default **on** for tenants with no explicit license row, so existing functionality is not silently disabled by this migration. The two new platform-admin surfaces this phase introduces — `marketplace` and `enterprise` (platform administration) — default **off** until a `settings:manage` operator explicitly grants them via `PUT /api/real-estate/licensing`. `hasFeature(tenantId, feature)` is the enforcement point; marketplace and enterprise-admin routes call it in addition to the existing role-permission check.
+
+## Enterprise admin (platform administration)
+
+`lib/real-estate/marketplace/admin.ts` adds: an append-only tenant lifecycle log (`real_estate_tenant_lifecycle_events` — activated/suspended/reinstated/offboarded, with actor and reason), incident open/resolve on top of the existing (Phase 6) `real_estate_operational_incidents` table so tenant and platform-wide incidents share one queryable surface, feature rollouts (`real_estate_feature_rollouts` — off/percentage/allowlist/all, with a deterministic tenant-bucket hash for percentage rollout so a tenant's inclusion doesn't flip between requests), and platform announcements (`real_estate_platform_announcements`, tenant-scoped or platform-wide, with expiry). All operations are exposed under `/api/real-estate/enterprise-admin/{operation}` (`lifecycle`, `incidents`, `rollouts`, `announcements`), gated by `settings:manage` plus the `enterprise` tenant license.
+
+## Deployment and scaling guidance
+
+`drizzle/0009_phase10_marketplace_platform.sql` is additive only (eight new tables, foreign keys and indexes scoped to those new tables) and must not be applied automatically — review and run it the same way `0008` was rolled out. No backfill is required: `real_estate_tenant_licenses` has no row for existing tenants until an operator sets one, and the code-level default (`legacyLicenseDefault`) preserves current behavior in the interim.
+
+Recommended rollout order: (1) apply the migration in a maintenance window or low-traffic period; (2) leave `marketplace` and `enterprise` licenses off (the default) until each tenant is ready; (3) enable `enterprise` for the operating brokerage first and validate the enterprise-admin surfaces against real data; (4) install one marketplace provider at a time per tenant, verifying `permissionReview` output before requesting the tenant's approval; (5) register custom domains and confirm DNS verification before flipping any tenant-facing branding link. Rollback is application-first, matching Phase 9: disable installations/licenses/rollouts, redeploy the prior application version, and retain Phase 10 tables for audit — do not drop tables during an incident.
+
+Scaling notes: MLS/IDX sync cursors and mappings are indexed by `(tenant_id, installation_id, sync_type|entity_type)`; a high-volume MLS feed should shard by `syncType` across multiple queued jobs rather than one large job. Feature-rollout percentage evaluation is a pure in-process hash (no DB round-trip beyond the single rollout row), so it is safe to call on the hot path. Provider health checks reuse the existing generic health table — if provider count grows large, prune old `real_estate_provider_health_checks` rows the same way the existing Phase 6 operator runbook already recommends.
+
+## Enterprise onboarding (operator handbook)
+
+To onboard a new enterprise tenant onto Phase 10 capabilities: (1) confirm the Phase 9 enterprise hierarchy is populated (franchise→region→brokerage→office→team) if the tenant needs org-level rollups; (2) grant the `enterprise` license, then the `marketplace` license once the tenant has reviewed provider permissions; (3) set white-label branding and, if applicable, register and DNS-verify a custom domain; (4) install and configure marketplace providers one at a time, confirming health via `POST /api/real-estate/marketplace/health`; (5) if MLS/IDX sync is required, register a real `MlsSyncAdapter` for the tenant's provider (this repository ships no vendor adapter) and trigger an initial sync per sync-type; (6) review `real_estate_tenant_lifecycle_events` after onboarding to confirm an `activated` record was written.
+
+## Known limits (unchanged posture from Phase 9)
+
+No real MLS/IDX/e-signature/accounting/CRM vendor adapter ships with this phase — only the provider-neutral interfaces and a safe no-op fallback. Marketplace billing, automated production restore, and load-test execution against production remain intentionally excluded, as in Phase 9.
