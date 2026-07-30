@@ -3,6 +3,7 @@ import { authorizeRealEstate } from "@/lib/real-estate/auth";
 import { propertyRepository } from "@/lib/real-estate/repositories";
 import { validatePropertyInput } from "@/lib/real-estate/validation";
 import { recordActivity } from "@/lib/real-estate/crm-repositories";
+import { triggerWorkflows } from "@/lib/real-estate/phase5-repositories";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const principal = await authorizeRealEstate(req, "properties:view");
@@ -32,6 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (property) {
     const activityAction = action || "updated";
     await recordActivity(principal.tenantId, "properties", id, activityAction, `Property ${activityAction}: ${property.title}`);
+    if (action === "publish") await triggerWorkflows(principal, "property_published", "property", id);
   }
   return property ? NextResponse.json({ ok: true, property }) : NextResponse.json({ error: "Property not found" }, { status: 404 });
 }

@@ -1,0 +1,12 @@
+"use client";
+import { useEffect, useState } from "react";
+import { storedPin } from "@/components/admin/Dashboard";
+import { demoTenant } from "@/lib/real-estate/fixtures";
+const headers = () => ({ "x-snaplink-pin": storedPin(), "x-real-estate-tenant": demoTenant.id });
+export default function AnalyticsView({ agents = false }: { agents?: boolean }) {
+  const [data, setData] = useState<Record<string, unknown>>({});
+  useEffect(() => { fetch(agents ? "/api/real-estate/analytics/agents" : "/api/real-estate/analytics/summary", { headers: headers() }).then(r => r.json()).then(setData); }, [agents]);
+  if (agents) return <div className="mx-auto max-w-7xl p-6"><h1 className="font-display text-4xl">Agent performance</h1><div className="mt-7 overflow-x-auto rounded-2xl border border-white/10"><table className="w-full min-w-[700px] text-sm"><thead className="bg-[#20231F] text-left text-xs uppercase text-[#AAA9A2]"><tr>{["Agent","Assigned leads","Converted leads","Active listings","Tasks completed"].map(x => <th key={x} className="p-4">{x}</th>)}</tr></thead><tbody>{((data.agents || []) as Record<string, unknown>[]).map(x => <tr key={String(x.id)} className="border-t border-white/10"><td className="p-4 font-semibold">{String(x.name)}</td><td className="p-4">{String(x.assignedLeads)}</td><td className="p-4">{String(x.convertedLeads)}</td><td className="p-4">{String(x.activeListings)}</td><td className="p-4">{String(x.tasksCompleted)}</td></tr>)}</tbody></table></div></div>;
+  const cards = [["QR scans", data.qrScans], ["Tracked event types", (data.events as unknown[] || []).length], ["Delivery states", (data.communications as unknown[] || []).length], ["Campaign states", (data.campaigns as unknown[] || []).length], ["Automation states", (data.automation as unknown[] || []).length]];
+  return <div className="mx-auto max-w-7xl p-6"><p className="text-xs uppercase tracking-[.2em] text-[#B99A5B]">Operational intelligence</p><h1 className="mt-2 font-display text-4xl">Analytics</h1><div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">{cards.map(([label,value]) => <article key={String(label)} className="rounded-2xl border border-white/10 bg-[#20231F] p-5"><p className="text-xs text-[#AAA9A2]">{String(label)}</p><p className="mt-3 text-3xl font-semibold text-[#D1B06A]">{String(value || 0)}</p></article>)}</div><a href="/real-estate/analytics/agents" className="mt-6 inline-block rounded-xl border border-[#B99A5B]/30 px-4 py-3 text-sm text-[#D1B06A]">View agent performance</a></div>;
+}

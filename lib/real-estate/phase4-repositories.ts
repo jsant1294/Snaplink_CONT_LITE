@@ -93,7 +93,7 @@ export async function listReminders(scope: DataScope) {
 }
 export async function createReminder(scope: DataScope, input: Record<string, unknown>) {
   const assignedAgentId = isAgentScope(scope) ? scope.agentId : String(input.assignedAgentId || "") || null;
-  return (await db().insert(realEstateReminders).values({ id: id("reminder"), tenantId: scope.tenantId, assignedAgentId, entityType: String(input.entityType), entityId: String(input.entityId), title: String(input.title), remindAt: String(input.remindAt) }).returning())[0];
+  return (await db().insert(realEstateReminders).values({ id: id("reminder"), tenantId: scope.tenantId, assignedAgentId, entityType: String(input.entityType), entityId: String(input.entityId), title: String(input.title), remindAt: String(input.remindAt), channels: Array.isArray(input.channels) ? input.channels.map(String) : ["in_app"], dedupeKey: input.dedupeKey ? String(input.dedupeKey) : null }).onConflictDoNothing().returning())[0] ?? null;
 }
 
 export async function listCalendarConnections(scope: DataScope, membershipId: string) {
@@ -122,7 +122,7 @@ export async function listCampaigns(scope: DataScope) {
   return db().select().from(realEstateCampaigns).where(and(eq(realEstateCampaigns.tenantId, scope.tenantId), isNull(realEstateCampaigns.deletedAt))).orderBy(desc(realEstateCampaigns.updatedAt));
 }
 export async function createCampaign(scope: DataScope, input: Record<string, unknown>, membershipId: string) {
-  return (await db().insert(realEstateCampaigns).values({ id: id("campaign"), tenantId: scope.tenantId, name: String(input.name), campaignType: String(input.campaignType), status: String(input.status || "draft"), propertyId: input.propertyId ? String(input.propertyId) : null, channels: Array.isArray(input.channels) ? input.channels.map(String) : [], content: typeof input.content === "object" && input.content ? input.content as Record<string, unknown> : {}, startsAt: input.startsAt ? String(input.startsAt) : null, endsAt: input.endsAt ? String(input.endsAt) : null, createdByMembershipId: membershipId }).returning())[0];
+  return (await db().insert(realEstateCampaigns).values({ id: id("campaign"), tenantId: scope.tenantId, name: String(input.name), campaignType: String(input.campaignType), status: String(input.status || "draft"), propertyId: input.propertyId ? String(input.propertyId) : null, channels: Array.isArray(input.channels) ? input.channels.map(String) : [], content: typeof input.content === "object" && input.content ? input.content as Record<string, unknown> : {}, audienceType: String(input.audienceType || "leads"), audienceFilters: typeof input.audienceFilters === "object" && input.audienceFilters ? input.audienceFilters as Record<string, unknown> : {}, templateId: input.templateId ? String(input.templateId) : null, scheduledAt: input.scheduledAt ? String(input.scheduledAt) : null, startsAt: input.startsAt ? String(input.startsAt) : null, endsAt: input.endsAt ? String(input.endsAt) : null, createdByMembershipId: membershipId }).returning())[0];
 }
 
 export async function trackEvent(tenantId: string, input: Record<string, unknown>) {

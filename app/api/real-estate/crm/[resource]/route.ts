@@ -3,6 +3,7 @@ import { authorizeRealEstate } from "@/lib/real-estate/auth";
 import { crmRepository, type CrmResource } from "@/lib/real-estate/crm-repositories";
 import { validateCrmInput } from "@/lib/real-estate/crm-validation";
 import type { RealEstatePermission } from "@/lib/real-estate/permissions";
+import { triggerWorkflows } from "@/lib/real-estate/phase5-repositories";
 
 const resources: CrmResource[] = ["brokerages", "agents", "buyers", "sellers", "leads", "showings", "open-houses", "tasks"];
 const viewPermission = (resource: CrmResource): RealEstatePermission =>
@@ -46,5 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ res
     data.assignedAgentId = principal.agentId;
   }
   const record = await crmRepository.create(resource, principal.tenantId, data);
+  if (resource === "leads") await triggerWorkflows(principal, "lead_created", "lead", String(record.id));
+  if (resource === "showings") await triggerWorkflows(principal, "showing_scheduled", "showing", String(record.id));
   return NextResponse.json({ ok: true, record }, { status: 201 });
 }

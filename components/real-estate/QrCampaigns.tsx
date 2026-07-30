@@ -1,0 +1,9 @@
+"use client";
+import { useState } from "react";
+import { storedPin } from "@/components/admin/Dashboard";
+import { demoTenant } from "@/lib/real-estate/fixtures";
+export default function QrCampaigns() {
+  const [form, setForm] = useState({ destinationType: "property", destinationId: "", destinationUrl: "" }), [result, setResult] = useState("");
+  async function save(e: React.FormEvent) { e.preventDefault(); const r = await fetch("/api/real-estate/qr-links", { method: "POST", headers: { "Content-Type": "application/json", "x-snaplink-pin": storedPin(), "x-real-estate-tenant": demoTenant.id }, body: JSON.stringify(form) }); const d = await r.json(); setResult(d.link ? `/api/real-estate/qr-links/${d.link.id}/scan` : d.error); }
+  return <div className="mx-auto max-w-4xl p-6"><h1 className="font-display text-4xl">QR campaign tracking</h1><form onSubmit={save} className="mt-7 grid gap-4 rounded-2xl border border-white/10 bg-[#20231F] p-5"><select className="rounded-xl bg-[#181A17] px-4 py-3" value={form.destinationType} onChange={e => setForm({ ...form, destinationType: e.target.value })}>{["property","agent","brokerage","campaign","showing","open_house"].map(x => <option key={x}>{x}</option>)}</select><input required className="rounded-xl bg-[#181A17] px-4 py-3" placeholder="Destination record ID" value={form.destinationId} onChange={e => setForm({ ...form, destinationId: e.target.value })}/><input required type="url" className="rounded-xl bg-[#181A17] px-4 py-3" placeholder="https:// destination" value={form.destinationUrl} onChange={e => setForm({ ...form, destinationUrl: e.target.value })}/><button className="rounded-xl bg-[#B99A5B] px-5 py-3 font-semibold text-[#181A17]">Create tracked destination</button>{result && <p className="text-sm text-[#D1B06A]">{result}</p>}</form></div>;
+}

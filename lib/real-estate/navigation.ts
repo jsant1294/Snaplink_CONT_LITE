@@ -2,7 +2,7 @@ import type { IconName } from "@/components/real-estate/Icon";
 
 export const REAL_ESTATE_SECTIONS = [
   "properties", "agents", "brokerages", "buyers", "sellers", "leads",
-  "showings", "open-houses", "campaigns", "marketing-assets", "qr-codes", "reviews",
+  "showings", "open-houses", "calendar", "communications", "automation", "notifications", "campaigns", "marketing-assets", "qr-codes", "reviews",
   "analytics", "settings",
 ] as const;
 
@@ -21,6 +21,10 @@ export const REAL_ESTATE_SECTION_META: Record<RealEstateSection, {
   leads: { title: "Lead Pipeline", description: "A future workspace for qualifying and assigning opportunities.", icon: "lead" },
   showings: { title: "Showings", description: "Property showing requests, approvals, assignments, and notes.", icon: "calendar" },
   "open-houses": { title: "Open Houses", description: "Showing schedules, visitor registration, and event follow-up.", icon: "calendar" },
+  calendar: { title: "Calendar", description: "Appointments, showings, open houses, reminders, and tasks.", icon: "calendar" },
+  communications: { title: "Communications", description: "Email and SMS messages, templates, scheduling, and delivery history.", icon: "lead" },
+  automation: { title: "Automation", description: "Triggered workflows, nurture sequences, execution, and history.", icon: "campaign" },
+  notifications: { title: "Notifications", description: "Prioritized operational alerts and linked records.", icon: "star" },
   campaigns: { title: "Campaigns", description: "Property-centered marketing campaign planning.", icon: "campaign" },
   "marketing-assets": { title: "Marketing Assets", description: "Flyers, brochures, social graphics, and signage.", icon: "image" },
   "qr-codes": { title: "QR Codes", description: "Property, agent, open-house, review, and brochure QR experiences.", icon: "qr" },

@@ -32,7 +32,7 @@ export const REAL_ESTATE_ROLE_PERMISSIONS: Record<
   office_manager: ALL_PERMISSIONS.filter((permission) => permission !== "brokerages:manage"),
   listing_agent: [
     "dashboard:view", "properties:view", "properties:manage", "agents:view",
-    "clients:view", "clients:manage", "leads:view", "campaigns:manage",
+    "clients:view", "clients:manage", "leads:view", "leads:assign", "campaigns:manage",
     "open_houses:manage", "analytics:view",
   ],
   marketing_coordinator: [
