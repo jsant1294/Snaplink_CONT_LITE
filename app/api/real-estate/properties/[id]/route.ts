@@ -5,16 +5,19 @@ import { validatePropertyInput } from "@/lib/real-estate/validation";
 import { recordActivity } from "@/lib/real-estate/crm-repositories";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:view");
+  const principal = await authorizeRealEstate(req, "properties:view");
   if (!principal) return NextResponse.json({ error: "Real Estate access denied" }, { status: 401 });
   const property = await propertyRepository.findPropertyById((await params).id, principal.tenantId);
+  if (property && principal.role === "listing_agent" && property.agentId !== principal.agentId) return NextResponse.json({ error: "Property not found" }, { status: 404 });
   return property ? NextResponse.json({ property }) : NextResponse.json({ error: "Property not found" }, { status: 404 });
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:manage");
+  const principal = await authorizeRealEstate(req, "properties:manage");
   if (!principal) return NextResponse.json({ error: "Property management permission required" }, { status: 403 });
   const id = (await params).id;
+  const existing = await propertyRepository.findPropertyById(id, principal.tenantId);
+  if (!existing || (principal.role === "listing_agent" && existing.agentId !== principal.agentId)) return NextResponse.json({ error: "Property not found" }, { status: 404 });
   const body = await req.json();
   const action = String(body.action ?? "");
   let property;
@@ -34,8 +37,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:manage");
+  const principal = await authorizeRealEstate(req, "properties:manage");
   if (!principal) return NextResponse.json({ error: "Property management permission required" }, { status: 403 });
-  const property = await propertyRepository.deleteProperty((await params).id, principal.tenantId);
+  const id = (await params).id;
+  const existing = await propertyRepository.findPropertyById(id, principal.tenantId);
+  if (!existing || (principal.role === "listing_agent" && existing.agentId !== principal.agentId)) return NextResponse.json({ error: "Property not found" }, { status: 404 });
+  const property = await propertyRepository.deleteProperty(id, principal.tenantId);
   return property ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Property not found" }, { status: 404 });
 }

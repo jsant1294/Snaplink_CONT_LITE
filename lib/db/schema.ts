@@ -405,6 +405,143 @@ export const realEstateTasks = pgTable(
   (t) => [index("real_estate_tasks_tenant_idx").on(t.tenantId), index("real_estate_tasks_agent_idx").on(t.assignedAgentId)]
 );
 
+export const realEstateMemberships = pgTable(
+  "real_estate_memberships",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    userEmail: text("user_email").notNull(),
+    role: text("role").notNull(),
+    agentId: text("agent_id").references(() => realEstateAgents.id),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    unique("real_estate_memberships_tenant_email_unique").on(t.tenantId, t.userEmail),
+    index("real_estate_memberships_tenant_idx").on(t.tenantId),
+    index("real_estate_memberships_agent_idx").on(t.agentId),
+  ]
+);
+
+export const realEstateOpenHouseAttendees = pgTable(
+  "real_estate_open_house_attendees",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    openHouseId: text("open_house_id").notNull().references(() => realEstateOpenHouses.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    email: text("email").notNull().default(""),
+    phone: text("phone").notNull().default(""),
+    workingWithRealtor: boolean("working_with_realtor").notNull().default(false),
+    preApproved: boolean("pre_approved").notNull().default(false),
+    budget: text("budget").notNull().default(""),
+    timeline: text("timeline").notNull().default(""),
+    notes: text("notes").notNull().default(""),
+    consent: boolean("consent").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  },
+  (t) => [index("real_estate_attendees_tenant_idx").on(t.tenantId), index("real_estate_attendees_open_house_idx").on(t.openHouseId)]
+);
+
+export const realEstateReminders = pgTable(
+  "real_estate_reminders",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    assignedAgentId: text("assigned_agent_id").references(() => realEstateAgents.id),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    title: text("title").notNull(),
+    remindAt: timestamp("remind_at", { withTimezone: true, mode: "string" }).notNull(),
+    status: text("status").notNull().default("scheduled"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_reminders_tenant_date_idx").on(t.tenantId, t.remindAt), index("real_estate_reminders_agent_idx").on(t.assignedAgentId)]
+);
+
+export const realEstateCalendarConnections = pgTable(
+  "real_estate_calendar_connections",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    memberId: text("member_id").notNull().references(() => realEstateMemberships.id),
+    provider: text("provider").notNull(),
+    externalCalendarId: text("external_calendar_id"),
+    syncEnabled: boolean("sync_enabled").notNull().default(false),
+    accessTokenEncrypted: text("access_token_encrypted"),
+    refreshTokenEncrypted: text("refresh_token_encrypted"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true, mode: "string" }),
+    lastSyncedAt: timestamp("last_synced_at", { withTimezone: true, mode: "string" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [unique("real_estate_calendar_member_provider_unique").on(t.memberId, t.provider), index("real_estate_calendar_tenant_idx").on(t.tenantId)]
+);
+
+export const realEstateCommunications = pgTable(
+  "real_estate_communications",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    channel: text("channel").notNull(),
+    recipient: text("recipient").notNull(),
+    subject: text("subject"),
+    body: text("body").notNull(),
+    status: text("status").notNull().default("queued"),
+    scheduledAt: timestamp("scheduled_at", { withTimezone: true, mode: "string" }),
+    sentAt: timestamp("sent_at", { withTimezone: true, mode: "string" }),
+    providerMessageId: text("provider_message_id"),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  },
+  (t) => [index("real_estate_communications_tenant_idx").on(t.tenantId), index("real_estate_communications_status_idx").on(t.tenantId, t.status)]
+);
+
+export const realEstateCampaigns = pgTable(
+  "real_estate_campaigns",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    propertyId: text("property_id").references(() => realEstateProperties.id),
+    name: text("name").notNull(),
+    campaignType: text("campaign_type").notNull(),
+    status: text("status").notNull().default("draft"),
+    channels: jsonb("channels").$type<string[]>().notNull().default([]),
+    content: jsonb("content").$type<Record<string, unknown>>().notNull().default({}),
+    startsAt: timestamp("starts_at", { withTimezone: true, mode: "string" }),
+    endsAt: timestamp("ends_at", { withTimezone: true, mode: "string" }),
+    createdByMembershipId: text("created_by_membership_id").references(() => realEstateMemberships.id),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_campaigns_tenant_idx").on(t.tenantId), index("real_estate_campaigns_property_idx").on(t.propertyId)]
+);
+
+export const realEstateAnalyticsEvents = pgTable(
+  "real_estate_analytics_events",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    eventName: text("event_name").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id"),
+    anonymousId: text("anonymous_id"),
+    source: text("source").notNull().default("app"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    occurredAt: timestamp("occurred_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  },
+  (t) => [index("real_estate_analytics_tenant_event_idx").on(t.tenantId, t.eventName), index("real_estate_analytics_entity_idx").on(t.entityType, t.entityId)]
+);
+
 // ---------------------------------------------------------------------------
 // Lucio Financial Copilot (LFC)
 // All money stored as INTEGER CENTS. Soft-delete only — tax records must stay

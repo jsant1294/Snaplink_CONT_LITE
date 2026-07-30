@@ -24,18 +24,27 @@ function parse(value: string): CrmResource | null {
 export async function GET(req: NextRequest, { params }: { params: Promise<{ resource: string }> }) {
   const resource = parse((await params).resource);
   if (!resource) return NextResponse.json({ error: "Unknown CRM resource" }, { status: 404 });
-  const principal = authorizeRealEstate(req, viewPermission(resource));
+  const principal = await authorizeRealEstate(req, viewPermission(resource));
   if (!principal) return NextResponse.json({ error: "CRM access denied" }, { status: 403 });
-  return NextResponse.json({ records: await crmRepository.list(resource, principal.tenantId) });
+  let records = await crmRepository.list(resource, principal.tenantId);
+  if (principal.role === "listing_agent") {
+    records = records.filter((record) => resource === "agents" ? record.id === principal.agentId : !("assignedAgentId" in record) || record.assignedAgentId === principal.agentId);
+  }
+  return NextResponse.json({ records });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ resource: string }> }) {
   const resource = parse((await params).resource);
   if (!resource) return NextResponse.json({ error: "Unknown CRM resource" }, { status: 404 });
-  const principal = authorizeRealEstate(req, managePermission(resource));
+  const principal = await authorizeRealEstate(req, managePermission(resource));
   if (!principal) return NextResponse.json({ error: "CRM management permission required" }, { status: 403 });
   const validation = validateCrmInput(resource, await req.json());
   if (!validation.valid) return NextResponse.json({ error: "Validation failed", errors: validation.errors }, { status: 400 });
-  const record = await crmRepository.create(resource, principal.tenantId, validation.data);
+  const data = { ...validation.data };
+  if (principal.role === "listing_agent" && ["buyers", "sellers", "leads", "showings", "open-houses", "tasks"].includes(resource)) {
+    if (!principal.agentId) return NextResponse.json({ error: "Agent membership is not linked" }, { status: 403 });
+    data.assignedAgentId = principal.agentId;
+  }
+  const record = await crmRepository.create(resource, principal.tenantId, data);
   return NextResponse.json({ ok: true, record }, { status: 201 });
 }

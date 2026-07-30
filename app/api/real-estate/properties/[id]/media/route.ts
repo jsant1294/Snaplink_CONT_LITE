@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { authorizeRealEstate } from "@/lib/real-estate/auth";
-import { propertyMediaRepository } from "@/lib/real-estate/repositories";
+import { propertyMediaRepository, propertyRepository } from "@/lib/real-estate/repositories";
+
+async function canAccessProperty(id: string, principal: Awaited<ReturnType<typeof authorizeRealEstate>>) {
+  if (!principal) return false;
+  const property = await propertyRepository.findPropertyById(id, principal.tenantId);
+  return Boolean(property && (principal.role !== "listing_agent" || property.agentId === principal.agentId));
+}
 
 async function resolveImage(dataUrl: string, filename: string, propertyId: string): Promise<string> {
   if (!dataUrl.startsWith("data:image/")) throw new Error("A valid image is required");
@@ -13,15 +19,18 @@ async function resolveImage(dataUrl: string, filename: string, propertyId: strin
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:view");
+  const principal = await authorizeRealEstate(req, "properties:view");
   if (!principal) return NextResponse.json({ error: "Real Estate access denied" }, { status: 401 });
-  return NextResponse.json({ media: await propertyMediaRepository.list((await params).id, principal.tenantId) });
+  const propertyId = (await params).id;
+  if (!await canAccessProperty(propertyId, principal)) return NextResponse.json({ error: "Property not found" }, { status: 404 });
+  return NextResponse.json({ media: await propertyMediaRepository.list(propertyId, principal.tenantId) });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:manage");
+  const principal = await authorizeRealEstate(req, "properties:manage");
   if (!principal) return NextResponse.json({ error: "Property management permission required" }, { status: 403 });
   const propertyId = (await params).id;
+  if (!await canAccessProperty(propertyId, principal)) return NextResponse.json({ error: "Property not found" }, { status: 404 });
   const body = await req.json();
   try {
     const filename = String(body.filename ?? "property-image.jpg");
@@ -34,9 +43,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:manage");
+  const principal = await authorizeRealEstate(req, "properties:manage");
   if (!principal) return NextResponse.json({ error: "Property management permission required" }, { status: 403 });
   const propertyId = (await params).id;
+  if (!await canAccessProperty(propertyId, principal)) return NextResponse.json({ error: "Property not found" }, { status: 404 });
   const body = await req.json();
   if (Array.isArray(body.ids)) {
     return NextResponse.json({ ok: true, media: await propertyMediaRepository.reorder(propertyId, principal.tenantId, body.ids.map(String)) });
@@ -52,9 +62,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const principal = authorizeRealEstate(req, "properties:manage");
+  const principal = await authorizeRealEstate(req, "properties:manage");
   if (!principal) return NextResponse.json({ error: "Property management permission required" }, { status: 403 });
   const propertyId = (await params).id;
+  if (!await canAccessProperty(propertyId, principal)) return NextResponse.json({ error: "Property not found" }, { status: 404 });
   const mediaId = req.nextUrl.searchParams.get("mediaId") ?? "";
   const removed = await propertyMediaRepository.remove(mediaId, propertyId, principal.tenantId);
   return removed ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Image not found" }, { status: 404 });

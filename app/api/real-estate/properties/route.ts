@@ -18,19 +18,28 @@ function options(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const principal = authorizeRealEstate(req, "properties:view");
+  const principal = await authorizeRealEstate(req, "properties:view");
   if (!principal) return NextResponse.json({ error: "Real Estate access denied" }, { status: 401 });
   const result = await propertyRepository.listProperties(principal.tenantId, options(req));
+  if (principal.role === "listing_agent") {
+    const properties = result.properties.filter((property) => property.agentId === principal.agentId);
+    return NextResponse.json({ ...result, properties, total: properties.length });
+  }
   return NextResponse.json(result);
 }
 
 export async function POST(req: NextRequest) {
-  const principal = authorizeRealEstate(req, "properties:manage");
+  const principal = await authorizeRealEstate(req, "properties:manage");
   if (!principal) return NextResponse.json({ error: "Property management permission required" }, { status: 403 });
   const validation = validatePropertyInput(await req.json());
   if (!validation.valid) return NextResponse.json({ error: "Validation failed", errors: validation.errors }, { status: 400 });
   try {
-    const property = await propertyRepository.createProperty(validation.data as PropertyInput, principal.tenantId);
+    const input = validation.data as PropertyInput;
+    if (principal.role === "listing_agent") {
+      if (!principal.agentId) return NextResponse.json({ error: "Agent membership is not linked" }, { status: 403 });
+      input.listingAgentId = principal.agentId;
+    }
+    const property = await propertyRepository.createProperty(input, principal.tenantId);
     await recordActivity(principal.tenantId, "properties", property.id, "created", `Property created: ${property.title}`);
     return NextResponse.json({ ok: true, property }, { status: 201 });
   } catch (error) {

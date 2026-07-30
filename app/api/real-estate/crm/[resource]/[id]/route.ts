@@ -13,9 +13,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ reso
   const { resource: value, id } = await params;
   const resource = resources.includes(value as CrmResource) ? value as CrmResource : null;
   if (!resource) return NextResponse.json({ error: "Unknown CRM resource" }, { status: 404 });
-  const principal = authorizeRealEstate(req, permission(resource));
+  const principal = await authorizeRealEstate(req, permission(resource));
   if (!principal) return NextResponse.json({ error: "CRM access denied" }, { status: 403 });
   const record = await crmRepository.find(resource, id, principal.tenantId);
+  if (record && principal.role === "listing_agent" && (resource === "agents" ? record.id !== principal.agentId : "assignedAgentId" in record && record.assignedAgentId !== principal.agentId)) return NextResponse.json({ error: "Record not found" }, { status: 404 });
   return record ? NextResponse.json({ record }) : NextResponse.json({ error: "Record not found" }, { status: 404 });
 }
 
@@ -23,9 +24,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ re
   const { resource: value, id } = await params;
   const resource = resources.includes(value as CrmResource) ? value as CrmResource : null;
   if (!resource) return NextResponse.json({ error: "Unknown CRM resource" }, { status: 404 });
-  const principal = authorizeRealEstate(req, permission(resource));
+  const principal = await authorizeRealEstate(req, permission(resource));
   if (!principal) return NextResponse.json({ error: "CRM management permission required" }, { status: 403 });
   const body = await req.json();
+  const existing = await crmRepository.find(resource, id, principal.tenantId);
+  if (!existing || (principal.role === "listing_agent" && (resource === "agents" ? existing.id !== principal.agentId : "assignedAgentId" in existing && existing.assignedAgentId !== principal.agentId))) return NextResponse.json({ error: "Record not found" }, { status: 404 });
   if (body.action === "archive") return NextResponse.json({ ok: await crmRepository.archive(resource, id, principal.tenantId) });
   const validation = validateCrmInput(resource, body, true);
   if (!validation.valid) return NextResponse.json({ error: "Validation failed", errors: validation.errors }, { status: 400 });
@@ -37,7 +40,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ r
   const { resource: value, id } = await params;
   const resource = resources.includes(value as CrmResource) ? value as CrmResource : null;
   if (!resource) return NextResponse.json({ error: "Unknown CRM resource" }, { status: 404 });
-  const principal = authorizeRealEstate(req, permission(resource));
+  const principal = await authorizeRealEstate(req, permission(resource));
   if (!principal) return NextResponse.json({ error: "CRM management permission required" }, { status: 403 });
+  const existing = await crmRepository.find(resource, id, principal.tenantId);
+  if (!existing || (principal.role === "listing_agent" && (resource === "agents" ? existing.id !== principal.agentId : "assignedAgentId" in existing && existing.assignedAgentId !== principal.agentId))) return NextResponse.json({ error: "Record not found" }, { status: 404 });
   return NextResponse.json({ ok: await crmRepository.softDelete(resource, id, principal.tenantId) });
 }
