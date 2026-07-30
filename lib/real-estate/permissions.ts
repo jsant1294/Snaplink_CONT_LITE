@@ -14,13 +14,24 @@ export type RealEstatePermission =
   | "campaigns:manage"
   | "open_houses:manage"
   | "analytics:view"
+  | "transactions:view"
+  | "transactions:manage"
+  | "transactions:close"
+  | "offers:manage"
+  | "documents:manage"
+  | "portal:manage"
+  | "commissions:view"
+  | "commissions:manage"
+  | "reports:view"
   | "settings:manage";
 
 const ALL_PERMISSIONS: RealEstatePermission[] = [
   "dashboard:view", "properties:view", "properties:manage", "agents:view",
   "agents:manage", "brokerages:manage", "clients:view", "clients:manage",
   "leads:view", "leads:assign", "campaigns:manage", "open_houses:manage",
-  "analytics:view", "settings:manage",
+  "analytics:view", "transactions:view", "transactions:manage", "transactions:close",
+  "offers:manage", "documents:manage", "portal:manage", "commissions:view",
+  "commissions:manage", "reports:view", "settings:manage",
 ];
 
 export const REAL_ESTATE_ROLE_PERMISSIONS: Record<
@@ -34,14 +45,20 @@ export const REAL_ESTATE_ROLE_PERMISSIONS: Record<
     "dashboard:view", "properties:view", "properties:manage", "agents:view",
     "clients:view", "clients:manage", "leads:view", "leads:assign", "campaigns:manage",
     "open_houses:manage", "analytics:view",
+    "transactions:view", "transactions:manage", "offers:manage", "documents:manage",
+    "portal:manage", "commissions:view", "reports:view",
   ],
   marketing_coordinator: [
     "dashboard:view", "properties:view", "agents:view", "campaigns:manage",
     "open_houses:manage", "analytics:view",
+    "reports:view",
   ],
   transaction_coordinator: [
     "dashboard:view", "properties:view", "clients:view", "clients:manage",
     "leads:view", "open_houses:manage",
+    "transactions:view", "transactions:manage", "transactions:close",
+    "offers:manage", "documents:manage", "portal:manage", "commissions:view",
+    "reports:view",
   ],
 };
 

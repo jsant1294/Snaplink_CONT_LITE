@@ -5,6 +5,7 @@ import Icon, { type IconName } from "./Icon";
 const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate", label: "Dashboard", icon: "grid" },
   { href: "/real-estate/properties", label: "Properties", icon: "home" },
+  { href: "/real-estate/transactions", label: "Transactions", icon: "lead" },
   { href: "/real-estate/agents", label: "Agents", icon: "user" },
   { href: "/real-estate/brokerages", label: "Brokerages", icon: "office" },
   { href: "/real-estate/buyers", label: "Buyers", icon: "users" },
@@ -21,6 +22,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate/qr-codes", label: "QR Codes", icon: "qr" },
   { href: "/real-estate/reviews", label: "Reviews", icon: "star" },
   { href: "/real-estate/analytics", label: "Analytics", icon: "chart" },
+  { href: "/real-estate/reports", label: "Reports", icon: "chart" },
   { href: "/real-estate/settings/integrations", label: "Integrations", icon: "settings" },
   { href: "/real-estate/settings", label: "Settings", icon: "settings" },
 ];

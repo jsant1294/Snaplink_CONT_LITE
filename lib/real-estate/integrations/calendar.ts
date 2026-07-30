@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { and, eq, isNull } from "drizzle-orm";
-import { realEstateAppointments, realEstateCalendarConnections, realEstateCalendarEventLinks, realEstateOauthStates, realEstateOpenHouses, realEstateShowings } from "@/lib/db/schema";
+import { realEstateAppointments, realEstateCalendarConnections, realEstateCalendarEventLinks, realEstateInspections, realEstateOauthStates, realEstateOpenHouses, realEstateShowings, realEstateTransactionMilestones } from "@/lib/db/schema";
 import type { DataScope } from "../access";
 import { isAgentScope } from "../access";
 import { db } from "../repositories";
@@ -45,7 +45,10 @@ export function calendarPayloadHash(payload: Record<string, unknown>) { return c
 async function internalEvent(scope:DataScope,type:string,eventId:string){
   if(type==="showing"){const x=(await db().select().from(realEstateShowings).where(and(eq(realEstateShowings.id,eventId),eq(realEstateShowings.tenantId,scope.tenantId),isNull(realEstateShowings.deletedAt),isAgentScope(scope)?eq(realEstateShowings.assignedAgentId,scope.agentId):undefined)).limit(1))[0];return x?{title:"Property showing",startsAt:x.requestedAt,endsAt:new Date(new Date(x.requestedAt).getTime()+3600000).toISOString()}:null}
   if(type==="open_house"){const x=(await db().select().from(realEstateOpenHouses).where(and(eq(realEstateOpenHouses.id,eventId),eq(realEstateOpenHouses.tenantId,scope.tenantId),isNull(realEstateOpenHouses.deletedAt),isAgentScope(scope)?eq(realEstateOpenHouses.assignedAgentId,scope.agentId):undefined)).limit(1))[0];return x?{title:"Open house",startsAt:x.startsAt,endsAt:x.endsAt}:null}
-  if(type==="appointment"){const x=(await db().select().from(realEstateAppointments).where(and(eq(realEstateAppointments.id,eventId),eq(realEstateAppointments.tenantId,scope.tenantId),isNull(realEstateAppointments.deletedAt),isAgentScope(scope)?eq(realEstateAppointments.assignedAgentId,scope.agentId):undefined)).limit(1))[0];return x?{title:x.title,startsAt:x.startsAt,endsAt:x.endsAt||new Date(new Date(x.startsAt).getTime()+3600000).toISOString()}:null}return null;
+  if(type==="appointment"){const x=(await db().select().from(realEstateAppointments).where(and(eq(realEstateAppointments.id,eventId),eq(realEstateAppointments.tenantId,scope.tenantId),isNull(realEstateAppointments.deletedAt),isAgentScope(scope)?eq(realEstateAppointments.assignedAgentId,scope.agentId):undefined)).limit(1))[0];return x?{title:x.title,startsAt:x.startsAt,endsAt:x.endsAt||new Date(new Date(x.startsAt).getTime()+3600000).toISOString()}:null}
+  if(type==="inspection"){const x=(await db().select().from(realEstateInspections).where(and(eq(realEstateInspections.id,eventId),eq(realEstateInspections.tenantId,scope.tenantId),isNull(realEstateInspections.deletedAt))).limit(1))[0];return x?.scheduledAt?{title:"Property inspection",startsAt:x.scheduledAt,endsAt:new Date(new Date(x.scheduledAt).getTime()+7200000).toISOString()}:null}
+  if(type==="transaction_milestone"){const x=(await db().select().from(realEstateTransactionMilestones).where(and(eq(realEstateTransactionMilestones.id,eventId),eq(realEstateTransactionMilestones.tenantId,scope.tenantId),isNull(realEstateTransactionMilestones.deletedAt))).limit(1))[0];return x?.dueAt?{title:x.title,startsAt:x.dueAt,endsAt:new Date(new Date(x.dueAt).getTime()+3600000).toISOString()}:null}
+  return null;
 }
 async function calendarAccessToken(connection:typeof realEstateCalendarConnections.$inferSelect){
   const config=loadIntegrationConfig();if(!config.encryptionKey||!connection.accessTokenEncrypted)throw new Error("Calendar token unavailable");

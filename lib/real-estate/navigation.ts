@@ -1,9 +1,9 @@
 import type { IconName } from "@/components/real-estate/Icon";
 
 export const REAL_ESTATE_SECTIONS = [
-  "properties", "agents", "brokerages", "buyers", "sellers", "leads",
+  "properties", "transactions", "agents", "brokerages", "buyers", "sellers", "leads",
   "showings", "open-houses", "calendar", "communications", "automation", "notifications", "campaigns", "marketing-assets", "qr-codes", "reviews",
-  "analytics", "settings",
+  "analytics", "reports", "settings",
 ] as const;
 
 export type RealEstateSection = (typeof REAL_ESTATE_SECTIONS)[number];
@@ -14,6 +14,7 @@ export const REAL_ESTATE_SECTION_META: Record<RealEstateSection, {
   icon: IconName;
 }> = {
   properties: { title: "Properties", description: "Manage listing details, media, publishing, and showing information.", icon: "home" },
+  transactions: { title: "Transactions", description: "Manage contracts, offers, milestones, documents, escrow, and closing operations.", icon: "lead" },
   agents: { title: "Agents", description: "Professional profiles, service areas, specialties, and booking availability.", icon: "user" },
   brokerages: { title: "Brokerages", description: "Office profiles, locations, teams, and brand information.", icon: "office" },
   buyers: { title: "Buyers", description: "Buyer criteria, budgets, timelines, tasks, and appointments.", icon: "users" },
@@ -30,6 +31,7 @@ export const REAL_ESTATE_SECTION_META: Record<RealEstateSection, {
   "qr-codes": { title: "QR Codes", description: "Property, agent, open-house, review, and brochure QR experiences.", icon: "qr" },
   reviews: { title: "Reviews", description: "Review collection and testimonial presentation planning.", icon: "star" },
   analytics: { title: "Analytics", description: "Views, scans, appointments, leads, and conversion reporting.", icon: "chart" },
+  reports: { title: "Reports", description: "Transaction, closing, commission, and agent performance reporting.", icon: "chart" },
   settings: { title: "Settings", description: "Future brokerage identity, language, role, and integration controls.", icon: "settings" },
 };
 

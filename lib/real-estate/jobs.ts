@@ -1,14 +1,14 @@
 import { and, asc, eq, inArray, isNull, lte, or, sql } from "drizzle-orm";
-import { realEstateAgents, realEstateBrokerages, realEstateCalendarConnections, realEstateDeadLetters, realEstateJobAttempts, realEstateJobLocks, realEstateJobs, realEstateMemberships } from "@/lib/db/schema";
+import { realEstateAgents, realEstateBrokerages, realEstateCalendarConnections, realEstateDeadLetters, realEstateJobAttempts, realEstateJobLocks, realEstateJobs, realEstateMemberships, realEstateOffers } from "@/lib/db/schema";
 import { db } from "./repositories";
 import type { DataScope } from "./access";
 import { dispatchCommunication, executeCampaign, executeWorkflowRun, processDueReminders } from "./phase5-repositories";
 import { processWebhookEvent } from "./integrations/deliverability";
 import { synchronizeCalendarConnection, synchronizeCalendarEvent } from "./integrations/calendar";
-export const JOB_TYPES = ["communication.send","communication.webhook.process","campaign.expand_audience","campaign.send_recipient","automation.start","automation.execute_step","reminder.process","calendar.sync.connection","calendar.sync.event","calendar.delete.event","analytics.rollup","deliverability.rollup"] as const;
+export const JOB_TYPES = ["communication.send","communication.webhook.process","campaign.expand_audience","campaign.send_recipient","automation.start","automation.execute_step","reminder.process","calendar.sync.connection","calendar.sync.event","calendar.delete.event","analytics.rollup","deliverability.rollup","transaction.milestone.reminder","offer.expire","portal.notification.send","document.scan","document_request.reminder"] as const;
 export type RealEstateJobType = typeof JOB_TYPES[number];
 const id = (kind: string) => `re_${kind}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 9)}`, now = () => new Date().toISOString();
-const required: Partial<Record<RealEstateJobType, string[]>> = { "communication.send": ["communicationId"], "campaign.expand_audience": ["campaignId"], "automation.execute_step": ["runId"], "calendar.sync.connection": ["connectionId"], "calendar.sync.event": ["connectionId","eventType","eventId"], "calendar.delete.event": ["connectionId","eventType","eventId"], "communication.webhook.process": ["webhookEventId"] };
+const required: Partial<Record<RealEstateJobType, string[]>> = { "communication.send": ["communicationId"], "campaign.expand_audience": ["campaignId"], "automation.execute_step": ["runId"], "calendar.sync.connection": ["connectionId"], "calendar.sync.event": ["connectionId","eventType","eventId"], "calendar.delete.event": ["connectionId","eventType","eventId"], "communication.webhook.process": ["webhookEventId"], "transaction.milestone.reminder":["milestoneId"], "offer.expire":["offerId"], "portal.notification.send":["portalUserId"], "document.scan":["documentVersionId"], "document_request.reminder":["documentRequestId"] };
 export function validateJobPayload(type: string, payload: unknown): payload is Record<string, unknown> { if (!JOB_TYPES.includes(type as RealEstateJobType) || !payload || typeof payload !== "object" || Array.isArray(payload)) return false; return (required[type as RealEstateJobType] || []).every(key => typeof (payload as Record<string, unknown>)[key] === "string"); }
 export async function enqueueJob(scope: DataScope, _clientOrganizationId: string, membershipId: string | null, input: { jobType: RealEstateJobType; payload: Record<string, unknown>; idempotencyKey: string; scheduledAt?: string; priority?: number; maxAttempts?: number }) {
   if (!validateJobPayload(input.jobType, input.payload)) throw new Error("Invalid job payload");
@@ -18,7 +18,7 @@ export async function enqueueJob(scope: DataScope, _clientOrganizationId: string
   if (!organizationId) throw new Error("No authorized organization is configured for this tenant");
   return (await db().insert(realEstateJobs).values({ id: id("job"), tenantId: scope.tenantId, organizationId, jobType: input.jobType, payload: input.payload, idempotencyKey: input.idempotencyKey, status: input.scheduledAt && new Date(input.scheduledAt) > new Date() ? "scheduled" : "available", scheduledAt: input.scheduledAt, availableAt: input.scheduledAt || now(), priority: input.priority ?? 100, maxAttempts: input.maxAttempts ?? 5, createdByMembershipId: membershipId }).onConflictDoNothing().returning())[0] ?? null;
 }
-export async function enqueueCalendarJobs(scope:DataScope,membershipId:string,eventType:"showing"|"open_house"|"appointment",eventId:string,operation:"sync"|"delete"="sync"){
+export async function enqueueCalendarJobs(scope:DataScope,membershipId:string,eventType:"showing"|"open_house"|"appointment"|"inspection"|"transaction_milestone",eventId:string,operation:"sync"|"delete"="sync"){
   const connections=await db().select({id:realEstateCalendarConnections.id}).from(realEstateCalendarConnections).where(and(eq(realEstateCalendarConnections.tenantId,scope.tenantId),eq(realEstateCalendarConnections.memberId,membershipId),eq(realEstateCalendarConnections.syncEnabled,true),isNull(realEstateCalendarConnections.deletedAt)));const jobs=[];for(const connection of connections){const job=await enqueueJob(scope,`tenant:${scope.tenantId}`,membershipId,{jobType:operation==="delete"?"calendar.delete.event":"calendar.sync.event",payload:{connectionId:connection.id,eventType,eventId},idempotencyKey:`calendar.${operation}:${connection.id}:${eventType}:${eventId}:${new Date().toISOString().slice(0,16)}`});if(job)jobs.push(job)}return jobs;
 }
 export async function claimJobs(workerId: string, limit: number) {
@@ -56,6 +56,8 @@ async function execute(job: typeof realEstateJobs.$inferSelect) {
   else if (job.jobType === "calendar.sync.event") await synchronizeCalendarEvent(principal.scope,String(p.connectionId),String(p.eventType),String(p.eventId),"upsert");
   else if (job.jobType === "calendar.delete.event") await synchronizeCalendarEvent(principal.scope,String(p.connectionId),String(p.eventType),String(p.eventId),"delete");
   else if (job.jobType === "calendar.sync.connection") await synchronizeCalendarConnection(principal.scope,String(p.connectionId));
+  else if (job.jobType === "offer.expire") await db().update(realEstateOffers).set({status:"expired",expiredAt:now(),updatedAt:now()}).where(and(eq(realEstateOffers.id,String(p.offerId)),eq(realEstateOffers.tenantId,principal.scope.tenantId),inArray(realEstateOffers.status,["draft","submitted","received","countered"]),isNull(realEstateOffers.deletedAt)));
+  else if (["transaction.milestone.reminder","portal.notification.send","document.scan","document_request.reminder"].includes(job.jobType)) return;
   else if (["analytics.rollup","deliverability.rollup","campaign.send_recipient","automation.start"].includes(job.jobType)) return;
 }
 export async function processJobBatch(workerId: string, limit = 10) {

@@ -43,6 +43,13 @@
       "when": 1785441159768,
       "tag": "0005_exotic_rockslide",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785442422145,
+      "tag": "0006_amazing_warbound",
+      "breakpoints": true
     }
   ]
 }

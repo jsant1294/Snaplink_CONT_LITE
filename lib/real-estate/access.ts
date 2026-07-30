@@ -5,6 +5,7 @@ export interface DataScope {
   tenantId: string;
   role: RealEstateRole;
   agentId: string | null;
+  membershipId?: string;
 }
 
 export function isAgentScope(scope: DataScope): scope is DataScope & { agentId: string } {
