@@ -50,6 +50,13 @@
       "when": 1785442422145,
       "tag": "0006_amazing_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1785443306426,
+      "tag": "0007_condemned_apocalypse",
+      "breakpoints": true
     }
   ]
 }

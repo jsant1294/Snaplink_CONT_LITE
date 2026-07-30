@@ -16,6 +16,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate/calendar", label: "Calendar", icon: "calendar" },
   { href: "/real-estate/communications", label: "Communications", icon: "lead" },
   { href: "/real-estate/automation", label: "Automation", icon: "campaign" },
+  { href: "/real-estate/ai", label: "AI Intelligence", icon: "star" },
   { href: "/real-estate/notifications", label: "Notifications", icon: "star" },
   { href: "/real-estate/campaigns", label: "Campaigns", icon: "campaign" },
   { href: "/real-estate/marketing-assets", label: "Marketing Assets", icon: "image" },
@@ -24,6 +25,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate/analytics", label: "Analytics", icon: "chart" },
   { href: "/real-estate/reports", label: "Reports", icon: "chart" },
   { href: "/real-estate/settings/integrations", label: "Integrations", icon: "settings" },
+  { href: "/real-estate/settings/ai", label: "AI Settings", icon: "settings" },
   { href: "/real-estate/settings", label: "Settings", icon: "settings" },
 ];
 

@@ -2,7 +2,7 @@ import type { IconName } from "@/components/real-estate/Icon";
 
 export const REAL_ESTATE_SECTIONS = [
   "properties", "transactions", "agents", "brokerages", "buyers", "sellers", "leads",
-  "showings", "open-houses", "calendar", "communications", "automation", "notifications", "campaigns", "marketing-assets", "qr-codes", "reviews",
+  "showings", "open-houses", "calendar", "communications", "automation", "ai", "notifications", "campaigns", "marketing-assets", "qr-codes", "reviews",
   "analytics", "reports", "settings",
 ] as const;
 
@@ -25,6 +25,7 @@ export const REAL_ESTATE_SECTION_META: Record<RealEstateSection, {
   calendar: { title: "Calendar", description: "Appointments, showings, open houses, reminders, and tasks.", icon: "calendar" },
   communications: { title: "Communications", description: "Email and SMS messages, templates, scheduling, and delivery history.", icon: "lead" },
   automation: { title: "Automation", description: "Triggered workflows, nurture sequences, execution, and history.", icon: "campaign" },
+  ai: { title: "AI Intelligence", description: "Assistive summaries, extraction, scoring, suggestions, and human review.", icon: "star" },
   notifications: { title: "Notifications", description: "Prioritized operational alerts and linked records.", icon: "star" },
   campaigns: { title: "Campaigns", description: "Property-centered marketing campaign planning.", icon: "campaign" },
   "marketing-assets": { title: "Marketing Assets", description: "Flyers, brochures, social graphics, and signage.", icon: "image" },
