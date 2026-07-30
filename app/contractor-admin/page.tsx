@@ -55,6 +55,12 @@ function MasterView({ pin }: { pin: string }) {
       <section className="max-w-5xl mx-auto px-4 pt-8">
         <div className="flex items-end justify-between mb-3">
           <h2 className="font-display text-2xl">Contractors ({contractors.length})</h2>
+          <a
+            href="/southline/admin"
+            className="text-xs text-muted hover:text-gold transition-colors"
+          >
+            Southline Living CMS →
+          </a>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           {contractors.map((c) => (
