@@ -197,6 +197,214 @@ export const realEstatePropertyMedia = pgTable(
   ]
 );
 
+export const realEstateBrokerages = pgTable(
+  "real_estate_brokerages",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    organizationId: text("organization_id").notNull(),
+    name: text("name").notNull(),
+    logoUrl: text("logo_url"),
+    description: text("description").notNull().default(""),
+    addressLine1: text("address_line_1").notNull().default(""),
+    addressLine2: text("address_line_2"),
+    city: text("city").notNull().default(""),
+    state: text("state").notNull().default(""),
+    postalCode: text("postal_code").notNull().default(""),
+    country: text("country").notNull().default("US"),
+    phone: text("phone").notNull().default(""),
+    email: text("email").notNull().default(""),
+    website: text("website"),
+    brandColor: text("brand_color"),
+    serviceAreas: jsonb("service_areas").$type<string[]>().notNull().default([]),
+    socialLinks: jsonb("social_links").$type<Record<string, string>>().notNull().default({}),
+    isArchived: boolean("is_archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    index("real_estate_brokerages_tenant_idx").on(t.tenantId),
+    index("real_estate_brokerages_org_idx").on(t.organizationId),
+    unique("real_estate_brokerages_tenant_name_unique").on(t.tenantId, t.name),
+  ]
+);
+
+export const realEstateAgents = pgTable(
+  "real_estate_agents",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    organizationId: text("organization_id").notNull(),
+    brokerageId: text("brokerage_id").notNull().references(() => realEstateBrokerages.id),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone").notNull().default(""),
+    photoUrl: text("photo_url"),
+    biography: text("biography").notNull().default(""),
+    licenseNumber: text("license_number").notNull().default(""),
+    licenseState: text("license_state").notNull().default(""),
+    specialties: jsonb("specialties").$type<string[]>().notNull().default([]),
+    serviceAreas: jsonb("service_areas").$type<string[]>().notNull().default([]),
+    languages: jsonb("languages").$type<string[]>().notNull().default([]),
+    certifications: jsonb("certifications").$type<string[]>().notNull().default([]),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    index("real_estate_agents_tenant_idx").on(t.tenantId),
+    index("real_estate_agents_brokerage_idx").on(t.brokerageId),
+    unique("real_estate_agents_tenant_email_unique").on(t.tenantId, t.email),
+  ]
+);
+
+export const realEstateBuyers = pgTable(
+  "real_estate_buyers",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    assignedAgentId: text("assigned_agent_id").references(() => realEstateAgents.id),
+    name: text("name").notNull(),
+    email: text("email").notNull().default(""),
+    phone: text("phone").notNull().default(""),
+    budgetMinCents: integer("budget_min_cents"),
+    budgetMaxCents: integer("budget_max_cents"),
+    preferredCities: jsonb("preferred_cities").$type<string[]>().notNull().default([]),
+    bedrooms: real("bedrooms"),
+    bathrooms: real("bathrooms"),
+    propertyTypes: jsonb("property_types").$type<string[]>().notNull().default([]),
+    financingStatus: text("financing_status").notNull().default("unknown"),
+    pipelineStage: text("pipeline_stage").notNull().default("new"),
+    notes: text("notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_buyers_tenant_idx").on(t.tenantId), index("real_estate_buyers_agent_idx").on(t.assignedAgentId)]
+);
+
+export const realEstateSellers = pgTable(
+  "real_estate_sellers",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    assignedAgentId: text("assigned_agent_id").references(() => realEstateAgents.id),
+    ownerName: text("owner_name").notNull(),
+    email: text("email").notNull().default(""),
+    phone: text("phone").notNull().default(""),
+    propertyAddress: text("property_address").notNull(),
+    timeline: text("timeline").notNull().default(""),
+    askingExpectationCents: integer("asking_expectation_cents"),
+    repairs: text("repairs").notNull().default(""),
+    mortgageEstimateCents: integer("mortgage_estimate_cents"),
+    pipelineStage: text("pipeline_stage").notNull().default("new"),
+    notes: text("notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_sellers_tenant_idx").on(t.tenantId), index("real_estate_sellers_agent_idx").on(t.assignedAgentId)]
+);
+
+export const realEstateLeads = pgTable(
+  "real_estate_leads",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    assignedAgentId: text("assigned_agent_id").references(() => realEstateAgents.id),
+    buyerId: text("buyer_id").references(() => realEstateBuyers.id),
+    sellerId: text("seller_id").references(() => realEstateSellers.id),
+    leadType: text("lead_type").notNull().default("general"),
+    stage: text("stage").notNull().default("new"),
+    name: text("name").notNull(),
+    email: text("email").notNull().default(""),
+    phone: text("phone").notNull().default(""),
+    source: text("source").notNull().default("manual"),
+    notes: text("notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    index("real_estate_leads_tenant_idx").on(t.tenantId),
+    index("real_estate_leads_agent_idx").on(t.assignedAgentId),
+    index("real_estate_leads_stage_idx").on(t.tenantId, t.stage),
+  ]
+);
+
+export const realEstateShowings = pgTable(
+  "real_estate_showings",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    propertyId: text("property_id").notNull().references(() => realEstateProperties.id),
+    buyerId: text("buyer_id").references(() => realEstateBuyers.id),
+    assignedAgentId: text("assigned_agent_id").notNull().references(() => realEstateAgents.id),
+    requestedAt: timestamp("requested_at", { withTimezone: true, mode: "string" }).notNull(),
+    status: text("status").notNull().default("requested"),
+    isApproved: boolean("is_approved").notNull().default(false),
+    notes: text("notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_showings_tenant_idx").on(t.tenantId), index("real_estate_showings_date_idx").on(t.tenantId, t.requestedAt)]
+);
+
+export const realEstateOpenHouses = pgTable(
+  "real_estate_open_houses",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    propertyId: text("property_id").notNull().references(() => realEstateProperties.id),
+    assignedAgentId: text("assigned_agent_id").notNull().references(() => realEstateAgents.id),
+    startsAt: timestamp("starts_at", { withTimezone: true, mode: "string" }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true, mode: "string" }).notNull(),
+    attendeeCount: integer("attendee_count").notNull().default(0),
+    isPublished: boolean("is_published").notNull().default(false),
+    notes: text("notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_open_houses_tenant_idx").on(t.tenantId), index("real_estate_open_houses_date_idx").on(t.tenantId, t.startsAt)]
+);
+
+export const realEstateActivities = pgTable(
+  "real_estate_activities",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    actorId: text("actor_id"),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    action: text("action").notNull(),
+    description: text("description").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  },
+  (t) => [index("real_estate_activities_tenant_idx").on(t.tenantId), index("real_estate_activities_entity_idx").on(t.entityType, t.entityId)]
+);
+
+export const realEstateTasks = pgTable(
+  "real_estate_tasks",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    assignedAgentId: text("assigned_agent_id").references(() => realEstateAgents.id),
+    title: text("title").notNull(),
+    dueAt: timestamp("due_at", { withTimezone: true, mode: "string" }),
+    status: text("status").notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("real_estate_tasks_tenant_idx").on(t.tenantId), index("real_estate_tasks_agent_idx").on(t.assignedAgentId)]
+);
+
 // ---------------------------------------------------------------------------
 // Lucio Financial Copilot (LFC)
 // All money stored as INTEGER CENTS. Soft-delete only — tax records must stay

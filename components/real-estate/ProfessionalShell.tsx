@@ -10,6 +10,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate/buyers", label: "Buyers", icon: "users" },
   { href: "/real-estate/sellers", label: "Sellers", icon: "users" },
   { href: "/real-estate/leads", label: "Leads", icon: "lead" },
+  { href: "/real-estate/showings", label: "Showings", icon: "calendar" },
   { href: "/real-estate/open-houses", label: "Open Houses", icon: "calendar" },
   { href: "/real-estate/campaigns", label: "Campaigns", icon: "campaign" },
   { href: "/real-estate/marketing-assets", label: "Marketing Assets", icon: "image" },

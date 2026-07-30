@@ -1,33 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { demoAppointments, demoLeads, demoProperties, formatPropertyPrice } from "@/lib/real-estate/fixtures";
+import { storedPin } from "@/components/admin/Dashboard";
+import { demoTenant } from "@/lib/real-estate/fixtures";
 import Icon, { type IconName } from "./Icon";
 
-const actions: { label: string; href: string; icon: IconName }[] = [
-  { label: "New Property", href: "/real-estate/properties", icon: "home" },
-  { label: "Create Campaign", href: "/real-estate/campaigns", icon: "campaign" },
-  { label: "Generate QR", href: "/real-estate/qr-codes", icon: "qr" },
-  { label: "Schedule Showing", href: "/real-estate/open-houses", icon: "calendar" },
-  { label: "Create Flyer", href: "/real-estate/marketing-assets", icon: "image" },
-  { label: "Add Buyer", href: "/real-estate/buyers", icon: "users" },
-];
+interface DashboardData {
+  metrics: {
+    activeListings: number; pendingListings: number; soldListings: number;
+    buyers: number; sellers: number; showings: number; openHouses: number;
+    leads: { stage: string; count: number }[];
+    tasks: { id: string; title: string; dueAt: string | null; status: string }[];
+  };
+  activities: { id: string; action: string; description: string; entityType: string; createdAt: string }[];
+}
+
+const headers = () => ({ "x-snaplink-pin": storedPin(), "x-real-estate-tenant": demoTenant.id });
 
 export default function RealEstateDashboard() {
-  const propertyViews = demoProperties.reduce((sum, property) => sum + property.viewCount, 0);
-  const qrScans = demoProperties.reduce((sum, property) => sum + property.qrScanCount, 0);
-  const metrics = [
-    ["Property views", propertyViews.toLocaleString(), "chart" as const],
-    ["QR scans", qrScans.toLocaleString(), "qr" as const],
-    ["Appointments", demoAppointments.length.toString(), "calendar" as const],
-    ["Recent leads", demoLeads.length.toString(), "lead" as const],
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    fetch("/api/real-estate/dashboard", { headers: headers() }).then(async (response) => {
+      const body = await response.json(); if (!response.ok) throw new Error(body.error); setData(body);
+    }).catch((reason) => setError(reason instanceof Error ? reason.message : "Dashboard unavailable"));
+  }, []);
+  const metrics = data?.metrics;
+  const cards: [string, number, IconName][] = [
+    ["Active listings", metrics?.activeListings ?? 0, "home"], ["Pending listings", metrics?.pendingListings ?? 0, "home"],
+    ["Sold listings", metrics?.soldListings ?? 0, "chart"], ["Buyer leads", metrics?.buyers ?? 0, "users"],
+    ["Seller leads", metrics?.sellers ?? 0, "users"], ["Scheduled showings", metrics?.showings ?? 0, "calendar"],
+    ["Upcoming open houses", metrics?.openHouses ?? 0, "calendar"],
   ];
   return <div className="mx-auto max-w-[1450px] p-4 sm:p-6 lg:p-8">
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs uppercase tracking-[0.22em] text-[#B99A5B]">Phase 1 demonstration</p><h1 className="mt-2 font-display text-3xl text-[#F3EEE5] sm:text-4xl">Real Estate dashboard</h1><p className="mt-2 text-sm text-[#9FA098]">A fixture-powered preview of the professional workspace.</p></div><Link href="/real-estate/properties" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#B99A5B] px-4 py-3 text-sm font-semibold text-[#1A1C18]"><Icon name="plus" className="h-4 w-4" />New property</Link></div>
-    <div className="mt-8 grid grid-cols-2 gap-3 xl:grid-cols-4">{metrics.map(([label, value, icon]) => <div key={label} className="rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><Icon name={icon as IconName} className="h-5 w-5 text-[#A88C52]" /><p className="mt-5 font-display text-3xl">{value}</p><p className="mt-1 text-xs text-[#9FA098]">{label}</p></div>)}</div>
-    <section className="mt-6 rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><h2 className="font-display text-xl">Quick actions</h2><div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">{actions.map((action) => <Link key={action.label} href={action.href} className="rounded-xl border border-white/[0.07] bg-[#272A25] p-3 hover:border-[#B99A5B]/40"><Icon name={action.icon} className="h-4 w-4 text-[#B99A5B]" /><span className="mt-3 block text-xs text-[#D5D1C8]">{action.label}</span></Link>)}</div></section>
-    <div className="mt-6 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-      <section className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#20231F]"><div className="border-b border-white/[0.07] p-5"><h2 className="font-display text-xl">Recent leads</h2></div><div className="divide-y divide-white/[0.06]">{demoLeads.map((lead) => <div key={lead.id} className="grid gap-2 p-4 sm:grid-cols-[1fr_1fr_auto]"><div><p className="text-sm font-medium">{lead.name}</p><p className="mt-1 text-xs text-[#8F928A]">{lead.type} · {lead.source}</p></div><p className="text-xs text-[#AAA9A2]">{lead.preferredCities.join(", ")}<br />{lead.budget ?? "Budget pending"}</p><span className="self-start rounded-full border border-[#789071]/30 bg-[#789071]/10 px-2 py-1 text-[10px] text-[#9BB294]">{lead.stage.replaceAll("_", " ")}</span></div>)}</div></section>
-      <section className="rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><h2 className="font-display text-xl">Upcoming activity</h2><div className="mt-5 space-y-4">{demoAppointments.map((appointment) => <div key={appointment.id} className="flex gap-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#2B3028] text-[#B99A5B]"><Icon name="calendar" className="h-4 w-4" /></span><div><p className="text-sm">{appointment.type.replaceAll("_", " ")}</p><p className="mt-1 text-xs text-[#9A9D94]">{new Date(appointment.startsAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</p></div></div>)}</div></section>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs uppercase tracking-[0.22em] text-[#B99A5B]">Operational CRM</p><h1 className="mt-2 font-display text-3xl sm:text-4xl">Real Estate dashboard</h1><p className="mt-2 text-sm text-[#9FA098]">Live listings, clients, activity, and assignments.</p></div><Link href="/real-estate/properties/new" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#B99A5B] px-4 py-3 text-sm font-semibold text-[#1A1C18]"><Icon name="plus" className="h-4 w-4" />New property</Link></div>
+    {error && <p className="mt-5 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger">{error}</p>}
+    <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">{cards.map(([label, value, icon]) => <div key={label} className="rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><Icon name={icon} className="h-5 w-5 text-[#A88C52]" /><p className="mt-5 font-display text-3xl">{value}</p><p className="mt-1 text-xs text-[#9FA098]">{label}</p></div>)}</div>
+    <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <section className="rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><h2 className="font-display text-xl">Conversion funnel</h2><div className="mt-5 space-y-3">{metrics?.leads.length ? metrics.leads.map((item) => { const max = Math.max(...metrics.leads.map((lead) => lead.count), 1); return <div key={item.stage}><div className="flex justify-between text-xs"><span className="capitalize">{item.stage.replaceAll("_", " ")}</span><span>{item.count}</span></div><div className="mt-1 h-2 rounded-full bg-white/5"><div className="h-full rounded-full bg-[#8CA184]" style={{ width: `${Math.max(8, item.count / max * 100)}%` }} /></div></div>; }) : <p className="text-sm text-[#8F928A]">No lead activity yet.</p>}</div></section>
+      <section className="rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><div className="flex justify-between"><h2 className="font-display text-xl">Assigned tasks</h2><Link href="/real-estate/tasks" className="text-xs text-[#C4A562]">Manage</Link></div><div className="mt-5 space-y-3">{metrics?.tasks.length ? metrics.tasks.map((task) => <div key={task.id} className="rounded-xl border border-white/[0.07] p-3"><p className="text-sm">{task.title}</p><p className="mt-1 text-xs text-[#8F928A]">{task.dueAt ? new Date(task.dueAt).toLocaleString() : "No due date"}</p></div>) : <p className="text-sm text-[#8F928A]">No open tasks.</p>}</div></section>
     </div>
-    <section className="mt-6"><div className="mb-4 flex justify-between"><h2 className="font-display text-xl">Property performance</h2><Link href="/real-estate/properties" className="text-xs text-[#C4A562]">View properties</Link></div><div className="grid gap-4 md:grid-cols-3">{demoProperties.map((property) => <article key={property.id} className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#20231F]"><img src={property.imageUrls[0]} alt="" className="h-36 w-full object-cover" /><div className="p-4"><p className="text-[10px] uppercase tracking-widest text-[#A88C52]">{property.status.replace("_", " ")}</p><h3 className="mt-2 text-sm">{property.address}</h3><p className="mt-1 text-xs text-[#92958D]">{formatPropertyPrice(property.price)} · {property.bedrooms} bd · {property.bathrooms} ba</p><div className="mt-4 flex gap-4 border-t border-white/[0.06] pt-3 text-[11px] text-[#8D9088]"><span>{property.viewCount.toLocaleString()} views</span><span>{property.qrScanCount} scans</span></div></div></article>)}</div></section>
+    <section className="mt-6 rounded-2xl border border-white/[0.08] bg-[#20231F] p-5"><h2 className="font-display text-xl">Recent activity</h2><div className="mt-5 divide-y divide-white/[0.06]">{data?.activities.length ? data.activities.map((activity) => <div key={activity.id} className="flex gap-3 py-3 first:pt-0"><span className="mt-1 h-2 w-2 rounded-full bg-[#B99A5B]" /><div><p className="text-sm">{activity.description}</p><p className="mt-1 text-xs text-[#8F928A]">{activity.entityType} · {new Date(activity.createdAt).toLocaleString()}</p></div></div>) : <p className="text-sm text-[#8F928A]">Activity will appear as your team works.</p>}</div></section>
   </div>;
 }

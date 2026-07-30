@@ -65,7 +65,7 @@ export interface PropertyRepository {
 
 let database: NodePgDatabase | null = null;
 
-function db(): NodePgDatabase {
+export function db(): NodePgDatabase {
   if (!database) {
     if (!databaseUrl) throw new Error("DATABASE_URL is required for Real Estate property persistence");
     database = drizzle(new Pool({ connectionString: databaseUrl, ssl: sslConfig, max: 5 }));

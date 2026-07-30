@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authorizeRealEstate } from "@/lib/real-estate/auth";
 import { propertyRepository } from "@/lib/real-estate/repositories";
 import { validatePropertyInput } from "@/lib/real-estate/validation";
+import { recordActivity } from "@/lib/real-estate/crm-repositories";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const principal = authorizeRealEstate(req, "properties:view");
@@ -24,6 +25,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const validation = validatePropertyInput(body, true);
     if (!validation.valid) return NextResponse.json({ error: "Validation failed", errors: validation.errors }, { status: 400 });
     property = await propertyRepository.updateProperty(id, principal.tenantId, validation.data ?? {});
+  }
+  if (property) {
+    const activityAction = action || "updated";
+    await recordActivity(principal.tenantId, "properties", id, activityAction, `Property ${activityAction}: ${property.title}`);
   }
   return property ? NextResponse.json({ ok: true, property }) : NextResponse.json({ error: "Property not found" }, { status: 404 });
 }

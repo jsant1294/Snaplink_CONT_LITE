@@ -8,6 +8,13 @@
       "when": 1785436309511,
       "tag": "0000_late_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785436943665,
+      "tag": "0001_glamorous_xavin",
+      "breakpoints": true
     }
   ]
 }

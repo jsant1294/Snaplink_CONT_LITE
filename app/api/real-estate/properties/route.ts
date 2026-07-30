@@ -3,6 +3,7 @@ import { authorizeRealEstate } from "@/lib/real-estate/auth";
 import { propertyRepository, type PropertyInput } from "@/lib/real-estate/repositories";
 import { validatePropertyInput } from "@/lib/real-estate/validation";
 import type { PropertyStatus } from "@/lib/real-estate/types";
+import { recordActivity } from "@/lib/real-estate/crm-repositories";
 
 function options(req: NextRequest) {
   const params = req.nextUrl.searchParams;
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
   if (!validation.valid) return NextResponse.json({ error: "Validation failed", errors: validation.errors }, { status: 400 });
   try {
     const property = await propertyRepository.createProperty(validation.data as PropertyInput, principal.tenantId);
+    await recordActivity(principal.tenantId, "properties", property.id, "created", `Property created: ${property.title}`);
     return NextResponse.json({ ok: true, property }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Property creation failed";
