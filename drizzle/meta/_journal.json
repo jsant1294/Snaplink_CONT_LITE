@@ -78,6 +78,13 @@
       "when": 1785446740895,
       "tag": "0010_phase11_oauth_billing",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1785447891370,
+      "tag": "0011_fix_oauth_client_id_unique_constraint",
+      "breakpoints": true
     }
   ]
 }
