@@ -1,0 +1,1 @@
+import{NextResponse}from"next/server";import spec from"@/docs/openapi/snaplink-real-estate-v1.json";export async function GET(){return NextResponse.json(spec,{headers:{"cache-control":"public, max-age=300","x-snaplink-api-version":"2026-07-01"}})}

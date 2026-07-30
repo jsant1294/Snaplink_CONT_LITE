@@ -57,6 +57,13 @@
       "when": 1785443306426,
       "tag": "0007_condemned_apocalypse",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785443861821,
+      "tag": "0008_salty_santa_claus",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+import{NextResponse}from"next/server";export async function GET(){return NextResponse.json({name:"SnapLink Real Estate API",version:"2026-07-01",documentation:"/api/v1/openapi.json"},{headers:{"x-snaplink-api-version":"2026-07-01"}})}

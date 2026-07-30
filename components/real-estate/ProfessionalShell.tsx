@@ -17,6 +17,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate/communications", label: "Communications", icon: "lead" },
   { href: "/real-estate/automation", label: "Automation", icon: "campaign" },
   { href: "/real-estate/ai", label: "AI Intelligence", icon: "star" },
+  { href: "/real-estate/enterprise", label: "Enterprise", icon: "office" },
   { href: "/real-estate/notifications", label: "Notifications", icon: "star" },
   { href: "/real-estate/campaigns", label: "Campaigns", icon: "campaign" },
   { href: "/real-estate/marketing-assets", label: "Marketing Assets", icon: "image" },

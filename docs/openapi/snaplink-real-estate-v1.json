@@ -1,0 +1,44 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SnapLink Real Estate API",
+    "version": "2026-07-01",
+    "description": "Tenant-scoped enterprise brokerage API. Internal database identifiers are never returned."
+  },
+  "servers": [{ "url": "/api/v1" }],
+  "security": [{ "apiKey": [] }],
+  "components": {
+    "securitySchemes": {
+      "apiKey": { "type": "http", "scheme": "bearer", "description": "A scoped SnapLink API key." }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["errors", "meta"],
+        "properties": {
+          "errors": { "type": "array", "items": { "type": "object", "properties": { "status": { "type": "string" }, "code": { "type": "string" }, "title": { "type": "string" } } } },
+          "meta": { "type": "object" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/{resource}": {
+      "get": {
+        "summary": "List a tenant-scoped resource",
+        "parameters": [
+          { "name": "resource", "in": "path", "required": true, "schema": { "type": "string", "enum": ["properties", "leads", "buyers", "sellers", "transactions", "documents", "appointments", "messages", "tasks", "contacts"] } },
+          { "name": "page[cursor]", "in": "query", "schema": { "type": "string" } },
+          { "name": "page[limit]", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["createdAt", "-createdAt", "updatedAt", "-updatedAt"] } },
+          { "name": "filter[q]", "in": "query", "schema": { "type": "string", "maxLength": 200 } }
+        ],
+        "responses": {
+          "200": { "description": "Cursor-paginated records" },
+          "401": { "description": "Invalid or insufficient credentials", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit or quota exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  }
+}
