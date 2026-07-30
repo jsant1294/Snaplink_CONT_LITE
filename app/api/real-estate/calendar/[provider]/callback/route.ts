@@ -1,0 +1,3 @@
+import { NextRequest, NextResponse } from "next/server";
+import { consumeOauthCallback } from "@/lib/real-estate/integrations/calendar";
+export async function GET(req: NextRequest, { params }: { params: Promise<{ provider: string }> }) { const provider = (await params).provider; if (!["google","microsoft"].includes(provider)) return NextResponse.json({ error: "Provider not found" }, { status: 404 }); try { await consumeOauthCallback(provider as "google"|"microsoft", req.nextUrl.searchParams.get("state") || "", req.nextUrl.searchParams.get("code") || ""); return NextResponse.redirect(new URL("/real-estate/calendar/settings?connected=1", req.url)); } catch { return NextResponse.redirect(new URL("/real-estate/calendar/settings?error=oauth", req.url)); } }

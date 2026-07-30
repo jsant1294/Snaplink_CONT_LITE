@@ -21,6 +21,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href: "/real-estate/qr-codes", label: "QR Codes", icon: "qr" },
   { href: "/real-estate/reviews", label: "Reviews", icon: "star" },
   { href: "/real-estate/analytics", label: "Analytics", icon: "chart" },
+  { href: "/real-estate/settings/integrations", label: "Integrations", icon: "settings" },
   { href: "/real-estate/settings", label: "Settings", icon: "settings" },
 ];
 

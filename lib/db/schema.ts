@@ -477,6 +477,13 @@ export const realEstateCalendarConnections = pgTable(
     provider: text("provider").notNull(),
     externalCalendarId: text("external_calendar_id"),
     syncEnabled: boolean("sync_enabled").notNull().default(false),
+    status: text("status").notNull().default("disconnected"),
+    syncDirection: text("sync_direction").notNull().default("outbound"),
+    timezone: text("timezone").notNull().default("America/New_York"),
+    encryptionVersion: integer("encryption_version"),
+    attentionRequired: boolean("attention_required").notNull().default(false),
+    lastErrorCode: text("last_error_code"),
+    lastErrorMessage: text("last_error_message"),
     accessTokenEncrypted: text("access_token_encrypted"),
     refreshTokenEncrypted: text("refresh_token_encrypted"),
     tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true, mode: "string" }),
@@ -500,6 +507,7 @@ export const realEstateCommunications = pgTable(
     channel: text("channel").notNull(),
     recipient: text("recipient").notNull(),
     provider: text("provider").notNull().default("disabled"),
+    idempotencyKey: text("idempotency_key"),
     templateId: text("template_id"),
     subject: text("subject"),
     body: text("body").notNull(),
@@ -520,7 +528,7 @@ export const realEstateCommunications = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
   },
-  (t) => [index("real_estate_communications_tenant_idx").on(t.tenantId), index("real_estate_communications_status_idx").on(t.tenantId, t.status)]
+  (t) => [index("real_estate_communications_tenant_idx").on(t.tenantId), index("real_estate_communications_status_idx").on(t.tenantId, t.status), index("real_estate_communications_provider_message_idx").on(t.provider, t.providerMessageId), unique("real_estate_communications_tenant_idempotency_unique").on(t.tenantId, t.idempotencyKey)]
 );
 
 export const realEstateCampaigns = pgTable(
@@ -729,6 +737,87 @@ export const realEstateQrScans = pgTable(
   },
   (t) => [index("real_estate_qr_scans_tenant_idx").on(t.tenantId), index("real_estate_qr_scans_link_idx").on(t.qrLinkId)]
 );
+
+export const realEstateJobs = pgTable(
+  "real_estate_jobs",
+  {
+    id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), organizationId: text("organization_id").notNull(),
+    jobType: text("job_type").notNull(), status: text("status").notNull().default("pending"), priority: integer("priority").notNull().default(100),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull().default({}), payloadVersion: integer("payload_version").notNull().default(1),
+    idempotencyKey: text("idempotency_key").notNull(), scheduledAt: timestamp("scheduled_at", { withTimezone: true, mode: "string" }),
+    availableAt: timestamp("available_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(), lockedAt: timestamp("locked_at", { withTimezone: true, mode: "string" }),
+    lockExpiresAt: timestamp("lock_expires_at", { withTimezone: true, mode: "string" }), lockedBy: text("locked_by"),
+    attemptCount: integer("attempt_count").notNull().default(0), maxAttempts: integer("max_attempts").notNull().default(5),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }), completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    failedAt: timestamp("failed_at", { withTimezone: true, mode: "string" }), cancelledAt: timestamp("cancelled_at", { withTimezone: true, mode: "string" }),
+    lastErrorCode: text("last_error_code"), lastErrorMessage: text("last_error_message"),
+    createdByMembershipId: text("created_by_membership_id").references(() => realEstateMemberships.id),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(), updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [unique("real_estate_jobs_tenant_idempotency_unique").on(t.tenantId, t.idempotencyKey), index("real_estate_jobs_claim_idx").on(t.status, t.availableAt, t.priority), index("real_estate_jobs_tenant_status_idx").on(t.tenantId, t.status)]
+);
+export const realEstateJobAttempts = pgTable("real_estate_job_attempts", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), jobId: text("job_id").notNull().references(() => realEstateJobs.id, { onDelete: "cascade" }),
+  attemptNumber: integer("attempt_number").notNull(), workerId: text("worker_id").notNull(), status: text("status").notNull(),
+  safeErrorCode: text("safe_error_code"), safeErrorMessage: text("safe_error_message"), startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+}, (t) => [index("real_estate_job_attempts_job_idx").on(t.jobId), index("real_estate_job_attempts_tenant_idx").on(t.tenantId)]);
+export const realEstateJobLocks = pgTable("real_estate_job_locks", {
+  id: text("id").primaryKey(), jobId: text("job_id").notNull().references(() => realEstateJobs.id, { onDelete: "cascade" }), workerId: text("worker_id").notNull(),
+  acquiredAt: timestamp("acquired_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(), expiresAt: timestamp("expires_at", { withTimezone: true, mode: "string" }).notNull(),
+}, (t) => [unique("real_estate_job_locks_job_unique").on(t.jobId), index("real_estate_job_locks_expiry_idx").on(t.expiresAt)]);
+export const realEstateDeadLetters = pgTable("real_estate_dead_letters", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), jobId: text("job_id").notNull().references(() => realEstateJobs.id),
+  jobType: text("job_type").notNull(), safeErrorCode: text("safe_error_code"), safeErrorMessage: text("safe_error_message"),
+  attemptCount: integer("attempt_count").notNull(), requeuedAt: timestamp("requeued_at", { withTimezone: true, mode: "string" }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+}, (t) => [unique("real_estate_dead_letters_job_unique").on(t.jobId), index("real_estate_dead_letters_tenant_idx").on(t.tenantId)]);
+
+export const realEstateOauthStates = pgTable("real_estate_oauth_states", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), membershipId: text("membership_id").notNull().references(() => realEstateMemberships.id),
+  provider: text("provider").notNull(), stateHash: text("state_hash").notNull(), expiresAt: timestamp("expires_at", { withTimezone: true, mode: "string" }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true, mode: "string" }), createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+}, (t) => [unique("real_estate_oauth_state_hash_unique").on(t.stateHash), index("real_estate_oauth_state_expiry_idx").on(t.expiresAt)]);
+export const realEstateCalendarEventLinks = pgTable("real_estate_calendar_event_links", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), connectionId: text("connection_id").notNull().references(() => realEstateCalendarConnections.id, { onDelete: "cascade" }),
+  internalEventType: text("internal_event_type").notNull(), internalEventId: text("internal_event_id").notNull(), externalCalendarId: text("external_calendar_id").notNull(),
+  externalEventId: text("external_event_id"), providerEtag: text("provider_etag"), synchronizedHash: text("synchronized_hash"), status: text("status").notNull().default("pending"),
+  lastSyncedAt: timestamp("last_synced_at", { withTimezone: true, mode: "string" }), lastErrorCode: text("last_error_code"), lastErrorMessage: text("last_error_message"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(), updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+}, (t) => [unique("real_estate_calendar_link_unique").on(t.connectionId, t.internalEventType, t.internalEventId, t.externalCalendarId), index("real_estate_calendar_external_idx").on(t.connectionId, t.externalEventId), index("real_estate_calendar_link_tenant_idx").on(t.tenantId)]);
+
+export const realEstateWebhookEvents = pgTable("real_estate_webhook_events", {
+  id: text("id").primaryKey(), provider: text("provider").notNull(), providerEventId: text("provider_event_id"), eventType: text("event_type").notNull(),
+  signatureVerified: boolean("signature_verified").notNull(), receivedAt: timestamp("received_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  processedAt: timestamp("processed_at", { withTimezone: true, mode: "string" }), status: text("status").notNull().default("received"), attemptCount: integer("attempt_count").notNull().default(0),
+  payloadHash: text("payload_hash").notNull(), safeMetadata: jsonb("safe_metadata").$type<Record<string, unknown>>().notNull().default({}),
+  lastErrorCode: text("last_error_code"), lastErrorMessage: text("last_error_message"), createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+}, (t) => [unique("real_estate_webhook_provider_event_unique").on(t.provider, t.providerEventId), unique("real_estate_webhook_provider_hash_unique").on(t.provider, t.payloadHash), index("real_estate_webhook_status_idx").on(t.status, t.receivedAt)]);
+export const realEstateCommunicationEvents = pgTable("real_estate_communication_events", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), communicationId: text("communication_id").notNull().references(() => realEstateCommunications.id, { onDelete: "cascade" }),
+  provider: text("provider").notNull(), eventType: text("event_type").notNull(), providerEventId: text("provider_event_id"), occurredAt: timestamp("occurred_at", { withTimezone: true, mode: "string" }).notNull(),
+  safeMetadata: jsonb("safe_metadata").$type<Record<string, unknown>>().notNull().default({}), createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+}, (t) => [unique("real_estate_communication_event_unique").on(t.provider, t.providerEventId), index("real_estate_communication_events_tenant_idx").on(t.tenantId), index("real_estate_communication_events_message_idx").on(t.communicationId)]);
+export const realEstateContactSuppressions = pgTable("real_estate_contact_suppressions", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), channel: text("channel").notNull(), recipientHash: text("recipient_hash").notNull(), suppressionType: text("suppression_type").notNull(),
+  source: text("source").notNull(), reason: text("reason"), createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(), removedAt: timestamp("removed_at", { withTimezone: true, mode: "string" }),
+}, (t) => [unique("real_estate_suppression_active_unique").on(t.tenantId, t.channel, t.recipientHash, t.suppressionType), index("real_estate_suppressions_tenant_idx").on(t.tenantId)]);
+export const realEstateDeliverabilityDaily = pgTable("real_estate_deliverability_daily", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id").notNull(), day: text("day").notNull(), provider: text("provider").notNull(), campaignId: text("campaign_id"),
+  metrics: jsonb("metrics").$type<Record<string, number>>().notNull().default({}), createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(), updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+}, (t) => [unique("real_estate_deliverability_daily_unique").on(t.tenantId, t.day, t.provider, t.campaignId), index("real_estate_deliverability_tenant_idx").on(t.tenantId, t.day)]);
+export const realEstateProviderHealthChecks = pgTable("real_estate_provider_health_checks", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id"), provider: text("provider").notNull(), status: text("status").notNull(), checkedAt: timestamp("checked_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  lastSuccessAt: timestamp("last_success_at", { withTimezone: true, mode: "string" }), lastFailureAt: timestamp("last_failure_at", { withTimezone: true, mode: "string" }),
+  safeFailureCode: text("safe_failure_code"), safeFailureMessage: text("safe_failure_message"), latencyMs: integer("latency_ms"),
+}, (t) => [index("real_estate_health_provider_idx").on(t.provider, t.checkedAt), index("real_estate_health_tenant_idx").on(t.tenantId, t.checkedAt)]);
+export const realEstateOperationalIncidents = pgTable("real_estate_operational_incidents", {
+  id: text("id").primaryKey(), tenantId: text("tenant_id"), incidentKey: text("incident_key").notNull(), type: text("type").notNull(), status: text("status").notNull().default("open"),
+  severity: text("severity").notNull().default("warning"), safeMessage: text("safe_message").notNull(), openedAt: timestamp("opened_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  resolvedAt: timestamp("resolved_at", { withTimezone: true, mode: "string" }), lastNotifiedAt: timestamp("last_notified_at", { withTimezone: true, mode: "string" }),
+}, (t) => [unique("real_estate_incident_key_unique").on(t.incidentKey), index("real_estate_incident_tenant_idx").on(t.tenantId, t.status)]);
 
 // ---------------------------------------------------------------------------
 // Lucio Financial Copilot (LFC)

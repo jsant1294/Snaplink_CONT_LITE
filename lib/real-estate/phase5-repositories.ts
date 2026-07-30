@@ -11,9 +11,11 @@ import { db } from "./repositories";
 import type { DataScope } from "./access";
 import { isAgentScope } from "./access";
 import { canCommunicate } from "./communications/consent";
-import { communicationProvider } from "./communications/providers";
+import { loadIntegrationConfig } from "./integrations/config";
+import { ProductionEmailProvider, ProductionSmsProvider } from "./integrations/providers";
 import { renderTemplate, TEMPLATE_TYPES, validateTemplate } from "./communications/templates";
 import type { CommunicationChannel } from "./communications/types";
+import { isSuppressed } from "./integrations/deliverability";
 
 const newId = (kind: string) => `re_${kind}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 9)}`;
 const now = () => new Date().toISOString();
@@ -47,14 +49,15 @@ export async function createCommunication(scope: DataScope, membershipId: string
   const recipient = String(input.recipient || "").trim();
   const purpose = input.purpose === "marketing" ? "marketing" : "transactional";
   const preference = await findPreference(scope.tenantId, channel, recipient);
-  const allowed = canCommunicate(preference, channel, purpose);
+  const allowed = canCommunicate(preference, channel, purpose) && !await isSuppressed(scope.tenantId, channel, recipient);
   const scheduledAt = input.scheduledAt ? String(input.scheduledAt) : null;
   const status = input.status === "draft" ? "draft" : !allowed ? "blocked" : scheduledAt ? "scheduled" : "queued";
+  const communicationId = newId("communication"), idempotencyKey = String(input.idempotencyKey || `communication:${communicationId}`);
   return (await db().insert(realEstateCommunications).values({
-    id: newId("communication"), tenantId: scope.tenantId, senderMembershipId: membershipId,
+    id: communicationId, tenantId: scope.tenantId, senderMembershipId: membershipId,
     sender: String(input.sender || ""), entityType: String(input.entityType || "manual"),
     entityId: String(input.entityId || membershipId), channel, recipient,
-    provider: "pending", templateId: input.templateId ? String(input.templateId) : null,
+    provider: "pending", idempotencyKey, templateId: input.templateId ? String(input.templateId) : null,
     subject: input.subject ? String(input.subject) : null, body: String(input.body || ""),
     renderedContent: { subject: input.subject || null, body: input.body || "" }, status, scheduledAt,
     propertyId: input.propertyId ? String(input.propertyId) : null, leadId: input.leadId ? String(input.leadId) : null,
@@ -62,17 +65,18 @@ export async function createCommunication(scope: DataScope, membershipId: string
     campaignId: input.campaignId ? String(input.campaignId) : null, showingId: input.showingId ? String(input.showingId) : null,
     openHouseId: input.openHouseId ? String(input.openHouseId) : null,
     error: allowed ? null : "Communication blocked by consent preferences",
-  }).returning())[0];
+  }).onConflictDoNothing().returning())[0] ?? (await db().select().from(realEstateCommunications).where(and(eq(realEstateCommunications.tenantId, scope.tenantId), eq(realEstateCommunications.idempotencyKey, idempotencyKey))).limit(1))[0];
 }
 
 export async function dispatchCommunication(scope: DataScope, communicationId: string) {
   const message = (await db().select().from(realEstateCommunications).where(and(eq(realEstateCommunications.id, communicationId), eq(realEstateCommunications.tenantId, scope.tenantId))).limit(1))[0];
   if (!message || !["queued", "scheduled", "failed"].includes(message.status)) return null;
   const preference = await findPreference(scope.tenantId, message.channel as CommunicationChannel, message.recipient);
-  if (!canCommunicate(preference, message.channel as CommunicationChannel, "transactional")) return (await db().update(realEstateCommunications).set({ status: "blocked", error: "Communication blocked by consent preferences", updatedAt: now() }).where(and(eq(realEstateCommunications.id, communicationId), eq(realEstateCommunications.tenantId, scope.tenantId))).returning())[0];
-  const provider = communicationProvider(message.channel as CommunicationChannel);
-  const result = await provider.send({ to: message.recipient, subject: message.subject || undefined, body: message.body });
-  return (await db().update(realEstateCommunications).set({ provider: result.provider, providerMessageId: result.messageId || null, status: result.status === "sent" ? "sent" : result.status === "preview" ? "sent" : "failed", sentAt: ["sent", "preview"].includes(result.status) ? now() : null, error: result.error || null, updatedAt: now() }).where(and(eq(realEstateCommunications.id, communicationId), eq(realEstateCommunications.tenantId, scope.tenantId))).returning())[0];
+  if (!canCommunicate(preference, message.channel as CommunicationChannel, "transactional") || await isSuppressed(scope.tenantId, message.channel, message.recipient)) return (await db().update(realEstateCommunications).set({ status: "blocked", error: "Communication blocked by consent or suppression", updatedAt: now() }).where(and(eq(realEstateCommunications.id, communicationId), eq(realEstateCommunications.tenantId, scope.tenantId))).returning())[0];
+  const config = loadIntegrationConfig(), provider = message.channel === "email" ? new ProductionEmailProvider(config.emailProvider === "sendgrid" ? "sendgrid" : "resend") : new ProductionSmsProvider();
+  if ((message.channel === "email" && ["disabled"].includes(config.emailProvider)) || (message.channel === "sms" && ["disabled"].includes(config.smsProvider))) return (await db().update(realEstateCommunications).set({ provider: "disabled", status: "failed", error: "Provider is disabled", updatedAt: now() }).where(and(eq(realEstateCommunications.id, communicationId), eq(realEstateCommunications.tenantId, scope.tenantId))).returning())[0];
+  const result = await provider.send({ recipient: message.recipient, subject: message.subject || undefined, html: message.body, text: message.body.replace(/<[^>]*>/g, " "), idempotencyKey: message.idempotencyKey || `communication:${message.id}`, purpose: message.campaignId ? "marketing" : "transactional" });
+  return (await db().update(realEstateCommunications).set({ provider: result.provider, providerMessageId: result.providerMessageId || null, status: result.internalStatus, sentAt: result.success ? now() : null, error: result.safeErrorMessage || null, updatedAt: now() }).where(and(eq(realEstateCommunications.id, communicationId), eq(realEstateCommunications.tenantId, scope.tenantId))).returning())[0];
 }
 
 export async function listTemplates(scope: DataScope) { return db().select().from(realEstateCommunicationTemplates).where(and(eq(realEstateCommunicationTemplates.tenantId, scope.tenantId), isNull(realEstateCommunicationTemplates.deletedAt))).orderBy(asc(realEstateCommunicationTemplates.name)); }

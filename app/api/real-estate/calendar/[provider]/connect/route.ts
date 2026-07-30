@@ -1,0 +1,4 @@
+import { NextRequest, NextResponse } from "next/server";
+import { authorizeRealEstate } from "@/lib/real-estate/auth";
+import { createOauthAuthorization } from "@/lib/real-estate/integrations/calendar";
+export async function GET(req: NextRequest, { params }: { params: Promise<{ provider: string }> }) { const p = await authorizeRealEstate(req, "settings:manage"); if (!p) return NextResponse.json({ error: "Access denied" }, { status: 403 }); const provider = (await params).provider; if (!["google","microsoft"].includes(provider)) return NextResponse.json({ error: "Provider not found" }, { status: 404 }); try { return NextResponse.redirect(await createOauthAuthorization(p, p.membershipId, provider as "google"|"microsoft")); } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "Calendar unavailable" }, { status: 503 }); } }

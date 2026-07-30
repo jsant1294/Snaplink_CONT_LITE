@@ -36,6 +36,13 @@
       "when": 1785439724557,
       "tag": "0004_small_ultimatum",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785441159768,
+      "tag": "0005_exotic_rockslide",
+      "breakpoints": true
     }
   ]
 }

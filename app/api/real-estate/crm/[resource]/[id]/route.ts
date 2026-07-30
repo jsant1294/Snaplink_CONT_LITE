@@ -4,6 +4,7 @@ import { crmRepository, type CrmResource } from "@/lib/real-estate/crm-repositor
 import { validateCrmInput } from "@/lib/real-estate/crm-validation";
 import type { RealEstatePermission } from "@/lib/real-estate/permissions";
 import { triggerWorkflows } from "@/lib/real-estate/phase5-repositories";
+import { enqueueCalendarJobs } from "@/lib/real-estate/jobs";
 
 const resources: CrmResource[] = ["brokerages", "agents", "buyers", "sellers", "leads", "showings", "open-houses", "tasks"];
 const permission = (resource: CrmResource): RealEstatePermission =>
@@ -35,6 +36,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ re
   if (!validation.valid) return NextResponse.json({ error: "Validation failed", errors: validation.errors }, { status: 400 });
   const record = await crmRepository.update(resource, id, principal.tenantId, validation.data);
   if (record && resource === "leads") await triggerWorkflows(principal, "lead_updated", "lead", id);
+  if (record && resource === "showings") await enqueueCalendarJobs(principal, principal.membershipId, "showing", id);
+  if (record && resource === "open-houses") await enqueueCalendarJobs(principal, principal.membershipId, "open_house", id);
   return record ? NextResponse.json({ ok: true, record }) : NextResponse.json({ error: "Record not found" }, { status: 404 });
 }
 

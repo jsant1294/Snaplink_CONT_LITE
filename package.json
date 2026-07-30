@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:real-estate": "node --test tests/real-estate-tenant-isolation.test.mjs tests/real-estate-phase5.test.mjs",
+    "test:real-estate": "node --test tests/real-estate-tenant-isolation.test.mjs tests/real-estate-phase5.test.mjs tests/real-estate-phase6.test.mjs tests/real-estate-db-integration.test.mjs",
     "db:push": "drizzle-kit push",
     "db:seed": "node scripts/seed-demos.mjs",
     "db:seed:categories": "node scripts/seed-categories.mjs",
