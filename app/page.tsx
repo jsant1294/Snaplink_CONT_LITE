@@ -19,6 +19,7 @@ import CommunitySpotlight from "@/components/southline/CommunitySpotlight";
 import RealEstateEntryBlock from "@/components/southline/RealEstateEntryBlock";
 import FeaturedHomes from "@/components/southline/FeaturedHomes";
 import FeaturedServicesEntryBlock from "@/components/southline/FeaturedServicesEntryBlock";
+import PoweredBySnapLink from "@/components/southline/PoweredBySnapLink";
 import DIYLearningTeaser from "@/components/southline/DIYLearningTeaser";
 import SeasonalIdeasBanner from "@/components/southline/SeasonalIdeasBanner";
 import EstimatorBookingSection from "@/components/southline/EstimatorBookingSection";
@@ -86,6 +87,7 @@ export default async function HomePage() {
         {(!sections || sections.featuredPros) && (
           <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
         )}
+        {(!sections || sections.poweredBySnaplink) && <PoweredBySnapLink lang={lang} />}
         {(!sections || sections.categories) && <CategoriesGrid lang={lang} />}
 
         {(!sections || sections.diyLearning) && <DIYLearningTeaser lang={lang} projects={diyTeaserProjects} />}

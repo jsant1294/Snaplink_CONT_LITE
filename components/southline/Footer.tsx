@@ -44,6 +44,7 @@ export default function Footer({ lang }: { lang: Lang }) {
               {t("footerProfessionals", lang)}
             </h4>
             <ul className="space-y-2.5">
+              <li><Link href="/snaplink" className="text-sm hover:text-gold transition-colors">{t("footerSnaplink", lang)}</Link></li>
               <li><Link href="/for-contractors" className="text-sm hover:text-gold transition-colors">{t("footerJoin", lang)}</Link></li>
               <li><Link href="/for-contractors" className="text-sm hover:text-gold transition-colors">{t("footerClaim", lang)}</Link></li>
               <li><Link href="/contractor-admin" className="text-sm hover:text-gold transition-colors">{t("contractorLogin", lang)}</Link></li>
@@ -60,6 +61,7 @@ export default function Footer({ lang }: { lang: Lang }) {
               <li><Link href="/how-it-works" className="text-sm hover:text-gold transition-colors">
                 {lang === "es" ? "Cómo funciona" : "How it works"}
               </Link></li>
+              <li><Link href="/faq" className="text-sm hover:text-gold transition-colors">{t("footerFaq", lang)}</Link></li>
               <li><Link href="#" className="text-sm hover:text-gold transition-colors">{t("footerAbout", lang)}</Link></li>
               <li><Link href="#" className="text-sm hover:text-gold transition-colors">{t("footerContact", lang)}</Link></li>
               <li><Link href="#" className="text-sm hover:text-gold transition-colors">{t("footerPrivacy", lang)}</Link></li>

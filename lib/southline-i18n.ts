@@ -145,6 +145,8 @@ export const UI_DEFS = {
   footerCompany: { es: "Compañía", en: "Company" },
   footerAbout: { es: "Acerca de", en: "About" },
   footerContact: { es: "Contacto", en: "Contact" },
+  footerFaq: { es: "Preguntas frecuentes", en: "FAQ" },
+  footerSnaplink: { es: "SnapLink", en: "SnapLink" },
   footerPrivacy: { es: "Privacidad", en: "Privacy" },
   footerTerms: { es: "Términos", en: "Terms" },
   footerAccessibility: { es: "Accesibilidad", en: "Accessibility" },
@@ -334,6 +336,26 @@ export const UI_DEFS = {
   exploreProfessionals: { es: "Explorar profesionales", en: "Explore Professionals" },
   findByTrade: { es: "Buscar por oficio", en: "Find by Trade" },
   browseCategories: { es: "Explorar categorías", en: "Browse Categories" },
+
+  // Homepage: Powered by SnapLink
+  poweredBySnaplinkEyebrow: { es: "SNAPLINK", en: "SNAPLINK" },
+  poweredBySnaplinkTitle: { es: "Impulsado por SnapLink", en: "Powered by SnapLink" },
+  poweredBySnaplinkSubtitle: { es: "La tecnología detrás de cada conexión de confianza.", en: "The technology behind every trusted connection." },
+  poweredBySnaplinkBody: {
+    es: "Southline Living está impulsado por SnapLink, una plataforma profesional que ayuda a negocios locales de confianza a conectar con propietarios a través de perfiles digitales modernos, herramientas de reserva, reseñas, tecnología NFC sin contacto y experiencias inteligentes para el cliente. Ya sea que te conectes con un contratista, agente inmobiliario, arquitecto, diseñador, paisajista o fotógrafo, cada Perfil SnapLink mantiene todo en un solo lugar.",
+    en: "Southline Living is powered by SnapLink — a professional platform that helps trusted local businesses connect with homeowners through modern digital profiles, booking tools, reviews, contactless NFC technology, and smart customer experiences. Whether you connect with a contractor, real estate agent, architect, designer, landscaper, or photographer, every SnapLink Profile keeps everything in one place.",
+  },
+  snaplinkGrowHeadline: { es: "Haz crecer tu negocio con SnapLink", en: "Grow Your Business with SnapLink" },
+  snaplinkGrowBody: {
+    es: "Ya seas contratista, agente inmobiliario, arquitecto, diseñador, paisajista, fotógrafo u otro profesional local, SnapLink te ayuda a generar confianza, recibir clientes potenciales, simplificar las reservas y hacer crecer tu negocio.",
+    en: "Whether you're a contractor, realtor, architect, designer, landscaper, photographer, or another local professional, SnapLink helps you build trust, receive leads, simplify booking, and grow your business.",
+  },
+  viewDemoProfile: { es: "Ver perfil de muestra", en: "View Demo Profile" },
+  learnMore: { es: "Más información", en: "Learn More" },
+  professionalLogin: { es: "Acceso profesional", en: "Professional Login" },
+  whyTrustSnaplink: { es: "Por qué los propietarios confían en SnapLink", en: "Why Homeowners Trust SnapLink" },
+  consumerJourneyTitle: { es: "El recorrido del propietario", en: "The Homeowner Journey" },
+  professionalJourneyTitle: { es: "El recorrido del profesional", en: "The Professional Journey" },
 
   // Homepage: DIY Learning
   diyLearningEyebrow: { es: "Aprende", en: "Learn" },

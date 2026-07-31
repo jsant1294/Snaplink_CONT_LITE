@@ -23,6 +23,7 @@ export interface SectionVisibility {
   featuredAgents: boolean;
   featuredHomes: boolean;
   featuredServices: boolean;
+  poweredBySnaplink: boolean;
   diyLearning: boolean;
   seasonalIdeas: boolean;
   costEstimator: boolean;
@@ -104,6 +105,7 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   featuredAgents: true,
   featuredHomes: true,
   featuredServices: true,
+  poweredBySnaplink: true,
   diyLearning: true,
   seasonalIdeas: true,
   costEstimator: true,
