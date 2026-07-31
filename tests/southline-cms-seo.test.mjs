@@ -99,9 +99,9 @@ test("buildSeoMetadata for home with no settings keeps today's exact fallbacks (
     "Explore, plan, and connect with trusted home professionals."
   );
   assert.equal(en.openGraph.siteName, "Southline Living");
-  assert.equal(en.openGraph.images[0].url, "/og-image.jpg");
+  assert.equal(en.openGraph.images[0].url, "/og-image.png");
   assert.equal(en.twitter.card, "summary_large_image");
-  assert.equal(en.twitter.images[0], "/og-image.jpg");
+  assert.equal(en.twitter.images[0], "/og-image.png");
   assert.equal(en.alternates.canonical, "http://localhost:3000");
   assert.deepEqual(en.alternates.languages, { en: "/", es: "/" });
   assert.equal(en.robots, undefined);

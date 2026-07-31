@@ -7,7 +7,7 @@ import type {
 } from "./southline-types";
 
 const SITE_NAME = "Southline Living";
-const DEFAULT_OG_IMAGE = "/og-image.jpg";
+const DEFAULT_OG_IMAGE = "/og-image.png";
 const DEFAULT_TITLE_TEMPLATE = "%s | Southline Living";
 const DEFAULT_APP_URL = "http://localhost:3000";
 

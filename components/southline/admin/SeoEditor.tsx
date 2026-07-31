@@ -135,7 +135,7 @@ export default function SeoEditor({ pin }: { pin: string }) {
           <Field label="OG title (ES)" value={content.defaultOpenGraphTitleEs} onChange={(v) => set("defaultOpenGraphTitleEs", v)} placeholder="Southline Living — Ideas para cada hogar" />
           <TextareaField label="OG description (EN)" value={content.defaultOpenGraphDescription} onChange={(v) => set("defaultOpenGraphDescription", v)} placeholder="Explore, plan, and connect with trusted home professionals." />
           <TextareaField label="OG description (ES)" value={content.defaultOpenGraphDescriptionEs} onChange={(v) => set("defaultOpenGraphDescriptionEs", v)} placeholder="Explora, planifica y conecta con profesionales de confianza para tu hogar." />
-          <Field label="OG image URL" value={content.defaultOpenGraphImageUrl} onChange={(v) => set("defaultOpenGraphImageUrl", v)} placeholder="/og-image.jpg" />
+          <Field label="OG image URL" value={content.defaultOpenGraphImageUrl} onChange={(v) => set("defaultOpenGraphImageUrl", v)} placeholder="/og-image.png" />
         </div>
       </section>
 
@@ -146,7 +146,7 @@ export default function SeoEditor({ pin }: { pin: string }) {
           <Field label="Twitter title (ES)" value={content.defaultTwitterTitleEs} onChange={(v) => set("defaultTwitterTitleEs", v)} />
           <TextareaField label="Twitter description (EN)" value={content.defaultTwitterDescription} onChange={(v) => set("defaultTwitterDescription", v)} />
           <TextareaField label="Twitter description (ES)" value={content.defaultTwitterDescriptionEs} onChange={(v) => set("defaultTwitterDescriptionEs", v)} />
-          <Field label="Twitter image URL" value={content.defaultTwitterImageUrl} onChange={(v) => set("defaultTwitterImageUrl", v)} placeholder="/og-image.jpg" />
+          <Field label="Twitter image URL" value={content.defaultTwitterImageUrl} onChange={(v) => set("defaultTwitterImageUrl", v)} placeholder="/og-image.png" />
           <div>
             <label className="label">Card type</label>
             <select
@@ -201,7 +201,7 @@ export default function SeoEditor({ pin }: { pin: string }) {
               <TextareaField label="Description (EN)" value={page.description} onChange={(v) => setPage(pageKey, "description", v)} />
               <TextareaField label="Description (ES)" value={page.descriptionEs} onChange={(v) => setPage(pageKey, "descriptionEs", v)} />
               <Field label="Canonical path" value={page.canonicalPath} onChange={(v) => setPage(pageKey, "canonicalPath", v)} placeholder={pageKey === "home" ? "/" : `/${pageKey}`} />
-              <Field label="OG image URL" value={page.openGraphImageUrl} onChange={(v) => setPage(pageKey, "openGraphImageUrl", v)} placeholder="/og-image.jpg" />
+              <Field label="OG image URL" value={page.openGraphImageUrl} onChange={(v) => setPage(pageKey, "openGraphImageUrl", v)} placeholder="/og-image.png" />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="OG title (EN)" value={page.openGraphTitle} onChange={(v) => setPage(pageKey, "openGraphTitle", v)} />
@@ -214,7 +214,7 @@ export default function SeoEditor({ pin }: { pin: string }) {
               <Field label="Twitter title (ES)" value={page.twitterTitleEs} onChange={(v) => setPage(pageKey, "twitterTitleEs", v)} />
               <TextareaField label="Twitter description (EN)" value={page.twitterDescription} onChange={(v) => setPage(pageKey, "twitterDescription", v)} />
               <TextareaField label="Twitter description (ES)" value={page.twitterDescriptionEs} onChange={(v) => setPage(pageKey, "twitterDescriptionEs", v)} />
-              <Field label="Twitter image URL" value={page.twitterImageUrl} onChange={(v) => setPage(pageKey, "twitterImageUrl", v)} placeholder="/og-image.jpg" />
+              <Field label="Twitter image URL" value={page.twitterImageUrl} onChange={(v) => setPage(pageKey, "twitterImageUrl", v)} placeholder="/og-image.png" />
             </div>
             <div className="pt-1">
               <label className="flex items-center justify-between border-t border-white/5 py-3">

@@ -3,7 +3,7 @@ import { t, type Lang } from "@/lib/southline-i18n";
 import { PRODUCT_FLOW, FEATURE_GRID, TRUST_POINTS, CONSUMER_JOURNEY, PROFESSIONAL_JOURNEY } from "@/lib/snaplink-content";
 
 // No real NFC/product photography exists in this repo yet (checked public/ —
-// only hero-contractor.jpg and og-image.jpg). Rather than use generic stock
+// only hero-contractor.jpg and og-image.png). Rather than use generic stock
 // photography for the "hero graphic" the spec calls for, this section uses a
 // typographic/numbered flow diagram instead — consistent with "no generic
 // stock imagery," honest about what assets actually exist today.
