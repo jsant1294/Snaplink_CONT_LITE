@@ -2,19 +2,37 @@
 
 import { useEffect, useState } from "react";
 import type { FlipCampaign, FlipPage, FlipPageType, FlipCtaType } from "@/lib/flipbook-types";
+import { nt, type Lang } from "@/lib/i18n";
 
 const PAGE_TYPES: FlipPageType[] = ["cover", "image", "text_image", "offer", "cta", "contact"];
 const CTA_TYPES: FlipCtaType[] = ["url", "phone", "sms", "whatsapp"];
 
+const PAGE_TYPE_KEYS: Record<FlipPageType, "pageTypeCover" | "pageTypeImage" | "pageTypeTextImage" | "pageTypeOffer" | "pageTypeCta" | "pageTypeContact"> = {
+  cover: "pageTypeCover",
+  image: "pageTypeImage",
+  text_image: "pageTypeTextImage",
+  offer: "pageTypeOffer",
+  cta: "pageTypeCta",
+  contact: "pageTypeContact",
+};
+
+function statusLabel(status: FlipCampaign["status"], lang: Lang): string {
+  if (status === "published") return nt("published", lang);
+  if (status === "archived") return nt("statusArchived", lang);
+  return nt("statusDraft", lang);
+}
+
 export default function FlipbookEditor({
   campaign,
   contractorId,
+  lang,
   pin,
   onClose,
   onChanged,
 }: {
   campaign: FlipCampaign;
   contractorId: string;
+  lang: Lang;
   pin: string;
   onClose: () => void;
   onChanged: (campaign: FlipCampaign) => void;
@@ -58,7 +76,7 @@ export default function FlipbookEditor({
     setBusy(false);
     if (data.campaign) {
       onChanged(data.campaign);
-      showToast("Saved");
+      showToast(nt("saved", lang));
     }
   }
 
@@ -73,7 +91,7 @@ export default function FlipbookEditor({
     setBusy(false);
     if (data.campaign) {
       onChanged(data.campaign);
-      showToast(status === "published" ? "Published" : "Updated");
+      showToast(status === "published" ? nt("published", lang) : nt("updated", lang));
     }
   }
 
@@ -97,7 +115,7 @@ export default function FlipbookEditor({
   }
 
   async function deletePage(id: string) {
-    if (!confirm("Delete this page?")) return;
+    if (!confirm(nt("confirmDeletePage", lang))) return;
     await fetch(`/api/contractor/flipbook/pages/${id}`, { method: "DELETE", headers: headers() });
     setPages((p) => p.filter((pg) => pg.id !== id));
   }
@@ -152,20 +170,20 @@ export default function FlipbookEditor({
                   : "border-gold/40 bg-gold/15 text-goldlight"
             }`}
           >
-            {campaign.status}
+            {statusLabel(campaign.status, lang)}
           </span>
           {campaign.status !== "published" && (
             <button onClick={() => setStatus("published")} disabled={busy} className="btn-gold !py-1.5 !px-3 text-xs">
-              Publish
+              {nt("publish", lang)}
             </button>
           )}
           {campaign.status === "published" && (
             <button onClick={() => setStatus("archived")} disabled={busy} className="btn-outline !py-1.5 !px-3 text-xs">
-              Archive
+              {nt("archive", lang)}
             </button>
           )}
           <button onClick={onClose} className="text-xs text-muted hover:text-bone">
-            Close
+            {nt("close", lang)}
           </button>
         </div>
       </div>
@@ -178,16 +196,16 @@ export default function FlipbookEditor({
           <button
             onClick={() => {
               navigator.clipboard.writeText(publicUrl);
-              showToast("Link copied");
+              showToast(nt("linkCopied", lang));
             }}
             className="shrink-0 text-muted hover:text-bone"
           >
-            Copy
+            {nt("copy", lang)}
           </button>
         </div>
       )}
 
-      {loading && <p className="text-sm text-muted">Loading…</p>}
+      {loading && <p className="text-sm text-muted">{nt("loading", lang)}</p>}
 
       <div className="space-y-3">
         {pages.map((page, i) => (
@@ -198,14 +216,15 @@ export default function FlipbookEditor({
                 onChange={(e) => updatePage(page.id, { pageType: e.target.value as FlipPageType })}
                 className="input !w-auto !py-1.5 text-xs"
               >
-                {PAGE_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {PAGE_TYPES.map((pt) => (
+                  <option key={pt} value={pt}>
+                    {nt(PAGE_TYPE_KEYS[pt], lang)}
                   </option>
                 ))}
               </select>
               <div className="flex items-center gap-1">
                 <button
+                  aria-label={nt("moveUp", lang)}
                   onClick={() => movePage(page.id, -1)}
                   disabled={i === 0}
                   className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
@@ -213,6 +232,7 @@ export default function FlipbookEditor({
                   ↑
                 </button>
                 <button
+                  aria-label={nt("moveDown", lang)}
                   onClick={() => movePage(page.id, 1)}
                   disabled={i === pages.length - 1}
                   className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
@@ -223,7 +243,7 @@ export default function FlipbookEditor({
                   onClick={() => deletePage(page.id)}
                   className="rounded-lg border border-white/10 px-2 py-1 text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2"
                 >
-                  Delete
+                  {nt("delete", lang)}
                 </button>
               </div>
             </div>
@@ -232,7 +252,7 @@ export default function FlipbookEditor({
               value={page.headline}
               onChange={(e) => setPages((p) => p.map((pg) => (pg.id === page.id ? { ...pg, headline: e.target.value } : pg)))}
               onBlur={(e) => updatePage(page.id, { headline: e.target.value })}
-              placeholder="Headline"
+              placeholder={nt("headlinePlaceholder", lang)}
               className="input mb-2 text-sm"
             />
             <textarea
@@ -240,7 +260,7 @@ export default function FlipbookEditor({
               onChange={(e) => setPages((p) => p.map((pg) => (pg.id === page.id ? { ...pg, body: e.target.value } : pg)))}
               onBlur={(e) => updatePage(page.id, { body: e.target.value })}
               rows={2}
-              placeholder="Body text"
+              placeholder={nt("bodyPlaceholder", lang)}
               className="input mb-2 text-sm"
             />
 
@@ -265,7 +285,7 @@ export default function FlipbookEditor({
                 }
                 className="input !py-1.5 text-xs"
               >
-                <option value="">No CTA</option>
+                <option value="">{nt("noCta", lang)}</option>
                 {CTA_TYPES.map((t) => (
                   <option key={t} value={t}>
                     {t}
@@ -275,13 +295,13 @@ export default function FlipbookEditor({
               <input
                 defaultValue={page.ctaLabel ?? ""}
                 onBlur={(e) => updatePage(page.id, { ctaLabel: e.target.value })}
-                placeholder="Button label"
+                placeholder={nt("buttonLabel", lang)}
                 className="input !py-1.5 text-xs"
               />
               <input
                 defaultValue={page.ctaValue ?? ""}
                 onBlur={(e) => updatePage(page.id, { ctaValue: e.target.value })}
-                placeholder="Phone / URL / number"
+                placeholder={nt("ctaValuePlaceholder", lang)}
                 className="input !py-1.5 text-xs"
               />
             </div>
@@ -290,7 +310,7 @@ export default function FlipbookEditor({
       </div>
 
       <button onClick={addPage} className="btn-outline mt-3 w-full !py-2 text-sm">
-        + Add page
+        {nt("addPage", lang)}
       </button>
 
       {toast && (

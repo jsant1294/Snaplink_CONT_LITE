@@ -69,7 +69,7 @@ test("the public /i/[token] route never imports operator-bypass auth", async () 
 test("the invoices dashboard tab renders a disabled state before ever showing forms", async () => {
   const text = await source("../components/admin/InvoiceBoard.tsx");
   assert.match(text, /!status\.stripeEnabled/);
-  assert.match(text, /Stripe isn&apos;t configured/);
+  assert.match(text, /nt\("stripeNotConfigured", lang\)/);
 });
 
 test("the Dashboard invoices tab link only renders in scoped (contractor) mode", async () => {

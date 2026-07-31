@@ -2,19 +2,30 @@
 
 import { useState } from "react";
 import type { Campaign, CampaignCtaType, CampaignStatus } from "@/lib/campaign-types";
+import { nt, type Lang } from "@/lib/i18n";
 
 const CTA_TYPES: CampaignCtaType[] = ["url", "phone", "sms", "whatsapp"];
 const STATUSES: CampaignStatus[] = ["draft", "scheduled", "active", "expired", "archived"];
 
+const STATUS_KEYS: Record<CampaignStatus, "statusDraft" | "statusScheduled" | "statusActive" | "statusExpired" | "statusArchived"> = {
+  draft: "statusDraft",
+  scheduled: "statusScheduled",
+  active: "statusActive",
+  expired: "statusExpired",
+  archived: "statusArchived",
+};
+
 export default function CampaignEditor({
   campaign,
   username,
+  lang,
   pin,
   onClose,
   onChanged,
 }: {
   campaign: Campaign;
   username: string;
+  lang: Lang;
   pin: string;
   onClose: () => void;
   onChanged: (campaign: Campaign) => void;
@@ -51,7 +62,7 @@ export default function CampaignEditor({
     setBusy(false);
     if (data.campaign) {
       onChanged(data.campaign);
-      showToast("Saved");
+      showToast(nt("saved", lang));
     }
   }
 
@@ -67,7 +78,7 @@ export default function CampaignEditor({
     if (data.campaign) {
       setLocal(data.campaign);
       onChanged(data.campaign);
-      showToast("Updated");
+      showToast(nt("updated", lang));
     }
   }
 
@@ -97,12 +108,12 @@ export default function CampaignEditor({
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>
-              {s}
+              {nt(STATUS_KEYS[s], lang)}
             </option>
           ))}
         </select>
         <button onClick={onClose} className="text-xs text-muted hover:text-bone">
-          Close
+          {nt("close", lang)}
         </button>
       </div>
 
@@ -114,32 +125,32 @@ export default function CampaignEditor({
           <button
             onClick={() => {
               navigator.clipboard.writeText(publicUrl);
-              showToast("Link copied");
+              showToast(nt("linkCopied", lang));
             }}
             className="shrink-0 text-muted hover:text-bone"
           >
-            Copy
+            {nt("copy", lang)}
           </button>
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Title (EN)</label>
+          <label className="label">{nt("titleEnLabel", lang)}</label>
           <input value={local.titleEn} onChange={(e) => setLocal((c) => ({ ...c, titleEn: e.target.value }))} className="input" />
         </div>
         <div>
-          <label className="label">Title (ES)</label>
+          <label className="label">{nt("titleEsLabel", lang)}</label>
           <input value={local.titleEs} onChange={(e) => setLocal((c) => ({ ...c, titleEs: e.target.value }))} className="input" />
         </div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Body (EN)</label>
+          <label className="label">{nt("bodyEnLabel", lang)}</label>
           <textarea rows={2} value={local.bodyEn} onChange={(e) => setLocal((c) => ({ ...c, bodyEn: e.target.value }))} className="input" />
         </div>
         <div>
-          <label className="label">Body (ES)</label>
+          <label className="label">{nt("bodyEsLabel", lang)}</label>
           <textarea rows={2} value={local.bodyEs} onChange={(e) => setLocal((c) => ({ ...c, bodyEs: e.target.value }))} className="input" />
         </div>
       </div>
@@ -159,7 +170,7 @@ export default function CampaignEditor({
 
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
-          <label className="label">CTA type</label>
+          <label className="label">{nt("ctaType", lang)}</label>
           <select
             value={local.ctaType}
             onChange={(e) => setLocal((c) => ({ ...c, ctaType: e.target.value as CampaignCtaType }))}
@@ -173,13 +184,13 @@ export default function CampaignEditor({
           </select>
         </div>
         <div>
-          <label className="label">Phone / URL / number</label>
+          <label className="label">{nt("ctaValuePlaceholder", lang)}</label>
           <input value={local.ctaValue} onChange={(e) => setLocal((c) => ({ ...c, ctaValue: e.target.value }))} className="input" />
         </div>
       </div>
 
       <button onClick={save} disabled={busy} className="btn-gold mt-4 w-full !py-2 text-sm disabled:opacity-40">
-        {busy ? "Saving…" : "Save"}
+        {busy ? nt("saving", lang) : nt("save", lang)}
       </button>
 
       {toast && (

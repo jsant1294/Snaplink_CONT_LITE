@@ -2,10 +2,26 @@
 
 import { useEffect, useState } from "react";
 import type { Contractor } from "@/lib/types";
-import type { Campaign } from "@/lib/campaign-types";
+import type { Campaign, CampaignStatus } from "@/lib/campaign-types";
+import { nt, type Lang } from "@/lib/i18n";
 import CampaignEditor from "@/components/admin/CampaignEditor";
 
 type PublicContractor = Omit<Contractor, "pin">;
+
+function statusLabel(status: CampaignStatus, lang: Lang): string {
+  switch (status) {
+    case "scheduled":
+      return nt("statusScheduled", lang);
+    case "active":
+      return nt("statusActive", lang);
+    case "expired":
+      return nt("statusExpired", lang);
+    case "archived":
+      return nt("statusArchived", lang);
+    default:
+      return nt("statusDraft", lang);
+  }
+}
 
 export default function CampaignBoard({
   contractor,
@@ -14,6 +30,7 @@ export default function CampaignBoard({
   contractor?: PublicContractor | null;
   pin: string;
 }) {
+  const lang: Lang = contractor?.preferredLanguage ?? "en";
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -41,7 +58,12 @@ export default function CampaignBoard({
     const res = await fetch("/api/contractor/campaigns", {
       method: "POST",
       headers: headers(),
-      body: JSON.stringify({ contractorId, titleEn: "Untitled Campaign", ctaType: "phone", ctaValue: contractor?.phone ?? "" }),
+      body: JSON.stringify({
+        contractorId,
+        titleEn: nt("untitledCampaign", "en"),
+        ctaType: "phone",
+        ctaValue: contractor?.phone ?? "",
+      }),
     });
     const data = await res.json();
     if (data.campaign) {
@@ -56,14 +78,16 @@ export default function CampaignBoard({
 
   const editing = campaigns.find((c) => c.id === editingId);
 
-  if (!contractor) return <p className="text-sm text-muted">Loading…</p>;
+  if (!contractor) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-muted">{campaigns.length} campaigns</p>
+        <p className="text-sm text-muted">
+          {campaigns.length} {nt("campaignsCount", lang)}
+        </p>
         <button onClick={create} className="btn-gold !py-2 text-sm">
-          + New Campaign
+          {nt("newCampaign", lang)}
         </button>
       </div>
 
@@ -72,6 +96,7 @@ export default function CampaignBoard({
           <CampaignEditor
             campaign={editing}
             username={contractor.username}
+            lang={lang}
             pin={pin}
             onClose={() => setEditingId(null)}
             onChanged={updateInList}
@@ -79,11 +104,9 @@ export default function CampaignBoard({
         </div>
       )}
 
-      {loading && <p className="text-sm text-muted">Loading…</p>}
+      {loading && <p className="text-sm text-muted">{nt("loading", lang)}</p>}
       {!loading && campaigns.length === 0 && (
-        <p className="py-8 text-center text-sm text-muted/60">
-          No campaigns yet. Create a single-page promo you can text or share.
-        </p>
+        <p className="py-8 text-center text-sm text-muted/60">{nt("noCampaigns", lang)}</p>
       )}
 
       <div className="space-y-2">
@@ -93,10 +116,10 @@ export default function CampaignBoard({
             <div key={c.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-obsidian p-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{c.titleEn}</p>
-                <p className="text-xs text-muted">{c.status}</p>
+                <p className="text-xs text-muted">{statusLabel(c.status, lang)}</p>
               </div>
               <button onClick={() => setEditingId(c.id)} className="btn-outline !py-1.5 !px-3 text-xs">
-                Edit
+                {nt("edit", lang)}
               </button>
             </div>
           ))}

@@ -465,3 +465,97 @@ export const QTR = {
 export function qt(key: keyof typeof QTR, lang: Lang): string {
   return QTR[key][lang];
 }
+
+// ---------------------------------------------------------------------------
+// Contractor self-service modules: Flipbook, Mini Campaign, Invoices.
+// Same fully-bilingual convention as MONEY — these render inside the same
+// PIN-gated, language-toggled contractor dashboard.
+// ---------------------------------------------------------------------------
+
+export const MODULES = {
+  loading: { en: "Loading…", es: "Cargando…" },
+  edit: { en: "Edit", es: "Editar" },
+  close: { en: "Close", es: "Cerrar" },
+  save: { en: "Save", es: "Guardar" },
+  saving: { en: "Saving…", es: "Guardando…" },
+  saved: { en: "Saved", es: "Guardado" },
+  linkCopied: { en: "Link copied", es: "Enlace copiado" },
+  copy: { en: "Copy", es: "Copiar" },
+
+  // Flipbook
+  flipbooksCount: { en: "flipbooks", es: "folletos" },
+  newFlipbook: { en: "+ New Flipbook", es: "+ Nuevo folleto" },
+  noFlipbooks: {
+    en: "No flipbooks yet. Create one to build a swipeable brochure you can text or share.",
+    es: "Aún no hay folletos. Crea uno para armar un folleto deslizable que puedas enviar o compartir.",
+  },
+  publish: { en: "Publish", es: "Publicar" },
+  published: { en: "Published", es: "Publicado" },
+  archive: { en: "Archive", es: "Archivar" },
+  updated: { en: "Updated", es: "Actualizado" },
+  addPage: { en: "+ Add page", es: "+ Agregar página" },
+  headlinePlaceholder: { en: "Headline", es: "Título" },
+  bodyPlaceholder: { en: "Body text", es: "Texto del cuerpo" },
+  noCta: { en: "No CTA", es: "Sin llamado a la acción" },
+  buttonLabel: { en: "Button label", es: "Texto del botón" },
+  ctaValuePlaceholder: { en: "Phone / URL / number", es: "Teléfono / URL / número" },
+  delete: { en: "Delete", es: "Eliminar" },
+  moveUp: { en: "Move page up", es: "Subir página" },
+  moveDown: { en: "Move page down", es: "Bajar página" },
+  pageTypeCover: { en: "cover", es: "portada" },
+  pageTypeImage: { en: "image", es: "imagen" },
+  pageTypeTextImage: { en: "text + image", es: "texto + imagen" },
+  pageTypeOffer: { en: "offer", es: "oferta" },
+  pageTypeCta: { en: "call to action", es: "llamado a la acción" },
+  pageTypeContact: { en: "contact", es: "contacto" },
+
+  // Mini Campaign
+  campaignsCount: { en: "campaigns", es: "campañas" },
+  newCampaign: { en: "+ New Campaign", es: "+ Nueva campaña" },
+  noCampaigns: {
+    en: "No campaigns yet. Create a single-page promo you can text or share.",
+    es: "Aún no hay campañas. Crea una promoción de una página que puedas enviar o compartir.",
+  },
+  titleEnLabel: { en: "Title (EN)", es: "Título (EN)" },
+  titleEsLabel: { en: "Title (ES)", es: "Título (ES)" },
+  bodyEnLabel: { en: "Body (EN)", es: "Cuerpo (EN)" },
+  bodyEsLabel: { en: "Body (ES)", es: "Cuerpo (ES)" },
+  ctaType: { en: "CTA type", es: "Tipo de llamado a la acción" },
+  statusDraft: { en: "draft", es: "borrador" },
+  statusScheduled: { en: "scheduled", es: "programada" },
+  statusActive: { en: "active", es: "activa" },
+  statusExpired: { en: "expired", es: "vencida" },
+  statusArchived: { en: "archived", es: "archivada" },
+
+  // Invoices
+  stripeNotConfigured: {
+    en: "Invoices aren't available yet. Stripe isn't configured for this app.",
+    es: "Las facturas aún no están disponibles. Stripe no está configurado para esta app.",
+  },
+  connectStripePrompt: {
+    en: "Connect Stripe to send hosted invoices your clients can pay online.",
+    es: "Conecta Stripe para enviar facturas alojadas que tus clientes puedan pagar en línea.",
+  },
+  connectStripe: { en: "Connect Stripe", es: "Conectar Stripe" },
+  redirecting: { en: "Redirecting…", es: "Redirigiendo…" },
+  invoicesCount: { en: "invoices", es: "facturas" },
+  newInvoice: { en: "+ New Invoice", es: "+ Nueva factura" },
+  noInvoices: { en: "No invoices yet.", es: "Aún no hay facturas." },
+  clientName: { en: "Client name", es: "Nombre del cliente" },
+  clientEmail: { en: "Client email", es: "Correo del cliente" },
+  amount: { en: "Amount ($)", es: "Monto ($)" },
+  description: { en: "Description", es: "Descripción" },
+  createDraft: { en: "Create draft", es: "Crear borrador" },
+  creating: { en: "Creating…", es: "Creando…" },
+  draftCreated: { en: "Draft created", es: "Borrador creado" },
+  send: { en: "Send", es: "Enviar" },
+  view: { en: "View", es: "Ver" },
+  sent: { en: "Sent", es: "Enviado" },
+  confirmDeletePage: { en: "Delete this page?", es: "¿Eliminar esta página?" },
+  untitledFlipbook: { en: "Untitled Flipbook", es: "Folleto sin título" },
+  untitledCampaign: { en: "Untitled Campaign", es: "Campaña sin título" },
+} as const;
+
+export function nt(key: keyof typeof MODULES, lang: Lang): string {
+  return MODULES[key][lang];
+}

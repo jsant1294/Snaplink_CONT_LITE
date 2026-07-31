@@ -36,13 +36,18 @@ function PageContent({ page }: { page: FlipPage }) {
       {page.mediaUrl && (
         <img src={page.mediaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-      <div className="relative z-10 w-full px-6 pb-14 pt-10 text-center text-cream sm:px-12">
-        {page.headline && (
-          <h2 className="font-display text-2xl sm:text-4xl">{page.headline}</h2>
-        )}
-        {page.body && <p className="mt-3 text-sm text-bone/90 sm:text-base">{page.body}</p>}
-        {cta}
+      {/* Full-height gradient keeps the top of the frame from looking bare, but it's not
+          load-bearing for text contrast — the solid scrim below guarantees that regardless
+          of what a contractor uploads (bright photo, low-contrast area, etc). */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+      <div className="relative z-10 w-full px-6 pb-10 pt-8 text-center text-cream sm:px-12">
+        <div className="mx-auto max-w-lg rounded-2xl bg-black/70 px-5 py-6 backdrop-blur-sm sm:px-8 sm:py-8">
+          {page.headline && (
+            <h2 className="font-display text-2xl sm:text-4xl">{page.headline}</h2>
+          )}
+          {page.body && <p className="mt-3 text-sm text-bone sm:text-base">{page.body}</p>}
+          {cta}
+        </div>
       </div>
     </div>
   );

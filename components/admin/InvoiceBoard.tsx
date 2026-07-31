@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Contractor } from "@/lib/types";
 import type { Invoice } from "@/lib/invoice-types";
 import { formatCents } from "@/lib/money";
+import { nt, type Lang } from "@/lib/i18n";
 
 type PublicContractor = Omit<Contractor, "pin">;
 
@@ -20,6 +21,7 @@ export default function InvoiceBoard({
   contractor?: PublicContractor | null;
   pin: string;
 }) {
+  const lang: Lang = contractor?.preferredLanguage ?? "en";
   const [status, setStatus] = useState<Status | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +89,7 @@ export default function InvoiceBoard({
       setClientEmail("");
       setAmount("");
       setDescription("");
-      showToast("Draft created");
+      showToast(nt("draftCreated", lang));
     } else {
       showToast(data.error ?? "Could not create invoice");
     }
@@ -100,20 +102,18 @@ export default function InvoiceBoard({
     setBusy(false);
     if (data.invoice) {
       setInvoices((list) => list.map((i) => (i.id === id ? data.invoice : i)));
-      showToast("Sent");
+      showToast(nt("sent", lang));
     } else {
       showToast(data.error ?? "Could not send invoice");
     }
   }
 
-  if (!contractor || loading || !status) return <p className="text-sm text-muted">Loading…</p>;
+  if (!contractor || loading || !status) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
 
   if (!status.stripeEnabled) {
     return (
       <div className="rounded-2xl border border-white/10 bg-charcoal p-6 text-center">
-        <p className="text-sm text-muted">
-          Invoices aren&apos;t available yet. Stripe isn&apos;t configured for this app.
-        </p>
+        <p className="text-sm text-muted">{nt("stripeNotConfigured", lang)}</p>
       </div>
     );
   }
@@ -121,11 +121,9 @@ export default function InvoiceBoard({
   if (!status.connected || !status.onboardingComplete) {
     return (
       <div className="rounded-2xl border border-white/10 bg-charcoal p-6 text-center">
-        <p className="mb-4 text-sm text-muted">
-          Connect Stripe to send hosted invoices your clients can pay online.
-        </p>
+        <p className="mb-4 text-sm text-muted">{nt("connectStripePrompt", lang)}</p>
         <button onClick={connect} disabled={busy} className="btn-gold !py-2 text-sm disabled:opacity-40">
-          {busy ? "Redirecting…" : "Connect Stripe"}
+          {busy ? nt("redirecting", lang) : nt("connectStripe", lang)}
         </button>
       </div>
     );
@@ -134,9 +132,11 @@ export default function InvoiceBoard({
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-muted">{invoices.length} invoices</p>
+        <p className="text-sm text-muted">
+          {invoices.length} {nt("invoicesCount", lang)}
+        </p>
         <button onClick={() => setShowForm((s) => !s)} className="btn-gold !py-2 text-sm">
-          + New Invoice
+          {nt("newInvoice", lang)}
         </button>
       </div>
 
@@ -144,21 +144,21 @@ export default function InvoiceBoard({
         <div className="mb-6 space-y-3 rounded-2xl border border-white/10 bg-charcoal p-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Client name</label>
+              <label className="label">{nt("clientName", lang)}</label>
               <input value={clientName} onChange={(e) => setClientName(e.target.value)} className="input" />
             </div>
             <div>
-              <label className="label">Client email</label>
+              <label className="label">{nt("clientEmail", lang)}</label>
               <input value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} className="input" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Amount ($)</label>
+              <label className="label">{nt("amount", lang)}</label>
               <input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="input" />
             </div>
             <div>
-              <label className="label">Description</label>
+              <label className="label">{nt("description", lang)}</label>
               <input value={description} onChange={(e) => setDescription(e.target.value)} className="input" />
             </div>
           </div>
@@ -167,13 +167,13 @@ export default function InvoiceBoard({
             disabled={busy || !clientEmail || !amount}
             className="btn-gold w-full !py-2 text-sm disabled:opacity-40"
           >
-            {busy ? "Creating…" : "Create draft"}
+            {busy ? nt("creating", lang) : nt("createDraft", lang)}
           </button>
         </div>
       )}
 
       {invoices.length === 0 && (
-        <p className="py-8 text-center text-sm text-muted/60">No invoices yet.</p>
+        <p className="py-8 text-center text-sm text-muted/60">{nt("noInvoices", lang)}</p>
       )}
 
       <div className="space-y-2">
@@ -188,12 +188,12 @@ export default function InvoiceBoard({
               </div>
               {!inv.providerInvoiceId && (
                 <button onClick={() => send(inv.id)} disabled={busy} className="btn-gold !py-1.5 !px-3 text-xs disabled:opacity-40">
-                  Send
+                  {nt("send", lang)}
                 </button>
               )}
               {inv.hostedInvoiceUrl && (
                 <a href={inv.hostedInvoiceUrl} target="_blank" rel="noopener noreferrer" className="btn-outline !py-1.5 !px-3 text-xs">
-                  View
+                  {nt("view", lang)}
                 </a>
               )}
             </div>

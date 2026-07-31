@@ -63,19 +63,23 @@ export default async function CampaignPage({
       {campaign.mediaUrl && (
         <img src={campaign.mediaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
-      <div className="relative z-10 w-full max-w-lg px-6 pb-16 pt-10 text-center text-cream">
-        <p className="text-xs uppercase tracking-[0.3em] text-gold">{contractor.businessName}</p>
-        <h1 className="font-display mt-3 text-3xl sm:text-4xl">{title}</h1>
-        {body && <p className="mt-3 text-sm text-bone/90 sm:text-base">{body}</p>}
-        <a
-          href={ctaHref(campaign)}
-          target={campaign.ctaType === "url" ? "_blank" : undefined}
-          rel={campaign.ctaType === "url" ? "noopener noreferrer" : undefined}
-          className="mt-6 inline-block rounded-full bg-gold px-8 py-3 text-sm font-semibold text-obsidian"
-        >
-          {lang === "es" ? "Contactar" : "Contact"}
-        </a>
+      {/* Gradient alone isn't load-bearing for contrast — a contractor's uploaded photo could be
+          bright anywhere. The solid scrim below guarantees legible text regardless. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+      <div className="relative z-10 w-full max-w-lg px-6 pb-12 pt-10 text-center text-cream">
+        <div className="rounded-2xl bg-black/70 px-6 py-8 backdrop-blur-sm sm:px-8">
+          <p className="text-xs uppercase tracking-[0.3em] text-gold">{contractor.businessName}</p>
+          <h1 className="font-display mt-3 text-3xl sm:text-4xl">{title}</h1>
+          {body && <p className="mt-3 text-sm text-bone sm:text-base">{body}</p>}
+          <a
+            href={ctaHref(campaign)}
+            target={campaign.ctaType === "url" ? "_blank" : undefined}
+            rel={campaign.ctaType === "url" ? "noopener noreferrer" : undefined}
+            className="mt-6 inline-block rounded-full bg-gold px-8 py-3 text-sm font-semibold text-obsidian focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-black/70"
+          >
+            {lang === "es" ? "Contactar" : "Contact"}
+          </a>
+        </div>
       </div>
     </div>
   );

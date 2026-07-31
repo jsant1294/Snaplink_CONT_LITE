@@ -3,7 +3,7 @@ import type { CmsImage, HeroContent } from "@/lib/southline-types";
 import Link from "next/link";
 import StartPlanningWithLucioButton from "@/components/lucio/StartPlanningWithLucioButton";
 
-const HERO_IMAGE = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80";
+const HERO_IMAGE = "/images/southline-living-hero.png";
 
 export default function Hero({
   lang,
@@ -44,13 +44,13 @@ export default function Hero({
         <img
           src={heroDesktop}
           alt={heroAlt ?? ""}
-          className="hidden w-full h-full object-cover md:block"
+          className="hidden w-full h-full object-cover object-left md:block"
           fetchPriority="high"
         />
         <img
           src={heroMobile}
           alt={heroAlt ?? ""}
-          className="w-full h-full object-cover md:hidden"
+          className="w-full h-full object-cover object-left md:hidden"
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#2a241e]/90 via-[#3c3229]/60 to-[#4a3d30]/20" />

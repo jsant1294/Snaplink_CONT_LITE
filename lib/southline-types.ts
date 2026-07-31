@@ -467,7 +467,8 @@ export const DEFAULT_REAL_ESTATE_BLOCK: RealEstateBlockSettings = {
 };
 
 export const DEFAULT_HERO_IMAGE: CmsImage = {
-  desktopUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80",
+  desktopUrl: "/images/southline-living-hero.png",
+  mobileUrl: "/images/southline-living-hero.png",
   altEn: "Southline Living — homes and trusted professionals",
   altEs: "Southline Living — hogares y profesionales de confianza",
 };

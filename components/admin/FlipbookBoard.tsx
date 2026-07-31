@@ -2,10 +2,17 @@
 
 import { useEffect, useState } from "react";
 import type { Contractor } from "@/lib/types";
-import type { FlipCampaign } from "@/lib/flipbook-types";
+import type { FlipCampaign, FlipCampaignStatus } from "@/lib/flipbook-types";
+import { nt, type Lang } from "@/lib/i18n";
 import FlipbookEditor from "@/components/admin/FlipbookEditor";
 
 type PublicContractor = Omit<Contractor, "pin">;
+
+function statusLabel(status: FlipCampaignStatus, lang: Lang): string {
+  if (status === "published") return nt("published", lang);
+  if (status === "archived") return nt("statusArchived", lang);
+  return nt("statusDraft", lang);
+}
 
 export default function FlipbookBoard({
   contractor,
@@ -14,6 +21,7 @@ export default function FlipbookBoard({
   contractor?: PublicContractor | null;
   pin: string;
 }) {
+  const lang: Lang = contractor?.preferredLanguage ?? "en";
   const [campaigns, setCampaigns] = useState<FlipCampaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -41,7 +49,7 @@ export default function FlipbookBoard({
     const res = await fetch("/api/contractor/flipbook/campaigns", {
       method: "POST",
       headers: headers(),
-      body: JSON.stringify({ contractorId, title: "Untitled Flipbook" }),
+      body: JSON.stringify({ contractorId, title: nt("untitledFlipbook", lang) }),
     });
     const data = await res.json();
     if (data.campaign) {
@@ -56,14 +64,16 @@ export default function FlipbookBoard({
 
   const editing = campaigns.find((c) => c.id === editingId);
 
-  if (!contractor) return <p className="text-sm text-muted">Loading…</p>;
+  if (!contractor) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-muted">{campaigns.length} flipbooks</p>
+        <p className="text-sm text-muted">
+          {campaigns.length} {nt("flipbooksCount", lang)}
+        </p>
         <button onClick={create} className="btn-gold !py-2 text-sm">
-          + New Flipbook
+          {nt("newFlipbook", lang)}
         </button>
       </div>
 
@@ -72,6 +82,7 @@ export default function FlipbookBoard({
           <FlipbookEditor
             campaign={editing}
             contractorId={contractorId}
+            lang={lang}
             pin={pin}
             onClose={() => setEditingId(null)}
             onChanged={updateInList}
@@ -79,11 +90,9 @@ export default function FlipbookBoard({
         </div>
       )}
 
-      {loading && <p className="text-sm text-muted">Loading…</p>}
+      {loading && <p className="text-sm text-muted">{nt("loading", lang)}</p>}
       {!loading && campaigns.length === 0 && (
-        <p className="py-8 text-center text-sm text-muted/60">
-          No flipbooks yet. Create one to build a swipeable brochure you can text or share.
-        </p>
+        <p className="py-8 text-center text-sm text-muted/60">{nt("noFlipbooks", lang)}</p>
       )}
 
       <div className="space-y-2">
@@ -93,10 +102,10 @@ export default function FlipbookBoard({
             <div key={c.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-obsidian p-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{c.title}</p>
-                <p className="text-xs text-muted">{c.status}</p>
+                <p className="text-xs text-muted">{statusLabel(c.status, lang)}</p>
               </div>
               <button onClick={() => setEditingId(c.id)} className="btn-outline !py-1.5 !px-3 text-xs">
-                Edit
+                {nt("edit", lang)}
               </button>
             </div>
           ))}
