@@ -170,6 +170,7 @@ function SectionsTab({
     { key: "featuredPros", label: "Featured professionals" },
     { key: "featuredAgents", label: "Real estate discovery block" },
     { key: "featuredHomes", label: "Featured homes" },
+    { key: "featuredServices", label: "Featured services marketplace" },
     { key: "diyLearning", label: "DIY learning" },
     { key: "trending", label: "Trending & editorial" },
     { key: "seasonalIdeas", label: "Seasonal ideas banner" },

@@ -309,6 +309,32 @@ export const UI_DEFS = {
   },
   viewAllHomes: { es: "Ver todas las casas", en: "View all homes" },
 
+  // Homepage: Featured Services Marketplace
+  featuredServicesEyebrow: { es: "SERVICIOS PARA EL HOGAR • PROFESIONALES DE CONFIANZA", en: "HOME SERVICES • TRUSTED PROFESSIONALS" },
+  featuredServicesTitle: {
+    es: "Encuentra profesionales de confianza para cada proyecto.",
+    en: "Find trusted professionals for every project.",
+  },
+  featuredServicesSubtitle: {
+    es: "Ya sea que estés remodelando, reparando, diseñando o dando mantenimiento a tu hogar, descubre profesionales locales de confianza impulsados por SnapLink. Cada profesional tiene un Perfil SnapLink verificado donde puedes conocer más, solicitar una cotización, agendar citas y mantenerte conectado.",
+    en: "Whether you're remodeling, repairing, designing, or maintaining your home, discover trusted local professionals powered by SnapLink. Every professional has a verified SnapLink Profile where you can learn more, request a quote, schedule appointments, and stay connected.",
+  },
+  featuredProject: { es: "Proyecto destacado", en: "Featured Project" },
+  bookConsultationCta2: { es: "Reservar consulta", en: "Book Consultation" },
+  snaplinkVerified: { es: "SnapLink Verificado", en: "SnapLink Verified" },
+  profilePoweredBySnaplink: { es: "Perfil impulsado por SnapLink", en: "Profile powered by SnapLink" },
+  servicesRecruitmentHeadline: { es: "¿Eres un profesional local?", en: "Are you a local professional?" },
+  servicesRecruitmentBody: {
+    es: "Únete a la red SnapLink y haz crecer tu negocio con un perfil digital moderno, productos NFC inteligentes, reservas, reseñas y generación de clientes potenciales.",
+    en: "Join the SnapLink network and grow your business with a modern digital profile, smart NFC products, booking, reviews, and lead generation.",
+  },
+  createSnaplinkProfile: { es: "Crear perfil SnapLink", en: "Create SnapLink Profile" },
+  claimYourBusiness: { es: "Reclama tu negocio", en: "Claim Your Business" },
+  viewPlans: { es: "Ver planes", en: "View Plans" },
+  exploreProfessionals: { es: "Explorar profesionales", en: "Explore Professionals" },
+  findByTrade: { es: "Buscar por oficio", en: "Find by Trade" },
+  browseCategories: { es: "Explorar categorías", en: "Browse Categories" },
+
   // Homepage: DIY Learning
   diyLearningEyebrow: { es: "Aprende", en: "Learn" },
   diyLearningTitle: { es: "Centro de aprendizaje DIY", en: "DIY Learning" },

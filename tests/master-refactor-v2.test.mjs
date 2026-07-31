@@ -52,9 +52,9 @@ test("FeaturedProfessionals cards are never text-only, and no two cards in the s
   assert.match(text, /used\.has\(photo\)/, "must dedup photo assignments within a single render");
 });
 
-test("homepage section order matches the V3 target flow: Hero, Find a Home, Categories, Professionals, DIY, Trending, Seasonal, Estimator+Booking, Become-a-Professional", async () => {
+test("homepage section order matches the V3 target flow: Hero, Find a Home, Featured Services, Professionals, Categories, DIY, Trending, Seasonal, Estimator+Booking, Become-a-Professional", async () => {
   const page = await source("../app/page.tsx");
-  const order = ["<Hero", "<RealEstateEntryBlock", "<FeaturedHomes", "<CategoriesGrid", "<FeaturedProfessionals", "<DIYLearningTeaser", "<TrendingSection", "<SeasonalIdeasBanner", "<EstimatorBookingSection", "<BecomeAProfessionalSection"];
+  const order = ["<Hero", "<RealEstateEntryBlock", "<FeaturedHomes", "<FeaturedServicesEntryBlock", "<FeaturedProfessionals", "<CategoriesGrid", "<DIYLearningTeaser", "<TrendingSection", "<SeasonalIdeasBanner", "<EstimatorBookingSection", "<BecomeAProfessionalSection"];
   let cursor = -1;
   for (const tag of order) {
     const idx = page.indexOf(tag);

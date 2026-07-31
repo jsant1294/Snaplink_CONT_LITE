@@ -22,6 +22,7 @@ export interface SectionVisibility {
   recruitment: boolean;
   featuredAgents: boolean;
   featuredHomes: boolean;
+  featuredServices: boolean;
   diyLearning: boolean;
   seasonalIdeas: boolean;
   costEstimator: boolean;
@@ -102,6 +103,7 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   recruitment: true,
   featuredAgents: true,
   featuredHomes: true,
+  featuredServices: true,
   diyLearning: true,
   seasonalIdeas: true,
   costEstimator: true,

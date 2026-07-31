@@ -10,7 +10,7 @@
     "test:real-estate": "node --test tests/real-estate-tenant-isolation.test.mjs tests/real-estate-phase5.test.mjs tests/real-estate-phase6.test.mjs tests/real-estate-phase7.test.mjs tests/real-estate-phase8.test.mjs tests/real-estate-phase9.test.mjs tests/real-estate-phase10.test.mjs tests/real-estate-phase11.test.mjs tests/real-estate-db-integration.test.mjs",
     "test:real-estate:staging-load": "node scripts/real-estate-staging-load-test.mjs",
     "test:agent-profiles": "node --test tests/agent-profiles.test.mjs tests/real-estate-entry-block.test.mjs",
-    "test:southline": "node --test tests/master-refactor-v2.test.mjs tests/master-refactor-v3.test.mjs",
+    "test:southline": "node --test tests/master-refactor-v2.test.mjs tests/master-refactor-v3.test.mjs tests/featured-services.test.mjs",
     "db:push": "drizzle-kit push",
     "db:seed": "node scripts/seed-demos.mjs",
     "db:seed:categories": "node scripts/seed-categories.mjs",
