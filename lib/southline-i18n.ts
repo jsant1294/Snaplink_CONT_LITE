@@ -282,6 +282,65 @@ export const UI_DEFS = {
     es: "Crea tu presencia digital y permite que compradores y vendedores locales te encuentren con un perfil Snaplink.",
     en: "Build your digital presence and get discovered by local buyers and sellers with a Snaplink Profile.",
   },
+
+  // Homepage: Featured Homes
+  featuredHomesEyebrow: { es: "Propiedades", en: "Homes" },
+  featuredHomesTitle: { es: "Casas destacadas", en: "Featured Homes" },
+  featuredHomesSubtitle: {
+    es: "Más propiedades publicadas por profesionales locales de Snaplink.",
+    en: "More properties published by local Snaplink real estate professionals.",
+  },
+  viewAllHomes: { es: "Ver todas las casas", en: "View all homes" },
+
+  // Homepage: DIY Learning
+  diyLearningEyebrow: { es: "Aprende", en: "Learn" },
+  diyLearningTitle: { es: "Centro de aprendizaje DIY", en: "DIY Learning" },
+  diyLearningSubtitle: {
+    es: "Guías paso a paso con dificultad, tiempo y costo estimado.",
+    en: "Step-by-step guides with difficulty, time, and estimated cost.",
+  },
+  exploreDiyProjects: { es: "Explorar proyectos DIY", en: "Explore DIY projects" },
+
+  // Homepage: Seasonal Ideas
+  seasonalIdeasEyebrow: { es: "De temporada", en: "Seasonal" },
+  seasonalIdeasHeadline: {
+    es: "Ideas de temporada para tu hogar",
+    en: "Seasonal ideas for your home",
+  },
+  seasonalIdeasBody: {
+    es: "Desde preparar tu jardín hasta acondicionar tu hogar para el próximo cambio de clima — encuentra inspiración a tiempo.",
+    en: "From getting your garden ready to prepping your home for the next season — find inspiration right on time.",
+  },
+  seasonalIdeasCta: { es: "Ver ideas de temporada", en: "See seasonal ideas" },
+
+  // Homepage: Cost Estimator
+  costEstimatorEyebrow: { es: "Planifica", en: "Plan" },
+  costEstimatorTitle: { es: "Estima el costo de tu proyecto", en: "Estimate your project cost" },
+  costEstimatorBody: {
+    es: "Cuéntanos tu idea y te conectamos con un profesional de Snaplink listo para dar el siguiente paso.",
+    en: "Tell us your idea and we'll connect you with a Snaplink professional ready for the next step.",
+  },
+  costEstimatorCta: { es: "Iniciar mi estimado", en: "Start my estimate" },
+
+  // Homepage: Book Consultation
+  bookConsultationEyebrow: { es: "Reserva", en: "Book" },
+  bookConsultationTitle: { es: "Reserva una consulta", en: "Book a consultation" },
+  bookConsultationBody: {
+    es: "Agenda una llamada, visita o consulta virtual directamente con un profesional local.",
+    en: "Schedule a call, visit, or virtual consultation directly with a local professional.",
+  },
+  bookConsultationCta: { es: "Reservar ahora", en: "Book now" },
+
+  // Homepage: Become a SnapLink Professional
+  becomeAProEyebrow: { es: "Snaplink · Conecta. Toca. Crece.", en: "Snaplink · Connect. Tap. Grow." },
+  becomeAProTitle: { es: "Conviértete en profesional Snaplink", en: "Become a SnapLink Professional" },
+  becomeAProBody: {
+    es: "Contratistas, remodeladores, diseñadores, arquitectos y más — muestra tu trabajo, genera confianza y recibe oportunidades locales con tu propio perfil Snaplink.",
+    en: "Contractors, remodelers, designers, architects, and more — showcase your work, build trust, and receive local opportunities with your own Snaplink Profile.",
+  },
+  becomeAProJoin: { es: "Únete a Snaplink", en: "Join Snaplink" },
+  becomeAProClaim: { es: "Reclama tu negocio", en: "Claim your business" },
+  becomeAProLogin: { es: "Acceso profesionales", en: "Professional login" },
 };
 
 export function t(key: UIKey, lang: Lang): string {

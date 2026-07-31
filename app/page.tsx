@@ -5,6 +5,7 @@ import { publicAgentProfile } from "@/lib/agent-profiles/auth";
 import { southlineStore } from "@/lib/southline-store";
 import { demoTenant } from "@/lib/real-estate/fixtures";
 import { propertyRepository } from "@/lib/real-estate/repositories";
+import { listProjects } from "@/lib/southline-diy";
 import type { Property } from "@/lib/real-estate/types";
 import type { Lang } from "@/lib/southline-i18n";
 import { DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
@@ -17,6 +18,12 @@ import Footer from "@/components/southline/Footer";
 import FeaturedProfessionals from "@/components/southline/FeaturedProfessionals";
 import CommunitySpotlight from "@/components/southline/CommunitySpotlight";
 import RealEstateEntryBlock from "@/components/southline/RealEstateEntryBlock";
+import FeaturedHomes from "@/components/southline/FeaturedHomes";
+import DIYLearningTeaser from "@/components/southline/DIYLearningTeaser";
+import SeasonalIdeasBanner from "@/components/southline/SeasonalIdeasBanner";
+import CostEstimatorTeaser from "@/components/southline/CostEstimatorTeaser";
+import BookConsultationTeaser from "@/components/southline/BookConsultationTeaser";
+import BecomeAProfessionalSection from "@/components/southline/BecomeAProfessionalSection";
 
 export const dynamic = "force-dynamic";
 
@@ -33,10 +40,11 @@ export default async function HomePage() {
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
 
-  const [settings, allContractors, activeAgentProfiles] = await Promise.all([
+  const [settings, allContractors, activeAgentProfiles, diyProjects] = await Promise.all([
     southlineStore.getSettings().catch(() => null),
     contractorStore.list().catch(() => [] as import("@/lib/types").Contractor[]),
     agentProfileStore.listActive().catch(() => [] as import("@/lib/agent-profiles/types").AgentProfile[]),
+    listProjects().catch(() => [] as import("@/lib/southline-diy").DIYProject[]),
   ]);
 
   const sections = settings?.sections ?? null;
@@ -60,6 +68,16 @@ export default async function HomePage() {
     ? await resolveFeaturedProperty(realEstateContent.featuredPropertyId)
     : null;
 
+  const showFeaturedHomes = !sections || sections.featuredHomes !== false;
+  const featuredHomesResult = showFeaturedHomes
+    ? await propertyRepository.listPublishedProperties(demoTenant.id, { pageSize: 4 }).catch(() => null)
+    : null;
+  const featuredHomes = (featuredHomesResult?.properties ?? [])
+    .filter((p) => p.id !== featuredProperty?.id)
+    .slice(0, 3);
+
+  const diyTeaserProjects = diyProjects.slice(0, 3);
+
   return (
     <>
       <Header lang={lang} navItems={navItems} />
@@ -72,49 +90,18 @@ export default async function HomePage() {
         {showRealEstateBlock && (
           <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />
         )}
+        {showFeaturedHomes && <FeaturedHomes lang={lang} properties={featuredHomes} />}
+        {(!sections || sections.diyLearning) && <DIYLearningTeaser lang={lang} projects={diyTeaserProjects} />}
         {(!sections || sections.trending) && <TrendingSection lang={lang} />}
 
         {settings?.spotlight && settings.spotlight.length > 0 && (
           <CommunitySpotlight lang={lang} items={settings.spotlight} />
         )}
 
-        {(!sections || sections.recruitment) && (
-          <section className="bg-snaplink-black py-14 sm:py-20 border-y border-snaplink-gold/35">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-              <p className="text-xs tracking-[0.35em] uppercase text-snaplink-gold font-medium mb-3">
-                Snaplink · Connect. Tap. Grow.
-              </p>
-              <h2 className="font-display text-3xl sm:text-5xl text-snaplink-cream leading-tight mb-4">
-                {lang === "es" ? "Crece con Snaplink" : "Grow with Snaplink"}
-              </h2>
-              <p className="text-base sm:text-lg text-snaplink-cream/75 max-w-2xl mx-auto mb-8 leading-relaxed">
-                {lang === "es"
-                  ? "Muestra tu trabajo, genera confianza, recibe oportunidades locales y permite que los propietarios soliciten presupuestos o reserven directamente."
-                  : "Showcase your work, build trust, receive local opportunities, and let homeowners request quotes or book directly."}
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a
-                  href="/for-contractors"
-                  className="w-full sm:w-auto bg-snaplink-gold text-snaplink-black font-semibold px-7 py-3 rounded-xl hover:bg-snaplink-gold-light transition-colors"
-                >
-                  {lang === "es" ? "Únete a Snaplink" : "Join Snaplink"}
-                </a>
-                <a
-                  href="/for-contractors"
-                  className="w-full sm:w-auto border border-snaplink-gold/60 text-snaplink-gold-light font-medium px-7 py-3 rounded-xl hover:bg-snaplink-charcoal transition-colors"
-                >
-                  {lang === "es" ? "Reclama tu negocio" : "Claim your business"}
-                </a>
-                <a
-                  href="/contractor-admin"
-                  className="w-full sm:w-auto border border-snaplink-cream/20 text-snaplink-cream font-medium px-7 py-3 rounded-xl hover:border-snaplink-gold/60 transition-colors"
-                >
-                  {lang === "es" ? "Acceso contratistas" : "Contractor login"}
-                </a>
-              </div>
-            </div>
-          </section>
-        )}
+        {(!sections || sections.seasonalIdeas) && <SeasonalIdeasBanner lang={lang} />}
+        {(!sections || sections.costEstimator) && <CostEstimatorTeaser lang={lang} />}
+        {(!sections || sections.bookConsultation) && <BookConsultationTeaser lang={lang} />}
+        {(!sections || sections.recruitment) && <BecomeAProfessionalSection lang={lang} />}
       </main>
       <Footer lang={lang} />
     </>

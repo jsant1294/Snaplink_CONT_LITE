@@ -92,6 +92,13 @@
       "when": 1785450333685,
       "tag": "0012_agent_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1785467899531,
+      "tag": "0013_contractor_profession_type",
+      "breakpoints": true
     }
   ]
 }

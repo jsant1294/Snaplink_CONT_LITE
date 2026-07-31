@@ -51,6 +51,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Paint a Room",
     descEs: "Transforma cualquier espacio con una capa de pintura fresca. Sigue esta guía para obtener resultados profesionales sin contratar a un pintor.",
     descEn: "Transform any space with a fresh coat of paint. Follow this guide to get professional results without hiring a painter.",
+    coverImage: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&q=85",
     steps: [
       {
         order: 1,
@@ -120,6 +121,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Install a Backsplash",
     descEs: "Dale vida a tu cocina con un backsplash de azulejos. Este proyecto es ideal para un fin de semana y transforma completamente el espacio.",
     descEn: "Bring your kitchen to life with a tile backsplash. This weekend project completely transforms the space.",
+    coverImage: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=900&q=85",
     steps: [
       {
         order: 1,
@@ -187,6 +189,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Refinish Kitchen Cabinets",
     descEs: "Transforma tus gabinetes sin reemplazarlos. Una capa de pintura y herrajes nuevos pueden hacer que tu cocina luzca completamente diferente.",
     descEn: "Transform your cabinets without replacing them. New paint and hardware can make your kitchen look completely different.",
+    coverImage: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=900&q=85",
     steps: [
       {
         order: 1,
@@ -254,6 +257,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Basic Gardening for Beginners",
     descEs: "Crea un jardín floreciente desde cero. Esta guía cubre selección de plantas, preparación del suelo y cuidados básicos para el éxito.",
     descEn: "Create a thriving garden from scratch. This guide covers plant selection, soil preparation, and basic care for success.",
+    coverImage: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=900&q=85",
     steps: [
       {
         order: 1,
@@ -312,6 +316,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Install a Smart Thermostat",
     descEs: "Ahorra en tu factura de energía instalando un termostato inteligente. La mayoría de los modelos modernos son compatibles con sistemas existentes.",
     descEn: "Save on your energy bill by installing a smart thermostat. Most modern models are compatible with existing systems.",
+    coverImage: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=85",
     steps: [
       {
         order: 1,
@@ -365,6 +370,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Renovate a Small Patio",
     descEs: "Convierte tu patio pequeño en un oasis exterior con losetas, plantas y una iluminación acogedora. Un proyecto gratificante para cualquier nivel.",
     descEn: "Turn your small patio into an outdoor oasis with tiles, plants, and cozy lighting. A rewarding project at any skill level.",
+    coverImage: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=900&q=85",
     steps: [
       {
         order: 1,
@@ -423,6 +429,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Organize a Closet",
     descEs: "Maximiza el espacio de tu armario con un sistema de organización simple que puedes instalar tú mismo en un fin de semana.",
     descEn: "Maximize your closet space with a simple organization system you can install yourself in a weekend.",
+    coverImage: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=900&q=85",
     steps: [
       { order: 1, titleEs: "Vacía todo el armario", titleEn: "Empty the closet completely", descEs: "Saca todo y clasifica en pilas: conservar, donar, tirar. Sé honesto con lo que realmente usas.", descEn: "Take everything out and sort into piles: keep, donate, discard. Be honest about what you actually use." },
       { order: 2, titleEs: "Limpia a fondo", titleEn: "Deep clean", descEs: "Aspira el polvo, limpia las repisas y paredes. Aprovecha para colocar bolsitas de lavanda o cedro contra polillas.", descEn: "Vacuum dust, wipe shelves and walls. Add lavender or cedar sachets for moth prevention." },
@@ -451,6 +458,7 @@ const SEED_PROJECTS: DIYProject[] = [
     titleEn: "Seal Windows for Energy Savings",
     descEs: "Reduce tu factura de energía sellando las corrientes de aire alrededor de las ventanas. Un proyecto económico con resultados inmediatos.",
     descEn: "Lower your energy bill by sealing drafts around windows. An inexpensive project with immediate results.",
+    coverImage: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&q=85",
     steps: [
       { order: 1, titleEs: "Identifica las corrientes de aire", titleEn: "Find the drafts", descEs: "En un día ventoso, pasa una vela encendida cerca de los bordes de la ventana. Si la llama titila, hay una filtración.", descEn: "On a windy day, pass a lit candle near window edges. If the flame flickers, there's a leak." },
       { order: 2, titleEs: "Limpia los marcos", titleEn: "Clean the frames", descEs: "Limpia los marcos y el vidrio donde aplicarás el sellador. El sellador no se adhiere bien a superficies sucias o húmedas.", descEn: "Clean frames and glass where you'll apply sealant. Sealant won't adhere well to dirty or damp surfaces." },

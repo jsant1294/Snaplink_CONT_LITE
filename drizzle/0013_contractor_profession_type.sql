@@ -1,0 +1,1 @@
+ALTER TABLE "contractors" ADD COLUMN "profession_type" text DEFAULT 'contractor' NOT NULL;

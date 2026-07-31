@@ -1,5 +1,6 @@
 import { t, type Lang } from "@/lib/southline-i18n";
 import { serviceLabel } from "@/lib/services";
+import { professionPlaceholderPhoto, professionTypeLabel } from "@/lib/profession-types";
 import type { Contractor } from "@/lib/types";
 
 export default function FeaturedProfessionals({
@@ -36,6 +37,20 @@ export default function FeaturedProfessionals({
               key={c.id}
               className="bg-cream rounded-2xl border border-walnut/15 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
             >
+              {/* Visual branding: professional-category photography (no logo/headshot/
+                  storefront/portfolio fields exist yet — this is the sanctioned fallback,
+                  never a blank box). */}
+              <div className="relative h-40 overflow-hidden">
+                <img
+                  src={professionPlaceholderPhoto(c.professionType)}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute left-3 top-3 rounded-full bg-obsidian/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-cream">
+                  {professionTypeLabel(c.professionType, lang)}
+                </span>
+              </div>
               {/* Card header */}
               <div className="p-5 sm:p-6">
                 <div className="flex items-start justify-between mb-3">

@@ -58,6 +58,8 @@ export interface Contractor {
   pin?: string;
   /** Language the contractor's own dashboard, estimator, and AI scope notes render in. */
   preferredLanguage: "en" | "es";
+  /** Profession category (contractor, electrician, architect, ...) — see lib/profession-types.ts. */
+  professionType: string;
   businessName: string;
   ownerName: string;
   phone: string; // E.164 preferred

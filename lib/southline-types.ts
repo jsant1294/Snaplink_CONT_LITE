@@ -21,6 +21,11 @@ export interface SectionVisibility {
   trending: boolean;
   recruitment: boolean;
   featuredAgents: boolean;
+  featuredHomes: boolean;
+  diyLearning: boolean;
+  seasonalIdeas: boolean;
+  costEstimator: boolean;
+  bookConsultation: boolean;
 }
 
 export interface SpotlightItem {
@@ -96,6 +101,11 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   trending: true,
   recruitment: true,
   featuredAgents: true,
+  featuredHomes: true,
+  diyLearning: true,
+  seasonalIdeas: true,
+  costEstimator: true,
+  bookConsultation: true,
 };
 
 export const DEFAULT_REAL_ESTATE_BLOCK: RealEstateBlockSettings = {

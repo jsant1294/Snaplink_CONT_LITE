@@ -168,8 +168,14 @@ function SectionsTab({
     { key: "hero", label: "Hero section" },
     { key: "categories", label: "Inspiration categories" },
     { key: "featuredPros", label: "Featured professionals" },
+    { key: "featuredAgents", label: "Real estate discovery block" },
+    { key: "featuredHomes", label: "Featured homes" },
+    { key: "diyLearning", label: "DIY learning" },
     { key: "trending", label: "Trending & editorial" },
-    { key: "recruitment", label: "Contractor recruitment CTA" },
+    { key: "seasonalIdeas", label: "Seasonal ideas banner" },
+    { key: "costEstimator", label: "Cost estimator CTA" },
+    { key: "bookConsultation", label: "Book consultation CTA" },
+    { key: "recruitment", label: "Become a SnapLink Professional CTA" },
   ];
 
   return (

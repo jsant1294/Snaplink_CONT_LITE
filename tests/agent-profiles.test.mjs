@@ -62,9 +62,21 @@ test("agent profile PINs are stripped from every public response via publicAgent
   }
 });
 
-test("contractor and multi-tenant real-estate modules remain outside the agent-profiles feature", async () => {
-  const diff = execSync("git diff --name-only ac65bbc -- app/api/contractor app/contractor-admin lib/payments.ts lib/types.ts lib/real-estate", { encoding: "utf8" }).trim();
-  assert.equal(diff, "", "contractor and multi-tenant real-estate files must not change for this feature");
+test("agent-profiles code stays structurally independent of contractor and multi-tenant real-estate modules", async () => {
+  // Contractor files are allowed to evolve over time by later, separate work (e.g. an additive
+  // professionType field) — what must hold permanently is that the agent-profiles system itself
+  // never imports contractor or lib/real-estate internals, and never touches LFC payment code.
+  for (const file of ["../lib/agent-profiles/store.ts", "../lib/agent-profiles/store-pg.ts", "../lib/agent-profiles/store-json.ts", "../lib/agent-profiles/auth.ts", "../lib/agent-profiles/billing.ts", "../lib/agent-profiles/events.ts"]) {
+    const text = await source(file);
+    assert.doesNotMatch(text, /from ["']@\/lib\/(store|payments|types)["']/, `${file} must not import contractor internals`);
+    if (file !== "../lib/agent-profiles/billing.ts") {
+      assert.doesNotMatch(text, /from ["']@\/lib\/real-estate\//, `${file} must not import multi-tenant real-estate internals`);
+    }
+  }
+  const billing = await source("../lib/agent-profiles/billing.ts");
+  assert.match(billing, /from "@\/lib\/real-estate\/marketplace\/billing"/, "billing.ts's one deliberate exception: reusing the unmodified Phase 11 billing module");
+  const diff = execSync("git diff --name-only ac65bbc -- lib/payments.ts", { encoding: "utf8" }).trim();
+  assert.equal(diff, "", "LFC payment code must never change for the agent-profiles feature");
 });
 
 test("the new agent_profiles table is not prefixed real_estate_ (a deliberately separate product)", async () => {

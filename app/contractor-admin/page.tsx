@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import Dashboard, { PinGate } from "@/components/admin/Dashboard";
 import type { Contractor } from "@/lib/types";
+import { professionTypeLabel } from "@/lib/profession-types";
 
 type PublicContractor = Omit<Contractor, "pin">;
 
@@ -110,7 +111,12 @@ function ContractorCard({
 
   return (
     <div className="card p-4">
-      <p className="font-semibold">{c.businessName}</p>
+      <p className="font-semibold">
+        {c.businessName}{" "}
+        <span className="ml-1 rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gold align-middle">
+          {professionTypeLabel(c.professionType, "en")}
+        </span>
+      </p>
       <p className="text-xs text-muted mb-1">
         /{c.username} ·{" "}
         <button onClick={toggleLanguage} className="underline decoration-dotted">

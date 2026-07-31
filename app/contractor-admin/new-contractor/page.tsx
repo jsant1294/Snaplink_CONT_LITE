@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SERVICE_CATEGORIES, SERVICE_LIBRARY } from "@/lib/services";
+import { DEFAULT_PROFESSION_TYPE, PROFESSION_TYPES } from "@/lib/profession-types";
 
 function cleanPayments(p: { zelle: string; cashApp: string; venmo: string; paypalMe: string; stripeLink: string; cash: boolean; check: boolean; payToName: string }) {
   const out: Record<string, unknown> = {};
@@ -20,6 +21,7 @@ export default function NewContractorPage() {
   const [operatorPin, setOperatorPin] = useState("");
   const [contractorPin, setContractorPin] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<"en" | "es">("en");
+  const [professionType, setProfessionType] = useState(DEFAULT_PROFESSION_TYPE);
   const [pay, setPay] = useState({ zelle: "", cashApp: "", venmo: "", paypalMe: "", stripeLink: "", cash: true, check: false, payToName: "" });
   const [form, setForm] = useState({
     businessName: "",
@@ -64,7 +66,7 @@ export default function NewContractorPage() {
       const res = await fetch("/api/contractor/profiles", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-snaplink-pin": operatorPin },
-        body: JSON.stringify({ ...form, pin: contractorPin, preferredLanguage, services: Array.from(services), payments: cleanPayments(pay) }),
+        body: JSON.stringify({ ...form, pin: contractorPin, preferredLanguage, professionType, services: Array.from(services), payments: cleanPayments(pay) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Create failed");
@@ -114,7 +116,7 @@ export default function NewContractorPage() {
   return (
     <main className="min-h-screen max-w-2xl mx-auto px-5 pt-8 pb-20">
       <Link href="/contractor-admin" className="text-sm text-muted">← Dashboard</Link>
-      <h1 className="font-display text-4xl mt-3 mb-1">New Contractor</h1>
+      <h1 className="font-display text-4xl mt-3 mb-1">New Professional</h1>
       <p className="text-muted text-sm mb-6">
         Creates a live public page at <span className="text-gold font-mono">/contractor/username</span> with its own intake, leads, and estimates.
       </p>
@@ -162,6 +164,26 @@ export default function NewContractorPage() {
           <div className="md:col-span-2">
             <label className="label">Google reviews URL</label>
             <input className="input" value={form.reviewsUrl} onChange={set("reviewsUrl")} placeholder="https://g.page/..." />
+          </div>
+        </div>
+
+        {/* Professional type */}
+        <div className="card p-4">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-gold mb-3">Professional type</p>
+          <div className="flex flex-wrap gap-2">
+            {PROFESSION_TYPES.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setProfessionType(p.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs border ${
+                  professionType === p.id
+                    ? "bg-gold text-obsidian border-gold font-medium"
+                    : "border-white/15 text-bone"
+                }`}
+              >
+                {p.en}
+              </button>
+            ))}
           </div>
         </div>
 

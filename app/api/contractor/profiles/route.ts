@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore, newId } from "@/lib/store";
 import { SERVICE_LIBRARY } from "@/lib/services";
+import { DEFAULT_PROFESSION_TYPE, isValidProfessionType } from "@/lib/profession-types";
 import type { Contractor } from "@/lib/types";
 import { pinFromRequest, isOperator, canAccessContractor, publicContractor } from "@/lib/auth";
 
@@ -50,6 +51,7 @@ export async function POST(req: NextRequest) {
     username,
     pin: contractorPin,
     preferredLanguage: body.preferredLanguage === "es" ? "es" : "en",
+    professionType: isValidProfessionType(body.professionType) ? body.professionType : DEFAULT_PROFESSION_TYPE,
     payments: typeof body.payments === "object" && body.payments ? body.payments : undefined,
     businessName,
     ownerName: String(body.ownerName ?? ""),

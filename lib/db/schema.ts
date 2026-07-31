@@ -25,6 +25,8 @@ export const contractors = pgTable(
     username: text("username").notNull(),
     pin: text("pin"),
     preferredLanguage: text("preferred_language").notNull().default("en"),
+    /** Profession category (contractor, electrician, architect, ...) — see lib/profession-types.ts. */
+    professionType: text("profession_type").notNull().default("contractor"),
     businessName: text("business_name").notNull(),
     ownerName: text("owner_name").notNull().default(""),
     phone: text("phone").notNull(),
