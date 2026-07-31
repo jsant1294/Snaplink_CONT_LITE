@@ -65,7 +65,7 @@ export default function DiyEditor({ pin }: { pin: string }) {
               >
                 Edit
               </button>
-              <button onClick={() => del(p.id)} className="text-xs text-danger hover:text-danger">
+              <button onClick={() => del(p.id)} className="text-xs text-danger hover:text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2">
                 Delete
               </button>
             </div>

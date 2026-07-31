@@ -56,10 +56,10 @@ export default async function SnapLinkPage() {
                 : "SnapLink is the technology platform behind Southline Living. It powers every professional's digital profile, booking, leads, and customer connection — including smart NFC and QR products that let a professional share their profile with a tap or a scan."}
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link href="/contractor-admin" className="rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight">
+              <Link href="/contractor-admin" className="rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian">
                 {lang === "es" ? "Únete a SnapLink" : "Join SnapLink"}
               </Link>
-              <Link href="/book" className="rounded-xl border border-cream/25 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-cream/10">
+              <Link href="/book" className="rounded-xl border border-cream/25 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-cream/10 active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian">
                 {lang === "es" ? "Solicitar demostración" : "Request Demo"}
               </Link>
             </div>
@@ -131,7 +131,7 @@ export default async function SnapLinkPage() {
               ? "Los planes varían según tus necesidades. Contáctanos para conocer los precios y encontrar el plan adecuado para tu negocio."
               : "Plans vary based on your needs. Reach out to learn current pricing and find the right fit for your business."}
           </p>
-          <Link href="/contractor-admin" className="mt-6 inline-flex rounded-xl bg-obsidian px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-obsidian/90">
+          <Link href="/contractor-admin" className="mt-6 inline-flex rounded-xl bg-obsidian px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-obsidian/90 active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory">
             {lang === "es" ? "Únete a SnapLink" : "Join SnapLink"}
           </Link>
         </section>
@@ -152,7 +152,7 @@ export default async function SnapLinkPage() {
             ))}
           </div>
           <div className="mt-6 text-center">
-            <Link href="/faq" className="text-sm font-medium text-olive hover:text-obsidian">
+            <Link href="/faq" className="text-sm font-medium text-olive hover:text-obsidian focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory rounded-sm">
               {lang === "es" ? "Ver todas las preguntas frecuentes" : "View all FAQ"} →
             </Link>
           </div>
@@ -167,13 +167,13 @@ export default async function SnapLinkPage() {
             {lang === "es" ? "Haz crecer tu negocio con SnapLink" : "Grow Your Business with SnapLink"}
           </h2>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/contractor-admin" className="rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight">
+            <Link href="/contractor-admin" className="rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian">
               {lang === "es" ? "Únete a SnapLink" : "Join SnapLink"}
             </Link>
-            <Link href="/book" className="rounded-xl border border-cream/25 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-cream/10">
+            <Link href="/book" className="rounded-xl border border-cream/25 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-cream/10 active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian">
               {lang === "es" ? "Solicitar demostración" : "Request Demo"}
             </Link>
-            <Link href="/contractor-admin" className="rounded-xl border border-cream/25 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-cream/10">
+            <Link href="/contractor-admin" className="rounded-xl border border-cream/25 px-6 py-3 text-sm font-medium text-cream transition-colors hover:bg-cream/10 active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian">
               {lang === "es" ? "Acceso profesional" : "Professional Login"}
             </Link>
           </div>

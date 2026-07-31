@@ -472,7 +472,7 @@ function TrendingTab({
                   type="button"
                   onClick={() => move(index, -1)}
                   disabled={index === 0}
-                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30"
+                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   ↑
                 </button>
@@ -480,7 +480,7 @@ function TrendingTab({
                   type="button"
                   onClick={() => move(index, 1)}
                   disabled={index === local.length - 1}
-                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30"
+                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   ↓
                 </button>
@@ -492,7 +492,7 @@ function TrendingTab({
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="text-xs text-danger"
+                className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2"
               >
                 Remove
               </button>
@@ -820,7 +820,7 @@ function CategoriesTab({
                   type="button"
                   onClick={() => move(index, -1)}
                   disabled={index === 0}
-                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30"
+                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   ↑
                 </button>
@@ -828,7 +828,7 @@ function CategoriesTab({
                   type="button"
                   onClick={() => move(index, 1)}
                   disabled={index === local.length - 1}
-                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30"
+                  className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   ↓
                 </button>
@@ -844,7 +844,7 @@ function CategoriesTab({
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="text-xs text-danger"
+                className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2"
               >
                 Remove
               </button>

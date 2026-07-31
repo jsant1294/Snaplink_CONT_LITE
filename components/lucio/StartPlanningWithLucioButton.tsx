@@ -11,7 +11,7 @@ export default function StartPlanningWithLucioButton({ lang }: { lang: Lang }) {
     <button
       type="button"
       onClick={openLucioWidget}
-      className="w-full sm:w-auto rounded-xl bg-gold/90 px-8 py-3.5 text-center font-semibold text-obsidian shadow-lg transition-colors hover:bg-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+      className="w-full sm:w-auto min-w-[12rem] rounded-xl bg-gold/90 px-8 py-3.5 text-center font-semibold text-obsidian shadow-lg transition-colors hover:bg-gold active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
     >
       {t("startPlanningWithLucio", lang)}
     </button>

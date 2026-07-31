@@ -221,10 +221,10 @@ export default function ContactEditor({ pin }: { pin: string }) {
             <span className="text-sm font-medium text-gold">Hours {index + 1}</span>
             <div className="flex items-center gap-3">
               <div className="flex gap-1">
-                <button type="button" onClick={() => moveHour(index, -1)} disabled={index === 0} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30">
+                <button type="button" onClick={() => moveHour(index, -1)} disabled={index === 0} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
                   ↑
                 </button>
-                <button type="button" onClick={() => moveHour(index, 1)} disabled={index === content.hours.length - 1} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30">
+                <button type="button" onClick={() => moveHour(index, 1)} disabled={index === content.hours.length - 1} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
                   ↓
                 </button>
               </div>
@@ -232,7 +232,7 @@ export default function ContactEditor({ pin }: { pin: string }) {
                 Visible
                 <Toggle on={entry.enabled} onToggle={() => updateHour(index, { enabled: !entry.enabled })} />
               </label>
-              <button type="button" onClick={() => removeHour(index)} className="text-xs text-danger">
+              <button type="button" onClick={() => removeHour(index)} className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2">
                 Remove
               </button>
             </div>

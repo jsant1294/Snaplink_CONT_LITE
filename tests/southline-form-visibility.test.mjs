@@ -153,3 +153,63 @@ test("Lucio Financial Copilot (tax/payment) code is untouched by this pass", asy
   ).trim();
   assert.equal(diff, "", "LFC tax/payment routes and stores must not change for a visual QA pass");
 });
+
+test("hero CTAs share a min-width, matching border weight on the two outline buttons, and an active-press state", async () => {
+  const hero = await source("../components/southline/Hero.tsx");
+  const minWidthCount = [...hero.matchAll(/min-w-\[12rem\]/g)].length;
+  assert.ok(minWidthCount >= 3, "expected a shared min-width on the 3 Hero-rendered CTA links");
+  assert.doesNotMatch(hero, /className="w-full sm:w-auto min-w-\[12rem\] bg-\[#3c3229\]\/60 backdrop-blur-sm border border-cream/, "the two outline buttons must use the same border weight, not one 1px and one 2px");
+  assert.match(hero, /active:scale-\[0\.98\] motion-reduce:active:scale-100/);
+  const lucioButton = await source("../components/lucio/StartPlanningWithLucioButton.tsx");
+  assert.match(lucioButton, /min-w-\[12rem\]/);
+  assert.match(lucioButton, /active:scale-\[0\.98\] motion-reduce:active:scale-100/);
+});
+
+test("the shared .btn-gold/.btn-outline classes (used app-wide, including dark contractor-admin) now carry a focus-visible ring", async () => {
+  const css = await source("../app/globals.css");
+  const btnGold = css.slice(css.indexOf(".btn-gold {"), css.indexOf(".btn-outline {"));
+  const btnOutline = css.slice(css.indexOf(".btn-outline {"), css.indexOf(".card {"));
+  for (const block of [btnGold, btnOutline]) {
+    assert.match(block, /focus-visible:ring-2 focus-visible:ring-gold/);
+    assert.match(block, /motion-reduce:active:scale-100/);
+  }
+});
+
+test("BookingFlow and ProjectPlanner back/selection buttons have focus-visible states — none had any before this pass", async () => {
+  for (const file of ["../components/southline/BookingFlow.tsx", "../components/southline/ProjectPlanner.tsx"]) {
+    const text = await source(file);
+    const ringCount = [...text.matchAll(/focus-visible:ring-2 focus-visible:ring-obsidian/g)].length;
+    assert.ok(ringCount >= 3, `${file} should have several newly-focus-ringed buttons`);
+  }
+});
+
+test("contractor profile page never renders a dead '#' link for gallery/reviews — only shown when a real URL exists", async () => {
+  const text = await source("../components/intake/ContractorPublicPage.tsx");
+  assert.doesNotMatch(text, /href=\{contractor\.galleryUrl \?\? "#"\}/);
+  assert.doesNotMatch(text, /href=\{contractor\.reviewsUrl \?\? "#"\}/);
+  assert.match(text, /\{contractor\.galleryUrl && \(/);
+  assert.match(text, /\{contractor\.reviewsUrl && \(/);
+  assert.doesNotMatch(text, /href="#"/);
+});
+
+test("decorative emoji icons on the contractor profile page are hidden from assistive technology", async () => {
+  const text = await source("../components/intake/ContractorPublicPage.tsx");
+  const allEmojiSpans = [...text.matchAll(/<span[^>]*>(?:📞|💬|🟢)<\/span>/g)];
+  const hiddenEmojiSpans = allEmojiSpans.filter((m) => m[0].includes('aria-hidden="true"'));
+  assert.equal(allEmojiSpans.length, 3, "expected exactly the 3 known decorative emoji icons");
+  assert.equal(hiddenEmojiSpans.length, 3, "every emoji span must carry aria-hidden=\"true\"");
+});
+
+test("admin destructive (delete/remove) and reorder buttons across every editor now carry a focus-visible ring — a systemic gap fixed once via the shared pattern", async () => {
+  const files = await import("node:fs/promises").then((fs) => fs.readdir(new URL("../components/southline/admin", import.meta.url)));
+  let destructiveWithRing = 0;
+  let reorderWithRing = 0;
+  for (const file of files) {
+    if (!file.endsWith(".tsx")) continue;
+    const text = await source(`../components/southline/admin/${file}`);
+    destructiveWithRing += [...text.matchAll(/text-danger[^"]*focus-visible:ring-danger/g)].length;
+    reorderWithRing += [...text.matchAll(/disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/g)].length;
+  }
+  assert.ok(destructiveWithRing >= 8, `expected at least 8 destructive buttons with a focus ring, found ${destructiveWithRing}`);
+  assert.ok(reorderWithRing >= 10, `expected at least 10 reorder buttons with a focus ring, found ${reorderWithRing}`);
+});

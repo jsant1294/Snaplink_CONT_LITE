@@ -78,7 +78,7 @@ export default function Hero({
                 <input
                   type="text"
                   placeholder={searchPrompt}
-                  className="w-full bg-[#3c3229]/30 backdrop-blur-sm border border-cream/20 rounded-2xl px-5 py-4 pl-12 text-cream placeholder:text-cream/40 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 text-base shadow-lg"
+                  className="w-full bg-[#3c3229]/30 backdrop-blur-sm border border-cream/20 rounded-2xl px-5 py-4 pl-12 text-cream placeholder:text-cream/40 focus:outline-none focus:border-gold focus-visible:ring-2 focus-visible:ring-cream text-base shadow-lg"
                 />
                 <svg
                   className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-bone/40"
@@ -99,19 +99,19 @@ export default function Hero({
             <div className="flex flex-wrap items-stretch gap-3 sm:gap-4">
               <Link
                 href="#categories"
-                className="w-full sm:w-auto bg-gold text-obsidian font-semibold px-8 py-3.5 rounded-xl text-center hover:bg-goldlight transition-colors shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+                className="w-full sm:w-auto min-w-[12rem] bg-gold text-obsidian font-semibold px-8 py-3.5 rounded-xl text-center hover:bg-goldlight active:scale-[0.98] motion-reduce:active:scale-100 transition-colors shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
               >
                 {exploreLabel}
               </Link>
               <Link
                 href="/planner"
-                className="w-full sm:w-auto bg-[#3c3229]/60 backdrop-blur-sm border border-cream/20 text-cream font-medium px-8 py-3.5 rounded-xl text-center hover:bg-[#3c3229]/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+                className="w-full sm:w-auto min-w-[12rem] bg-[#3c3229]/60 backdrop-blur-sm border-2 border-cream/30 text-cream font-medium px-8 py-3.5 rounded-xl text-center hover:bg-[#3c3229]/80 hover:border-cream/50 active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
               >
                 {planLabel}
               </Link>
               <Link
                 href="/book"
-                className="w-full sm:w-auto bg-[#3c3229]/60 backdrop-blur-sm border-2 border-gold/70 text-gold font-medium px-8 py-3.5 rounded-xl text-center hover:bg-gold hover:text-[#2a241e] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+                className="w-full sm:w-auto min-w-[12rem] bg-[#3c3229]/60 backdrop-blur-sm border-2 border-gold/70 text-gold font-medium px-8 py-3.5 rounded-xl text-center hover:bg-gold hover:text-[#2a241e] active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
               >
                 {findProLabel}
               </Link>

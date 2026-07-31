@@ -244,7 +244,7 @@ export default function ProjectPlanner({
                   setSelectedService(null);
                   setStep("service");
                 }}
-                className="p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left"
+                className="p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
               >
                 <span className="font-medium text-obsidian">
                   {lang === "es" ? cat.es : cat.en}
@@ -260,7 +260,7 @@ export default function ProjectPlanner({
         <div>
           <button
             onClick={() => setStep("category")}
-            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1"
+            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
@@ -280,7 +280,7 @@ export default function ProjectPlanner({
                   setSelectedService(svc);
                   setStep("details");
                 }}
-                className="p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left"
+                className="p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
               >
                 <span className="font-medium text-obsidian">
                   {serviceLabel(svc.name, lang)}
@@ -296,7 +296,7 @@ export default function ProjectPlanner({
         <div className="max-w-lg mx-auto">
           <button
             onClick={() => setStep("service")}
-            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1"
+            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
@@ -429,7 +429,7 @@ export default function ProjectPlanner({
         <div className="max-w-lg mx-auto">
           <button
             onClick={() => setStep("details")}
-            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1"
+            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
@@ -495,7 +495,7 @@ export default function ProjectPlanner({
         <div className="space-y-8">
           <button
             onClick={reset}
-            className="text-sm text-clay hover:text-obsidian inline-flex items-center gap-1"
+            className="text-sm text-clay hover:text-obsidian inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Nuevo plan" : "New plan"}
           </button>
@@ -617,7 +617,7 @@ export default function ProjectPlanner({
               )}
               <button
                 onClick={reset}
-                className="block w-full text-sm text-clay hover:text-obsidian text-center py-2"
+                className="block w-full text-sm text-clay hover:text-obsidian text-center py-2 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
               >
                 {lang === "es"
                   ? "Planificar otro proyecto"

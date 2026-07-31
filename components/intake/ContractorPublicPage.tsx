@@ -57,13 +57,13 @@ export default function ContractorPublicPage({ contractor }: { contractor: Contr
         <div className="inline-flex rounded-full border border-[#B99552]/60 bg-[#F5EFE4]/45 overflow-hidden text-xs">
           <button
             onClick={() => setLang("en")}
-            className={`px-3 py-1.5 ${lang === "en" ? "bg-[#B99552] text-[#2F2923] font-semibold" : "text-[#6F552A]"}`}
+            className={`px-3 py-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2F2923] focus-visible:ring-offset-1 ${lang === "en" ? "bg-[#B99552] text-[#2F2923] font-semibold" : "text-[#6F552A]"}`}
           >
             English
           </button>
           <button
             onClick={() => setLang("es")}
-            className={`px-3 py-1.5 ${lang === "es" ? "bg-[#B99552] text-[#2F2923] font-semibold" : "text-[#6F552A]"}`}
+            className={`px-3 py-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2F2923] focus-visible:ring-offset-1 ${lang === "es" ? "bg-[#B99552] text-[#2F2923] font-semibold" : "text-[#6F552A]"}`}
           >
             Español
           </button>
@@ -97,21 +97,21 @@ export default function ContractorPublicPage({ contractor }: { contractor: Contr
 
       {/* Contact grid */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <a href={`tel:${contractor.phone}`} className="card p-3 text-center !bg-[#F5EFE4]/65 !border-[#B99552]/45 !text-[#2F2923]">
-          <span className="block text-xl mb-1">📞</span>
+        <a href={`tel:${contractor.phone}`} className="card p-3 text-center !bg-[#F5EFE4]/65 !border-[#B99552]/45 !text-[#2F2923] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2F2923] focus-visible:ring-offset-2">
+          <span aria-hidden="true" className="block text-xl mb-1">📞</span>
           <span className="text-xs font-medium">{t("callNow", lang)}</span>
         </a>
-        <a href={`sms:${contractor.phone}`} className="card p-3 text-center !bg-[#F5EFE4]/65 !border-[#B99552]/45 !text-[#2F2923]">
-          <span className="block text-xl mb-1">💬</span>
+        <a href={`sms:${contractor.phone}`} className="card p-3 text-center !bg-[#F5EFE4]/65 !border-[#B99552]/45 !text-[#2F2923] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2F2923] focus-visible:ring-offset-2">
+          <span aria-hidden="true" className="block text-xl mb-1">💬</span>
           <span className="text-xs font-medium">{t("textUs", lang)}</span>
         </a>
         <a
           href={`https://wa.me/${wa}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="card p-3 text-center !bg-[#F5EFE4]/65 !border-[#B99552]/45 !text-[#2F2923]"
+          className="card p-3 text-center !bg-[#F5EFE4]/65 !border-[#B99552]/45 !text-[#2F2923] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2F2923] focus-visible:ring-offset-2"
         >
-          <span className="block text-xl mb-1">🟢</span>
+          <span aria-hidden="true" className="block text-xl mb-1">🟢</span>
           <span className="text-xs font-medium">{t("whatsapp", lang)}</span>
         </a>
       </div>
@@ -124,17 +124,23 @@ export default function ContractorPublicPage({ contractor }: { contractor: Contr
         >
           {t("viewServices", lang)}
         </button>
-        <a href={contractor.galleryUrl ?? "#"} className="btn-outline w-full block !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55">
-          {t("beforeAfter", lang)}
-        </a>
-        <a
-          href={contractor.reviewsUrl ?? "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-outline w-full block !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55"
-        >
-          {t("readReviews", lang)}
-        </a>
+        {/* galleryUrl/reviewsUrl are optional — only render these as links when a
+            real destination exists, rather than falling back to a dead "#" href. */}
+        {contractor.galleryUrl && (
+          <a href={contractor.galleryUrl} className="btn-outline w-full block !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55">
+            {t("beforeAfter", lang)}
+          </a>
+        )}
+        {contractor.reviewsUrl && (
+          <a
+            href={contractor.reviewsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline w-full block !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55"
+          >
+            {t("readReviews", lang)}
+          </a>
+        )}
         <button onClick={() => startIntake("walkthrough")} className="btn-outline w-full !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55">
           {t("bookWalkthrough", lang)}
         </button>
@@ -151,7 +157,7 @@ export default function ContractorPublicPage({ contractor }: { contractor: Contr
             <button
               key={s}
               onClick={() => startIntake("estimate")}
-              className="card p-4 text-left !bg-[#26241F] !border-[rgba(214,173,85,0.20)] hover:!border-[rgba(214,173,85,0.42)] transition-colors"
+              className="card p-4 text-left !bg-[#26241F] !border-[rgba(214,173,85,0.20)] hover:!border-[rgba(214,173,85,0.42)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D6AD55] focus-visible:ring-offset-2"
             >
               <span className="text-sm font-medium text-[#F5EFE4]">{serviceLabel(s, lang)}</span>
               <span className="block text-xs font-medium text-[#D6AD55] mt-1">{t("getEstimate", lang)}</span>

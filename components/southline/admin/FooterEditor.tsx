@@ -237,10 +237,10 @@ export default function FooterEditor({ pin }: { pin: string }) {
             <span className="text-sm font-medium text-gold">Column {columnIndex + 1}</span>
             <div className="flex items-center gap-3">
               <div className="flex gap-1">
-                <button type="button" onClick={() => moveColumn(columnIndex, -1)} disabled={columnIndex === 0} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30">
+                <button type="button" onClick={() => moveColumn(columnIndex, -1)} disabled={columnIndex === 0} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
                   ↑
                 </button>
-                <button type="button" onClick={() => moveColumn(columnIndex, 1)} disabled={columnIndex === content.columns.length - 1} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30">
+                <button type="button" onClick={() => moveColumn(columnIndex, 1)} disabled={columnIndex === content.columns.length - 1} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
                   ↓
                 </button>
               </div>
@@ -248,7 +248,7 @@ export default function FooterEditor({ pin }: { pin: string }) {
                 Visible
                 <Toggle on={column.visible} onToggle={() => updateColumn(columnIndex, { visible: !column.visible })} />
               </label>
-              <button type="button" onClick={() => removeColumn(columnIndex)} className="text-xs text-danger">
+              <button type="button" onClick={() => removeColumn(columnIndex)} className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2">
                 Remove
               </button>
             </div>
@@ -273,10 +273,10 @@ export default function FooterEditor({ pin }: { pin: string }) {
                 <span className="text-xs text-muted">Link {linkIndex + 1}</span>
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1">
-                    <button type="button" onClick={() => moveLink(columnIndex, linkIndex, -1)} disabled={linkIndex === 0} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30">
+                    <button type="button" onClick={() => moveLink(columnIndex, linkIndex, -1)} disabled={linkIndex === 0} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
                       ↑
                     </button>
-                    <button type="button" onClick={() => moveLink(columnIndex, linkIndex, 1)} disabled={linkIndex === column.links.length - 1} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30">
+                    <button type="button" onClick={() => moveLink(columnIndex, linkIndex, 1)} disabled={linkIndex === column.links.length - 1} className="rounded-lg border border-white/10 px-2 py-1 text-xs disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
                       ↓
                     </button>
                   </div>
@@ -284,7 +284,7 @@ export default function FooterEditor({ pin }: { pin: string }) {
                     Visible
                     <Toggle on={link.visible} onToggle={() => updateLink(columnIndex, linkIndex, { visible: !link.visible })} />
                   </label>
-                  <button type="button" onClick={() => removeLink(columnIndex, linkIndex)} className="text-xs text-danger">
+                  <button type="button" onClick={() => removeLink(columnIndex, linkIndex)} className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2">
                     Remove
                   </button>
                 </div>

@@ -72,7 +72,7 @@ export default function SpotlightEditor({ pin }: { pin: string }) {
             </div>
             <div className="flex gap-2 ml-3 shrink-0">
               <button onClick={() => { setEditing(item); setShowForm(true); }} className="text-xs text-gold">Edit</button>
-              <button onClick={() => remove(item.id)} className="text-xs text-danger">Remove</button>
+              <button onClick={() => remove(item.id)} className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2">Remove</button>
             </div>
           </div>
         ))}

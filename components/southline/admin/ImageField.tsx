@@ -53,7 +53,7 @@ export default function ImageField({
             alt=""
             className="h-16 w-28 rounded-lg border border-white/10 object-cover"
           />
-          <button type="button" onClick={() => onChange("")} className="text-xs text-danger">
+          <button type="button" onClick={() => onChange("")} className="text-xs text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2">
             Remove
           </button>
         </div>

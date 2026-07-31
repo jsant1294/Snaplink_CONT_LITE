@@ -42,10 +42,12 @@ body {
 
 @layer components {
   .btn-gold {
-    @apply bg-gold text-obsidian font-semibold rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
+    @apply bg-gold text-obsidian font-semibold rounded-xl px-4 py-3 text-center active:scale-[0.98] transition
+      motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2;
   }
   .btn-outline {
-    @apply border border-gold/50 text-goldlight rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
+    @apply border border-gold/50 text-goldlight rounded-xl px-4 py-3 text-center active:scale-[0.98] transition
+      motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2;
   }
   .card {
     @apply bg-charcoal border border-white/5 rounded-2xl shadow-card;

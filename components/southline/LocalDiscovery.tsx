@@ -192,7 +192,7 @@ export default function LocalDiscovery({
           <div className="sm:self-end">
             <button
               type="submit"
-              className="w-full rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-gold/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory motion-reduce:transition-none"
+              className="w-full rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-gold/90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               {submitLabel}
             </button>

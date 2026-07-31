@@ -126,7 +126,7 @@ export default function BookingFlow({
         </p>
         <button
           onClick={reset}
-          className="bg-gold text-obsidian font-semibold px-6 py-3 rounded-xl hover:bg-goldlight transition-colors"
+          className="bg-gold text-obsidian font-semibold px-6 py-3 rounded-xl hover:bg-goldlight active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
         >
           {lang === "es" ? "Enviar otra solicitud" : "Send another request"}
         </button>
@@ -186,7 +186,7 @@ export default function BookingFlow({
                   setSelectedContractor(c);
                   setStep("service");
                 }}
-                className="w-full p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left"
+                className="w-full p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
               >
                 <p className="font-semibold text-obsidian">{c.businessName}</p>
                 <p className="text-xs text-clay">{c.serviceArea}</p>
@@ -199,7 +199,7 @@ export default function BookingFlow({
       {/* Step: Select service */}
       {step === "service" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("contractor")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1">
+          <button onClick={() => setStep("contractor")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
           <h2 className="font-display text-xl text-obsidian mb-2">
@@ -216,7 +216,7 @@ export default function BookingFlow({
                   setSelectedService(svc.name);
                   setStep("details");
                 }}
-                className="w-full p-3 rounded-xl border border-sand/40 bg-paper hover:border-gold/50 text-left"
+                className="w-full p-3 rounded-xl border border-sand/40 bg-paper hover:border-gold/50 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
               >
                 <span className="text-sm font-medium text-obsidian">{serviceLabel(svc.name, lang)}</span>
               </button>
@@ -228,7 +228,7 @@ export default function BookingFlow({
       {/* Step: Project details */}
       {step === "details" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("service")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1">
+          <button onClick={() => setStep("service")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
           <h2 className="font-display text-xl text-obsidian mb-4">
@@ -298,7 +298,7 @@ export default function BookingFlow({
       {/* Step: Contact info */}
       {step === "contact" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("details")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1">
+          <button onClick={() => setStep("details")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
           <h2 className="font-display text-xl text-obsidian mb-2">
@@ -353,7 +353,7 @@ export default function BookingFlow({
       {/* Step: Confirm */}
       {step === "confirm" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("contact")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1">
+          <button onClick={() => setStep("contact")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
           <h2 className="font-display text-xl text-obsidian mb-4">
