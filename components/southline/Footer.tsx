@@ -29,6 +29,7 @@ export default function Footer({ lang }: { lang: Lang }) {
               {t("footerExplore", lang)}
             </h4>
             <ul className="space-y-2.5">
+              <li><Link href="/homes" className="text-sm hover:text-gold transition-colors">{t("navRealEstate", lang)}</Link></li>
               <li><Link href="/diy" className="text-sm hover:text-gold transition-colors">{t("navIdeas", lang)}</Link></li>
               <li><Link href="/planner" className="text-sm hover:text-gold transition-colors">{t("navProjects", lang)}</Link></li>
               <li><Link href="/diy" className="text-sm hover:text-gold transition-colors">{t("navDIY", lang)}</Link></li>
@@ -37,15 +38,16 @@ export default function Footer({ lang }: { lang: Lang }) {
             </ul>
           </div>
 
-          {/* Contractors */}
+          {/* Professionals */}
           <div>
             <h4 className="text-xs tracking-[0.2em] uppercase text-gold font-medium mb-4">
-              {t("footerContractors", lang)}
+              {t("footerProfessionals", lang)}
             </h4>
             <ul className="space-y-2.5">
               <li><Link href="/for-contractors" className="text-sm hover:text-gold transition-colors">{t("footerJoin", lang)}</Link></li>
               <li><Link href="/for-contractors" className="text-sm hover:text-gold transition-colors">{t("footerClaim", lang)}</Link></li>
               <li><Link href="/contractor-admin" className="text-sm hover:text-gold transition-colors">{t("contractorLogin", lang)}</Link></li>
+              <li><Link href="/agents" className="text-sm hover:text-gold transition-colors">{t("footerAgentProfiles", lang)}</Link></li>
             </ul>
           </div>
 

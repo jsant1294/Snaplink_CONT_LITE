@@ -5,7 +5,7 @@ import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
 import type { Lang } from "@/lib/southline-i18n";
 import { demoAgents, demoTenant, formatPropertyPrice } from "@/lib/real-estate/fixtures";
-import { propertyRepository } from "@/lib/real-estate/repositories";
+import { listPublishedPropertiesWithFallback } from "@/lib/real-estate/homes-fallback";
 
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 
@@ -23,7 +23,7 @@ export default async function HomesPage({ searchParams }: { searchParams: Promis
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
-  const result = await propertyRepository.listPublishedProperties(demoTenant.id, { search: params.q, page, pageSize: 9 });
+  const result = await listPublishedPropertiesWithFallback(demoTenant.id, { search: params.q, page, pageSize: 9 });
   const pages = Math.max(1, Math.ceil(result.total / result.pageSize));
   return <>
     <Header lang={lang} />

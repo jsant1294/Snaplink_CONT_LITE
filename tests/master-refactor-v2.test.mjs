@@ -13,12 +13,15 @@ test("profession types cover the trade/design/build taxonomy but exclude realtor
   assert.doesNotMatch(text, /id: "realtor"|id: "mortgage_broker"/);
 });
 
-test("every profession type has a placeholder photo, and no card can render blank or with an emoji", async () => {
+test("every profession type has at least two placeholder photo variants, and no card can render blank or with an emoji", async () => {
   const text = await source("../lib/profession-types.ts");
   const idMatches = [...text.matchAll(/id: "([a-z_]+)", en:/g)].map((m) => m[1]);
   assert.ok(idMatches.length >= 17);
   for (const id of idMatches) {
-    assert.match(text, new RegExp(`${id}: "https://images\\.unsplash\\.com/photo-`), `missing placeholder photo for ${id}`);
+    const block = text.slice(text.indexOf(`  ${id}: [`), text.indexOf("],", text.indexOf(`  ${id}: [`)));
+    assert.match(block, /https:\/\/images\.unsplash\.com\/photo-/, `missing placeholder photo for ${id}`);
+    const urlCount = [...block.matchAll(/https:\/\/images\.unsplash\.com\/photo-/g)].length;
+    assert.ok(urlCount >= 2, `${id} should have at least two photo variants so repeated companies don't share one image`);
   }
   assert.doesNotMatch(text, /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u);
 });
@@ -42,14 +45,16 @@ test("the operator dashboard says 'New Professional' and offers a profession typ
   assert.match(text, /PROFESSION_TYPES\.map/);
 });
 
-test("FeaturedProfessionals cards are never text-only: every card renders a profession-branded photo", async () => {
+test("FeaturedProfessionals cards are never text-only, and no two cards in the same render share a placeholder photo when variants exist", async () => {
   const text = await source("../components/southline/FeaturedProfessionals.tsx");
-  assert.match(text, /professionPlaceholderPhoto\(c\.professionType\)/);
+  assert.match(text, /professionPlaceholderPhotoFor\(c\.id, c\.professionType\)/);
+  assert.match(text, /function assignCardPhotos/);
+  assert.match(text, /used\.has\(photo\)/, "must dedup photo assignments within a single render");
 });
 
-test("homepage section order matches the target flow: Hero, Categories, Professionals, Real Estate, Homes, DIY, Trending, Seasonal, Estimator, Booking, Become-a-Professional", async () => {
+test("homepage section order matches the V3 target flow: Hero, Find a Home, Categories, Professionals, DIY, Trending, Seasonal, Estimator+Booking, Become-a-Professional", async () => {
   const page = await source("../app/page.tsx");
-  const order = ["<Hero", "<CategoriesGrid", "<FeaturedProfessionals", "<RealEstateEntryBlock", "<FeaturedHomes", "<DIYLearningTeaser", "<TrendingSection", "<SeasonalIdeasBanner", "<CostEstimatorTeaser", "<BookConsultationTeaser", "<BecomeAProfessionalSection"];
+  const order = ["<Hero", "<RealEstateEntryBlock", "<FeaturedHomes", "<CategoriesGrid", "<FeaturedProfessionals", "<DIYLearningTeaser", "<TrendingSection", "<SeasonalIdeasBanner", "<EstimatorBookingSection", "<BecomeAProfessionalSection"];
   let cursor = -1;
   for (const tag of order) {
     const idx = page.indexOf(tag);
@@ -64,8 +69,7 @@ test("new homepage sections never link to a dead \"#\" and contain no emoji", as
     "../components/southline/FeaturedHomes.tsx",
     "../components/southline/DIYLearningTeaser.tsx",
     "../components/southline/SeasonalIdeasBanner.tsx",
-    "../components/southline/CostEstimatorTeaser.tsx",
-    "../components/southline/BookConsultationTeaser.tsx",
+    "../components/southline/EstimatorBookingSection.tsx",
     "../components/southline/BecomeAProfessionalSection.tsx",
   ]) {
     const text = await source(file);

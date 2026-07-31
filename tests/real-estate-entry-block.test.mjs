@@ -4,14 +4,18 @@ import { readFile } from "node:fs/promises";
 
 const source = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("the real estate block sits between Featured Professionals and Trending Projects on the homepage", async () => {
+test("the real estate block ('Find a Home') sits directly after the Hero, ahead of Categories and Featured Professionals", async () => {
+  // V3 refactor: homes must never rank below contractors on the homepage — the block
+  // moved from after Featured Professionals to immediately after the Hero.
   const page = await source("../app/page.tsx");
-  const featuredIdx = page.indexOf("<FeaturedProfessionals");
+  const heroIdx = page.indexOf("<Hero");
   const blockIdx = page.indexOf("<RealEstateEntryBlock");
-  const trendingIdx = page.indexOf("<TrendingSection");
-  assert.ok(featuredIdx > -1 && blockIdx > -1 && trendingIdx > -1, "all three sections must render");
-  assert.ok(featuredIdx < blockIdx, "real estate block must come after Featured Professionals");
-  assert.ok(blockIdx < trendingIdx, "real estate block must come before Trending Projects");
+  const categoriesIdx = page.indexOf("<CategoriesGrid");
+  const featuredIdx = page.indexOf("<FeaturedProfessionals");
+  assert.ok(heroIdx > -1 && blockIdx > -1 && categoriesIdx > -1 && featuredIdx > -1, "all sections must render");
+  assert.ok(heroIdx < blockIdx, "real estate block must come after the Hero");
+  assert.ok(blockIdx < categoriesIdx, "real estate block must come before Browse Categories");
+  assert.ok(blockIdx < featuredIdx, "real estate block must come before Featured Professionals");
 });
 
 test("primary CTAs route to real pages, never a dead \"#\"", async () => {
@@ -33,10 +37,10 @@ test("the entry block renders only real, already-fetched data — no fabricated 
   assert.match(text, /agent\.languages\.length > 0 &&/);
 });
 
-test("no desktop-only carousel; layout is a static two-column grid that stacks on mobile", async () => {
+test("no desktop-only carousel; layout is a static asymmetric grid (image-dominant) that stacks on mobile", async () => {
   const text = await source("../components/southline/RealEstateEntryBlock.tsx");
   assert.doesNotMatch(text, /carousel|swiper|overflow-x-scroll|overflow-x-auto/i);
-  assert.match(text, /grid gap-6 lg:grid-cols-2/);
+  assert.match(text, /grid gap-6 lg:grid-cols-\[1\.4fr_1fr\]/);
 });
 
 test("Real Estate is a primary nav item placed between Ideas and Projects, in both Header's default and the CMS default", async () => {

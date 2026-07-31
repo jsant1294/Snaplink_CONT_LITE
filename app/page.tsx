@@ -4,9 +4,8 @@ import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { publicAgentProfile } from "@/lib/agent-profiles/auth";
 import { southlineStore } from "@/lib/southline-store";
 import { demoTenant } from "@/lib/real-estate/fixtures";
-import { propertyRepository } from "@/lib/real-estate/repositories";
+import { listPublishedPropertiesWithFallback, resolveFeaturedPropertyWithFallback } from "@/lib/real-estate/homes-fallback";
 import { listProjects } from "@/lib/southline-diy";
-import type { Property } from "@/lib/real-estate/types";
 import type { Lang } from "@/lib/southline-i18n";
 import { DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
 
@@ -21,20 +20,10 @@ import RealEstateEntryBlock from "@/components/southline/RealEstateEntryBlock";
 import FeaturedHomes from "@/components/southline/FeaturedHomes";
 import DIYLearningTeaser from "@/components/southline/DIYLearningTeaser";
 import SeasonalIdeasBanner from "@/components/southline/SeasonalIdeasBanner";
-import CostEstimatorTeaser from "@/components/southline/CostEstimatorTeaser";
-import BookConsultationTeaser from "@/components/southline/BookConsultationTeaser";
+import EstimatorBookingSection from "@/components/southline/EstimatorBookingSection";
 import BecomeAProfessionalSection from "@/components/southline/BecomeAProfessionalSection";
 
 export const dynamic = "force-dynamic";
-
-async function resolveFeaturedProperty(featuredPropertyId: string | null): Promise<Property | null> {
-  if (featuredPropertyId) {
-    const byId = await propertyRepository.findPropertyById(featuredPropertyId, demoTenant.id).catch(() => null);
-    if (byId) return byId;
-  }
-  const result = await propertyRepository.listPublishedProperties(demoTenant.id, { pageSize: 1 }).catch(() => null);
-  return result?.properties[0] ?? null;
-}
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -65,12 +54,12 @@ export default async function HomePage() {
   // homepage" toggle, still defaults visible so existing settings aren't silently hidden.
   const showRealEstateBlock = !sections || sections.featuredAgents !== false;
   const featuredProperty = showRealEstateBlock
-    ? await resolveFeaturedProperty(realEstateContent.featuredPropertyId)
+    ? await resolveFeaturedPropertyWithFallback(demoTenant.id, realEstateContent.featuredPropertyId)
     : null;
 
   const showFeaturedHomes = !sections || sections.featuredHomes !== false;
   const featuredHomesResult = showFeaturedHomes
-    ? await propertyRepository.listPublishedProperties(demoTenant.id, { pageSize: 4 }).catch(() => null)
+    ? await listPublishedPropertiesWithFallback(demoTenant.id, { pageSize: 4 })
     : null;
   const featuredHomes = (featuredHomesResult?.properties ?? [])
     .filter((p) => p.id !== featuredProperty?.id)
@@ -78,19 +67,25 @@ export default async function HomePage() {
 
   const diyTeaserProjects = diyProjects.slice(0, 3);
 
+  const showEstimator = !sections || sections.costEstimator;
+  const showBooking = !sections || sections.bookConsultation;
+
   return (
     <>
       <Header lang={lang} navItems={navItems} />
       <main>
         {(!sections || sections.hero) && <Hero lang={lang} hero={hero} />}
-        {(!sections || sections.categories) && <CategoriesGrid lang={lang} />}
-        {(!sections || sections.featuredPros) && (
-          <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
-        )}
+
         {showRealEstateBlock && (
           <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />
         )}
         {showFeaturedHomes && <FeaturedHomes lang={lang} properties={featuredHomes} />}
+
+        {(!sections || sections.categories) && <CategoriesGrid lang={lang} />}
+        {(!sections || sections.featuredPros) && (
+          <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
+        )}
+
         {(!sections || sections.diyLearning) && <DIYLearningTeaser lang={lang} projects={diyTeaserProjects} />}
         {(!sections || sections.trending) && <TrendingSection lang={lang} />}
 
@@ -99,8 +94,7 @@ export default async function HomePage() {
         )}
 
         {(!sections || sections.seasonalIdeas) && <SeasonalIdeasBanner lang={lang} />}
-        {(!sections || sections.costEstimator) && <CostEstimatorTeaser lang={lang} />}
-        {(!sections || sections.bookConsultation) && <BookConsultationTeaser lang={lang} />}
+        <EstimatorBookingSection lang={lang} showEstimator={Boolean(showEstimator)} showBooking={Boolean(showBooking)} />
         {(!sections || sections.recruitment) && <BecomeAProfessionalSection lang={lang} />}
       </main>
       <Footer lang={lang} />

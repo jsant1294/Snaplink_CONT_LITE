@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { t, type Lang } from "@/lib/southline-i18n";
-import { formatPropertyPrice } from "@/lib/real-estate/fixtures";
+import { demoAgents, formatPropertyPrice } from "@/lib/real-estate/fixtures";
 import type { Property } from "@/lib/real-estate/types";
 import type { AgentProfile } from "@/lib/agent-profiles/types";
 import type { RealEstateBlockSettings } from "@/lib/southline-types";
@@ -20,6 +20,7 @@ export default function RealEstateEntryBlock({
   const headline = lang === "es" ? content.headlineEs : content.headlineEn;
   const body = lang === "es" ? content.bodyEs : content.bodyEn;
   const featured = agents.slice(0, 2);
+  const listingAgent = property ? demoAgents.find((a) => a.id === property.agentId) : undefined;
 
   return (
     <section id="real-estate" className="bg-mushroom/25 py-14 sm:py-20">
@@ -30,33 +31,67 @@ export default function RealEstateEntryBlock({
           <p className="mt-3 text-sm leading-relaxed text-walnut/80 sm:text-base">{body}</p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
-          {/* Left: featured property */}
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-stretch">
+          {/* Left: featured property — dominant, image-driven */}
           <div className="overflow-hidden rounded-2xl border border-olive/20 bg-paper shadow-[0_18px_40px_rgba(93,70,53,0.14)]">
-            {property ? (
-              <div className="relative h-64 sm:h-80 lg:h-full lg:min-h-[380px]">
+            {property && (
+              <div className="relative h-80 sm:h-[26rem] lg:h-full lg:min-h-[460px]">
                 {property.imageUrls[0] ? (
                   <img src={property.imageUrls[0]} alt={property.title} className="h-full w-full object-cover" />
                 ) : (
                   <div className="h-full w-full bg-sand" />
                 )}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-obsidian/85 via-obsidian/45 to-transparent p-6">
-                  <p className="text-lg font-semibold text-cream">{formatPropertyPrice(property.price)}</p>
-                  <h3 className="mt-1 font-display text-xl text-cream">{property.title}</h3>
+                <span className="absolute left-5 top-5 rounded-full bg-obsidian/85 px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-gold">
+                  {property.status.replace("_", " ")}
+                </span>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-obsidian/90 via-obsidian/55 to-transparent p-6 sm:p-8">
+                  <p className="text-2xl font-semibold text-cream sm:text-3xl">{formatPropertyPrice(property.price)}</p>
+                  <h3 className="mt-1 font-display text-xl text-cream sm:text-2xl">{property.title}</h3>
                   <p className="mt-1 text-sm text-cream/80">
-                    {property.city}, {property.state} · {property.bedrooms} bd · {property.bathrooms} ba · {property.squareFeet.toLocaleString()} sq ft
+                    {property.address}, {property.city}, {property.state}
                   </p>
-                  <Link
-                    href={`/homes/${property.slug}`}
-                    className="mt-4 inline-flex rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight"
-                  >
-                    {t("viewProperty", lang)}
-                  </Link>
+                  <p className="mt-1 text-sm text-cream/80">
+                    {property.bedrooms} bd · {property.bathrooms} ba · {property.squareFeet.toLocaleString()} sq ft
+                  </p>
+                  {listingAgent && (
+                    <p className="mt-2 text-xs text-cream/70">{t("listedBy", lang)} {listingAgent.name}</p>
+                  )}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link
+                      href={`/homes/${property.slug}`}
+                      className="inline-flex rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight"
+                    >
+                      {t("viewHome", lang)}
+                    </Link>
+                    <Link
+                      href="/book"
+                      className="inline-flex rounded-xl border border-cream/40 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-cream/10"
+                    >
+                      {t("scheduleShowing", lang)}
+                    </Link>
+                  </div>
                 </div>
               </div>
-            ) : (
-              <div className="flex h-64 items-center justify-center p-8 text-center text-sm text-walnut/60 lg:h-full">
-                {t("realEstateNoProperty", lang)}
+            )}
+            {/* Defensive last resort: the fixtures fallback (see lib/real-estate/homes-fallback.ts)
+                should always supply a property before this ever renders, but a premium
+                placeholder still beats a blank card if that layer is ever bypassed. */}
+            {!property && (
+              <div className="relative h-80 sm:h-[26rem] lg:h-full lg:min-h-[460px]">
+                <img
+                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=86"
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-obsidian/90 via-obsidian/55 to-transparent p-6 sm:p-8">
+                  <h3 className="font-display text-xl text-cream sm:text-2xl">{t("realEstateNoProperty", lang)}</h3>
+                  <Link
+                    href="/homes"
+                    className="mt-4 inline-flex rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight"
+                  >
+                    {t("exploreHomes", lang)}
+                  </Link>
+                </div>
               </div>
             )}
           </div>

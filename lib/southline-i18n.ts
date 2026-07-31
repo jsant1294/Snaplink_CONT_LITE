@@ -27,16 +27,16 @@ export const UI_DEFS = {
 
   // Hero
   heroTitle: {
-    es: "Ideas para cada hogar. Profesionales de confianza para hacerlas realidad.",
-    en: "Ideas for every home. Trusted professionals to bring them to life.",
+    es: "Todo el hogar. Un solo lugar de confianza.",
+    en: "Everything Home. One Trusted Place.",
   },
   heroSubtitle: {
-    es: "Explora espacios inspiradores, planifica tu próximo proyecto y conecta con profesionales locales de Snaplink.",
-    en: "Explore inspiring spaces, plan your next project, and connect with local Snaplink professionals.",
+    es: "Southline Living es el mercado de confianza para el hogar, impulsado por SnapLink. Descubre casas, profesionales de confianza, vecindarios, ideas de remodelación y servicios locales, todo desde una sola plataforma conectada.",
+    en: "Southline Living is the trusted home marketplace powered by SnapLink. Discover homes, trusted professionals, neighborhoods, remodeling ideas, and local services — all from one connected platform.",
   },
   heroSearchPrompt: {
-    es: "¿Qué proyecto estás planeando hoy?",
-    en: "What project are you planning today?",
+    es: "Buscar casas, profesionales, vecindarios, proyectos o ideas...",
+    en: "Search homes, professionals, neighborhoods, projects, or ideas...",
   },
   heroExplore: { es: "Explorar ideas", en: "Explore ideas" },
   heroPlan: { es: "Planificar mi proyecto", en: "Plan my project" },
@@ -84,8 +84,21 @@ export const UI_DEFS = {
     en: "Discover seasonal projects, budget-friendly ideas, and stunning transformations.",
   },
   seasonalTitle: { es: "Proyectos de temporada", en: "Seasonal Projects" },
+  seasonalCardDesc: {
+    es: "Prepara tu hogar para la temporada con proyectos oportunos y de alto impacto.",
+    en: "Get your home ready for the season with timely, high-impact projects.",
+  },
   budgetTitle: { es: "Mejoras económicas", en: "Budget-Friendly Upgrades" },
+  budgetCardDesc: {
+    es: "Mejoras con gran impacto visual sin romper el presupuesto.",
+    en: "High-impact upgrades that won't stretch your budget.",
+  },
   beforeAfterTitle: { es: "Antes y después", en: "Before & After" },
+  beforeAfterCardDesc: {
+    es: "Transformaciones reales de hogares hechas por profesionales de Snaplink.",
+    en: "Real home transformations completed by Snaplink professionals.",
+  },
+  viewProjects: { es: "Ver proyectos", en: "View Projects" },
   readMore: { es: "Leer más", en: "Read more" },
 
   // Project planner (hero CTA)
@@ -125,9 +138,10 @@ export const UI_DEFS = {
     en: "Connecting homeowners with trusted professionals to bring home projects to life.",
   },
   footerExplore: { es: "Explorar", en: "Explore" },
-  footerContractors: { es: "Contratistas", en: "Contractors" },
+  footerProfessionals: { es: "Profesionales", en: "Professionals" },
   footerJoin: { es: "Únete a Snaplink", en: "Join Snaplink" },
   footerClaim: { es: "Reclama tu negocio", en: "Claim your business" },
+  footerAgentProfiles: { es: "Perfiles de agentes", en: "Agent profiles" },
   footerCompany: { es: "Compañía", en: "Company" },
   footerAbout: { es: "Acerca de", en: "About" },
   footerContact: { es: "Contacto", en: "Contact" },
@@ -269,6 +283,9 @@ export const UI_DEFS = {
   findAnAgent: { es: "Encontrar un agente", en: "Find an agent" },
   exploreCommunities: { es: "Explorar comunidades", en: "Explore communities" },
   viewProperty: { es: "Ver propiedad", en: "View property" },
+  viewHome: { es: "Ver casa", en: "View Home" },
+  scheduleShowing: { es: "Agendar visita", en: "Schedule Showing" },
+  listedBy: { es: "Publicado por", en: "Listed by" },
   verifiedAgent: { es: "Verificado", en: "Verified" },
   realEstateNoProperty: {
     es: "Aún no hay una propiedad destacada.",

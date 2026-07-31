@@ -1,7 +1,28 @@
 import { t, type Lang } from "@/lib/southline-i18n";
 import { serviceLabel } from "@/lib/services";
-import { professionPlaceholderPhoto, professionTypeLabel } from "@/lib/profession-types";
+import { professionPlaceholderPhotoFor, professionPlaceholderPhotos, professionTypeLabel } from "@/lib/profession-types";
 import type { Contractor } from "@/lib/types";
+
+// Assigns each contractor a photo from its profession's variant pool, preferring a
+// stable per-contractor pick but bumping to the next unused variant within this
+// render whenever two contractors of the same profession would otherwise collide —
+// distinct companies should never look duplicated by sharing a placeholder photo.
+function assignCardPhotos(contractors: Contractor[]): Map<string, string> {
+  const used = new Set<string>();
+  const assignments = new Map<string, string>();
+  for (const c of contractors) {
+    const variants = professionPlaceholderPhotos(c.professionType);
+    const preferred = professionPlaceholderPhotoFor(c.id, c.professionType);
+    let photo = preferred;
+    if (used.has(photo)) {
+      const alternate = variants.find((v) => !used.has(v));
+      if (alternate) photo = alternate;
+    }
+    used.add(photo);
+    assignments.set(c.id, photo);
+  }
+  return assignments;
+}
 
 export default function FeaturedProfessionals({
   contractors,
@@ -11,6 +32,7 @@ export default function FeaturedProfessionals({
   lang: Lang;
 }) {
   if (!contractors.length) return null;
+  const cardPhotos = assignCardPhotos(contractors);
 
   return (
     <section id="professionals" className="bg-sage/15 py-14 sm:py-20">
@@ -42,7 +64,7 @@ export default function FeaturedProfessionals({
                   never a blank box). */}
               <div className="relative h-40 overflow-hidden">
                 <img
-                  src={professionPlaceholderPhoto(c.professionType)}
+                  src={cardPhotos.get(c.id)}
                   alt=""
                   loading="lazy"
                   className="h-full w-full object-cover"

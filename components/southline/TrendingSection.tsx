@@ -1,29 +1,24 @@
+import Link from "next/link";
 import { t, type Lang } from "@/lib/southline-i18n";
 
-const TRENDING_ITEMS = [
+const TRENDING_CARDS = [
   {
     titleKey: "seasonalTitle" as const,
-    items: [
-      { es: "Prepara tu hogar para el verano", en: "Prepare your home for summer" },
-      { es: "Proyectos de jardín para primavera", en: "Spring garden projects" },
-      { es: "Mantenimiento de temporada", en: "Seasonal maintenance guide" },
-    ],
+    descKey: "seasonalCardDesc" as const,
+    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=900&q=85",
+    href: "/diy",
   },
   {
     titleKey: "budgetTitle" as const,
-    items: [
-      { es: "Cocina renovada por menos de $5,000", en: "Kitchen refresh under $5,000" },
-      { es: "Pintura interior: el cambio más económico", en: "Interior paint: the most affordable change" },
-      { es: "5 mejoras que aumentan el valor de tu hogar", en: "5 upgrades that boost home value" },
-    ],
+    descKey: "budgetCardDesc" as const,
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85",
+    href: "/diy",
   },
   {
     titleKey: "beforeAfterTitle" as const,
-    items: [
-      { es: "Transformación de patio trasero", en: "Backyard transformation" },
-      { es: "De baño antiguo a spa moderno", en: "From outdated bath to modern spa" },
-      { es: "Sótano terminado: antes y después", en: "Finished basement: before & after" },
-    ],
+    descKey: "beforeAfterCardDesc" as const,
+    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=900&q=85",
+    href: "/diy",
   },
 ];
 
@@ -31,7 +26,6 @@ export default function TrendingSection({ lang }: { lang: Lang }) {
   return (
     <section className="bg-paper py-14 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
         <div className="text-center mb-12">
           <p className="text-xs tracking-[0.35em] uppercase text-gold font-medium mb-3">
             {t("trendingTitle", lang)}
@@ -41,23 +35,29 @@ export default function TrendingSection({ lang }: { lang: Lang }) {
           </h2>
         </div>
 
-        {/* Trending columns */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-          {TRENDING_ITEMS.map((column) => (
-            <div key={column.titleKey}>
-              <h3 className="font-display text-lg text-obsidian mb-4 border-l-2 border-gold pl-3">
-                {t(column.titleKey, lang)}
-              </h3>
-              <ul className="space-y-3">
-                {column.items.map((item, i) => (
-                  <li key={i}>
-                    <button className="w-full text-left p-3 rounded-xl bg-ivory border border-walnut/15 hover:border-olive/40 hover:shadow-sm transition-all text-sm text-walnut hover:text-obsidian">
-                      {lang === "es" ? item.es : item.en}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
+          {TRENDING_CARDS.map((card) => (
+            <Link
+              key={card.titleKey}
+              href={card.href}
+              className="group overflow-hidden rounded-2xl border border-walnut/15 bg-cream shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={card.image}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="p-5">
+                <h3 className="font-display text-lg text-obsidian">{t(card.titleKey, lang)}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-clay">{t(card.descKey, lang)}</p>
+                <span className="mt-4 inline-flex text-sm font-medium text-olive group-hover:text-obsidian transition-colors">
+                  {t("viewProjects", lang)} →
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

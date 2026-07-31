@@ -18,7 +18,7 @@ export interface EditorialCategory {
 export const DEFAULT_CATEGORIES: EditorialCategory[] = [
   {
     slug: "cocinas",
-    image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1556911073-38141963c9e0?w=900&q=85",
     titleEs: "Cocinas",
     titleEn: "Kitchens",
     subtitleEs: "Cocinas de lujo",
@@ -29,7 +29,7 @@ export const DEFAULT_CATEGORIES: EditorialCategory[] = [
   },
   {
     slug: "banos",
-    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=900&q=85",
     titleEs: "Baños",
     titleEn: "Bathrooms",
     subtitleEs: "Refugios inspirados en spas",
@@ -40,7 +40,7 @@ export const DEFAULT_CATEGORIES: EditorialCategory[] = [
   },
   {
     slug: "patios",
-    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=900&q=85",
     titleEs: "Patios",
     titleEn: "Patios",
     subtitleEs: "Espacios para compartir",
@@ -84,7 +84,7 @@ export const DEFAULT_CATEGORIES: EditorialCategory[] = [
   },
   {
     slug: "garajes",
-    image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=900&q=85",
     titleEs: "Garajes y talleres",
     titleEn: "Garage & Workshop",
     subtitleEs: "Talleres organizados",

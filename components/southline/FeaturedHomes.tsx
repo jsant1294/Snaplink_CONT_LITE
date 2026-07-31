@@ -45,6 +45,9 @@ export default function FeaturedHomes({ lang, properties }: { lang: Lang; proper
                 <p className="mt-1 text-sm text-clay">
                   {property.city}, {property.state} · {property.bedrooms} bd · {property.bathrooms} ba · {property.squareFeet.toLocaleString()} sq ft
                 </p>
+                <span className="mt-4 inline-flex rounded-xl border border-walnut/25 px-4 py-2 text-xs font-semibold text-walnut transition-colors group-hover:bg-walnut/5">
+                  {t("viewHome", lang)}
+                </span>
               </div>
             </Link>
           ))}

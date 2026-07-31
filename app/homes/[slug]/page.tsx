@@ -5,14 +5,14 @@ import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
 import type { Lang } from "@/lib/southline-i18n";
 import { demoAgents, demoTenant, formatPropertyPrice } from "@/lib/real-estate/fixtures";
-import { propertyRepository } from "@/lib/real-estate/repositories";
+import { findPropertyBySlugWithFallback } from "@/lib/real-estate/homes-fallback";
 
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const property = await propertyRepository.findPropertyBySlug(slug, demoTenant.id);
+  const property = await findPropertyBySlugWithFallback(slug, demoTenant.id);
   if (!property) return { title: "Property not found | Southline Living", robots: { index: false, follow: false } };
   const url = `${appUrl}/homes/${property.slug}`;
   const images = property.imageUrls[0] ? [property.imageUrls[0]] : [];
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
-  const property = await propertyRepository.findPropertyBySlug((await params).slug, demoTenant.id);
+  const property = await findPropertyBySlugWithFallback((await params).slug, demoTenant.id);
   if (!property) notFound();
   const agent = demoAgents.find((item) => item.id === property.agentId);
   return <>
