@@ -21,6 +21,7 @@ const DEFAULT_NAV: NavItem[] = [
   { key: "navProjects", href: "/planner" },
   { key: "navDIY", href: "/diy" },
   { key: "navPros", href: "/#professionals" },
+  { key: "navAgents", href: "/agents" },
   { key: "navBook", href: "/book" },
   { key: "navForContractors", href: "/for-contractors" },
 ];

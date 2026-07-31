@@ -201,6 +201,63 @@ export const UI_DEFS = {
     es: "No hay contenido disponible en este momento.",
     en: "No content available at the moment.",
   },
+
+  // Agent profiles (Snaplink Profile)
+  navAgents: { es: "Agentes", en: "Agents" },
+  featuredAgentsEyebrow: { es: "Bienes raíces", en: "Real estate" },
+  featuredAgentsTitle: {
+    es: "Profesionales inmobiliarios destacados",
+    en: "Featured Local Real Estate Professionals",
+  },
+  featuredAgentsSubtitle: {
+    es: "Conecta con agentes locales verificados de Snaplink.",
+    en: "Connect with verified local Snaplink real estate professionals.",
+  },
+  agentsDirectoryTitle: { es: "Directorio de agentes", en: "Agent directory" },
+  agentsDirectoryEmpty: {
+    es: "Aún no hay perfiles activos.",
+    en: "No active profiles yet.",
+  },
+  contactAgent: { es: "Contactar agente", en: "Contact agent" },
+  callNow: { es: "Llamar", en: "Call" },
+  textUs: { es: "Enviar mensaje", en: "Text" },
+  emailAgent: { es: "Correo", en: "Email" },
+  aboutAgent: { es: "Acerca del agente", en: "About the agent" },
+  specialties: { es: "Especialidades", en: "Specialties" },
+  languages: { es: "Idiomas", en: "Languages" },
+  serviceAreasLabel: { es: "Áreas de servicio", en: "Featured communities" },
+  yearsExperience: { es: "Años de experiencia", en: "Years of experience" },
+  agentLicense: { es: "Licencia", en: "License" },
+  saveContact: { es: "Guardar contacto", en: "Save Contact" },
+  poweredBySnaplinkProfile: {
+    es: "Impulsado por Snaplink Profile",
+    en: "Powered by Snaplink Profile",
+  },
+
+  // Agent recruitment
+  agentRecruitmentHeadline: {
+    es: "Convierte tu reputación local en una presencia digital profesional.",
+    en: "Turn your local reputation into a professional digital presence.",
+  },
+  agentRecruitmentSubcopy: {
+    es: "Tu perfil de Snaplink reúne tus propiedades, reseñas, experiencia local, opciones de contacto y herramientas de reserva en un solo destino profesional.",
+    en: "Your Snaplink Profile brings your listings, reviews, local expertise, contact options, and booking tools together in one professional destination.",
+  },
+  createAgentProfile: { es: "Crea tu perfil de agente", en: "Create your agent profile" },
+  claimAgentProfile: { es: "Reclama tu perfil", en: "Claim your profile" },
+  requestAgentDemo: { es: "Solicita una demostración", en: "Request a demo" },
+  viewAgentPlans: { es: "Ver planes", en: "View profile plans" },
+  agentRequestFormTitle: { es: "Solicita tu perfil de Snaplink", en: "Request your Snaplink Profile" },
+  agentRequestName: { es: "Nombre completo", en: "Full name" },
+  agentRequestEmail: { es: "Correo electrónico", en: "Email" },
+  agentRequestPhone: { es: "Teléfono", en: "Phone" },
+  agentRequestServiceArea: { es: "Área de servicio", en: "Service area" },
+  agentRequestBrokerage: { es: "Correduría", en: "Brokerage" },
+  agentRequestSubmit: { es: "Enviar solicitud", en: "Submit request" },
+  agentRequestSuccess: {
+    es: "¡Gracias! Un operador revisará tu solicitud en breve.",
+    en: "Thanks! An operator will review your request shortly.",
+  },
 };
 
 export function t(key: UIKey, lang: Lang): string {

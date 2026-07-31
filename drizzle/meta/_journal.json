@@ -85,6 +85,13 @@
       "when": 1785447891370,
       "tag": "0011_fix_oauth_client_id_unique_constraint",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1785450333685,
+      "tag": "0012_agent_profiles",
+      "breakpoints": true
     }
   ]
 }

@@ -20,6 +20,7 @@ export interface SectionVisibility {
   featuredPros: boolean;
   trending: boolean;
   recruitment: boolean;
+  featuredAgents: boolean;
 }
 
 export interface SpotlightItem {
@@ -38,6 +39,7 @@ export interface SouthlineSettings {
   hero: HeroContent;
   sections: SectionVisibility;
   featuredContractorIds: string[];
+  featuredAgentProfileIds: string[];
   featureFlags: Record<string, boolean>;
   seo: {
     titleEs: string;
@@ -78,6 +80,7 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   featuredPros: true,
   trending: true,
   recruitment: true,
+  featuredAgents: true,
 };
 
 export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
@@ -107,6 +110,7 @@ export function defaultSouthlineSettings(): SouthlineSettings {
     hero: { ...DEFAULT_HERO },
     sections: { ...DEFAULT_SECTIONS },
     featuredContractorIds: [],
+    featuredAgentProfileIds: [],
     featureFlags: { ...DEFAULT_FEATURE_FLAGS },
     seo: { ...DEFAULT_SEO },
     navigation: {
@@ -116,6 +120,7 @@ export function defaultSouthlineSettings(): SouthlineSettings {
         { key: "navProjects", href: "#", labelEs: "Proyectos", labelEn: "Projects", visible: true },
         { key: "navDIY", href: "#", labelEs: "DIY", labelEn: "DIY", visible: true },
         { key: "navPros", href: "#", labelEs: "Profesionales", labelEn: "Professionals", visible: true },
+        { key: "navAgents", href: "/agents", labelEs: "Agentes", labelEn: "Agents", visible: true },
         { key: "navBook", href: "#", labelEs: "Reservar", labelEn: "Book", visible: true },
       ],
     },

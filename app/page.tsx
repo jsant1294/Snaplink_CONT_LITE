@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { contractorStore } from "@/lib/store";
+import { agentProfileStore } from "@/lib/agent-profiles/store";
+import { publicAgentProfile } from "@/lib/agent-profiles/auth";
 import { southlineStore } from "@/lib/southline-store";
 import type { Lang } from "@/lib/southline-i18n";
 
@@ -10,7 +12,8 @@ import TrendingSection from "@/components/southline/TrendingSection";
 import Footer from "@/components/southline/Footer";
 import FeaturedProfessionals from "@/components/southline/FeaturedProfessionals";
 import CommunitySpotlight from "@/components/southline/CommunitySpotlight";
-import RealEstateDiscovery from "@/components/southline/RealEstateDiscovery";
+import FeaturedAgents from "@/components/southline/FeaturedAgents";
+import AgentRecruitmentSection from "@/components/southline/AgentRecruitmentSection";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +21,10 @@ export default async function HomePage() {
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
 
-  const [settings, allContractors] = await Promise.all([
+  const [settings, allContractors, activeAgentProfiles] = await Promise.all([
     southlineStore.getSettings().catch(() => null),
     contractorStore.list().catch(() => [] as import("@/lib/types").Contractor[]),
+    agentProfileStore.listActive().catch(() => [] as import("@/lib/agent-profiles/types").AgentProfile[]),
   ]);
 
   const sections = settings?.sections ?? null;
@@ -30,6 +34,11 @@ export default async function HomePage() {
   const featuredContractors = featuredIds.size > 0
     ? allContractors.filter((c) => featuredIds.has(c.id))
     : allContractors;
+  const featuredAgentIds = new Set(settings?.featuredAgentProfileIds ?? []);
+  const featuredAgents = (featuredAgentIds.size > 0
+    ? activeAgentProfiles.filter((a) => featuredAgentIds.has(a.id))
+    : activeAgentProfiles
+  ).map(publicAgentProfile);
 
   return (
     <>
@@ -41,7 +50,13 @@ export default async function HomePage() {
           <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
         )}
         {(!sections || sections.trending) && <TrendingSection lang={lang} />}
-        <RealEstateDiscovery lang={lang} />
+        {/* featuredAgents replaces the old RealEstateDiscovery preview; defaults to
+            visible (undefined !== false) so existing settings files without this
+            new key don't suddenly hide real estate content that was always shown. */}
+        {(!sections || sections.featuredAgents !== false) && (
+          <FeaturedAgents agents={featuredAgents} lang={lang} />
+        )}
+        <AgentRecruitmentSection lang={lang} />
 
         {settings?.spotlight && settings.spotlight.length > 0 && (
           <CommunitySpotlight lang={lang} items={settings.spotlight} />

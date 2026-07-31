@@ -33,6 +33,7 @@ export default function Footer({ lang }: { lang: Lang }) {
               <li><Link href="/planner" className="text-sm hover:text-gold transition-colors">{t("navProjects", lang)}</Link></li>
               <li><Link href="/diy" className="text-sm hover:text-gold transition-colors">{t("navDIY", lang)}</Link></li>
               <li><Link href="/#professionals" className="text-sm hover:text-gold transition-colors">{t("navPros", lang)}</Link></li>
+              <li><Link href="/agents" className="text-sm hover:text-gold transition-colors">{t("navAgents", lang)}</Link></li>
             </ul>
           </div>
 
