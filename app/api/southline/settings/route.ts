@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isOperator, operatorPin, pinFromRequest } from "@/lib/auth";
 import { southlineStore } from "@/lib/southline-store";
+import { validateSouthlineSettings } from "@/lib/southline-validation";
 
 export async function GET(req: NextRequest) {
   const pin = pinFromRequest(req);
@@ -18,6 +19,10 @@ export async function PATCH(req: NextRequest) {
   }
   try {
     const body = await req.json();
+    const validationError = validateSouthlineSettings(body);
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
     const settings = await southlineStore.updateSettings(body);
     return NextResponse.json({ settings });
   } catch (e) {

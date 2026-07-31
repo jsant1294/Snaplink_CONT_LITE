@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { t, type Lang } from "@/lib/southline-i18n";
 import { DEMO_FEATURED_PROFESSIONAL } from "@/lib/featured-services-fixtures";
-import { PROFESSION_TYPES, professionTypeLabel } from "@/lib/profession-types";
+import { PROFESSION_TYPES, professionTypeLabel, professionPlaceholderPhotoFor } from "@/lib/profession-types";
+import type { HomeServicesContent } from "@/lib/southline-types";
+import type { Contractor } from "@/lib/types";
 
 // Mirrors RealEstateEntryBlock.tsx's layout exactly (large image-dominant featured
 // card | summary card | recruitment card | primary CTAs) so Homes and Services read
@@ -13,16 +15,48 @@ import { PROFESSION_TYPES, professionTypeLabel } from "@/lib/profession-types";
 // ("Future Ready... Initially use demo professionals"). No star rating is shown
 // anywhere in this component: this app has no reviews/ratings system for any
 // professional yet, so inventing one — even as demo flavor — isn't done here.
-export default function FeaturedServicesEntryBlock({ lang }: { lang: Lang }) {
-  const pro = DEMO_FEATURED_PROFESSIONAL;
+export default function FeaturedServicesEntryBlock({
+  lang,
+  content,
+  featuredContractor,
+}: {
+  lang: Lang;
+  content?: HomeServicesContent;
+  featuredContractor?: Contractor | null;
+}) {
+  // The featured card is CMS-driven when an operator picks a real contractor;
+  // it falls back to demo content otherwise. Real contractors don't carry
+  // years-of-experience, portfolio photos, or a logo/headshot yet, so those
+  // fields are only rendered when present.
+  const pro = featuredContractor
+    ? {
+        id: featuredContractor.id,
+        companyName: featuredContractor.businessName,
+        projectType: professionTypeLabel(featuredContractor.professionType, lang),
+        location: featuredContractor.serviceArea,
+        yearsExperience: null as number | null,
+        heroImage: content?.featuredImageUrl ?? professionPlaceholderPhotoFor(featuredContractor.id, featuredContractor.professionType),
+        logoUrl: null as string | null,
+        headshotUrl: null as string | null,
+        specialties: featuredContractor.services,
+        languages: [featuredContractor.preferredLanguage === "es" ? "Español" : "English"],
+        profileHref: `/contractor/${featuredContractor.username}`,
+      }
+    : { ...DEMO_FEATURED_PROFESSIONAL, yearsExperience: DEMO_FEATURED_PROFESSIONAL.yearsExperience as number | null };
+
+  const eyebrow = lang === "es" ? content?.eyebrowEs : content?.eyebrowEn;
+  const title = lang === "es" ? content?.titleEs : content?.titleEn;
+  const subtitle = lang === "es" ? content?.descriptionEs : content?.descriptionEn;
+  const requestQuoteLabel = lang === "es" ? content?.primaryCtaLabelEs : content?.primaryCtaLabelEn;
+  const requestQuoteHref = content?.primaryCtaUrl ?? "/book";
 
   return (
     <section id="services" className="bg-sand/20 py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 max-w-2xl">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.35em] text-gold">{t("featuredServicesEyebrow", lang)}</p>
-          <h2 className="font-display text-3xl leading-tight text-walnut sm:text-4xl">{t("featuredServicesTitle", lang)}</h2>
-          <p className="mt-3 text-sm leading-relaxed text-walnut/80 sm:text-base">{t("featuredServicesSubtitle", lang)}</p>
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.35em] text-gold">{eyebrow ?? t("featuredServicesEyebrow", lang)}</p>
+          <h2 className="font-display text-3xl leading-tight text-walnut sm:text-4xl">{title ?? t("featuredServicesTitle", lang)}</h2>
+          <p className="mt-3 text-sm leading-relaxed text-walnut/80 sm:text-base">{subtitle ?? t("featuredServicesSubtitle", lang)}</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-stretch">
@@ -36,15 +70,17 @@ export default function FeaturedServicesEntryBlock({ lang }: { lang: Lang }) {
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-obsidian/90 via-obsidian/55 to-transparent p-6 sm:p-8">
                 <p className="text-xl font-semibold text-cream sm:text-2xl">{pro.companyName}</p>
                 <h3 className="mt-1 font-display text-lg text-cream sm:text-xl">{pro.projectType}</h3>
-                <p className="mt-1 text-sm text-cream/80">
-                  {pro.location} · {pro.yearsExperience} {t("yearsExperience", lang)}
-                </p>
+                {pro.yearsExperience != null && (
+                  <p className="mt-1 text-sm text-cream/80">
+                    {pro.location} · {pro.yearsExperience} {t("yearsExperience", lang)}
+                  </p>
+                )}
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link href={pro.profileHref} className="inline-flex rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-obsidian transition-colors hover:bg-goldlight">
                     {t("viewProfile", lang)}
                   </Link>
-                  <Link href="/book" className="inline-flex rounded-xl border border-cream/40 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-cream/10">
-                    {t("requestQuote", lang)}
+                  <Link href={requestQuoteHref} className="inline-flex rounded-xl border border-cream/40 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-cream/10">
+                    {requestQuoteLabel ?? t("requestQuote", lang)}
                   </Link>
                   <Link href="/book" className="inline-flex rounded-xl border border-cream/40 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-cream/10">
                     {t("bookConsultationCta2", lang)}
@@ -58,8 +94,8 @@ export default function FeaturedServicesEntryBlock({ lang }: { lang: Lang }) {
           <div className="flex flex-col gap-4">
             <div className="rounded-2xl border border-olive/20 bg-cream p-5 shadow-sm">
               <div className="flex items-start gap-3">
-                <img src={pro.logoUrl} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
-                <img src={pro.headshotUrl} alt="" className="h-12 w-12 shrink-0 rounded-full object-cover" />
+                {pro.logoUrl && <img src={pro.logoUrl} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />}
+                {pro.headshotUrl && <img src={pro.headshotUrl} alt="" className="h-12 w-12 shrink-0 rounded-full object-cover" />}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="truncate font-display text-lg text-obsidian">{pro.companyName}</h3>
@@ -84,8 +120,8 @@ export default function FeaturedServicesEntryBlock({ lang }: { lang: Lang }) {
                 <Link href={pro.profileHref} className="flex-1 rounded-xl border border-olive/30 py-2 text-center text-sm font-medium text-olive transition-colors hover:bg-olive/5">
                   {t("viewProfile", lang)}
                 </Link>
-                <Link href="/book" className="flex-1 rounded-xl bg-obsidian py-2 text-center text-sm font-medium text-cream transition-colors hover:bg-obsidian/90">
-                  {t("requestQuote", lang)}
+                <Link href={requestQuoteHref} className="flex-1 rounded-xl bg-obsidian py-2 text-center text-sm font-medium text-cream transition-colors hover:bg-obsidian/90">
+                  {requestQuoteLabel ?? t("requestQuote", lang)}
                 </Link>
               </div>
             </div>

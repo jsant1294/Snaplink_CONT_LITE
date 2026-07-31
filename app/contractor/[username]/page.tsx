@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
 import ContractorPublicPage from "@/components/intake/ContractorPublicPage";
+import LucioMount from "@/components/lucio/LucioMount";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export default async function ContractorProfilePage({
         <ContractorPublicPage contractor={contractor} />
       </div>
       <Footer lang={lang} />
+      <LucioMount lang={lang} pageContext={{ type: "contractor", ref: contractor.username }} />
     </>
   );
 }

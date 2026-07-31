@@ -6,6 +6,7 @@ import Footer from "@/components/southline/Footer";
 import type { Lang } from "@/lib/southline-i18n";
 import { demoAgents, demoTenant, formatPropertyPrice } from "@/lib/real-estate/fixtures";
 import { findPropertyBySlugWithFallback } from "@/lib/real-estate/homes-fallback";
+import LucioMount from "@/components/lucio/LucioMount";
 
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 export const dynamic = "force-dynamic";
@@ -40,5 +41,6 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
       </section>
     </main>
     <Footer lang={lang} />
+    <LucioMount lang={lang} pageContext={{ type: "property", ref: property.slug }} />
   </>;
 }

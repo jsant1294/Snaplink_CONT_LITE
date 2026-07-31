@@ -6,6 +6,7 @@ import { getProjectBySlug } from "@/lib/southline-diy";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
 import Link from "next/link";
+import LucioMount from "@/components/lucio/LucioMount";
 
 export const dynamic = "force-dynamic";
 
@@ -147,6 +148,7 @@ export default async function DIYDetailPage({
         </div>
       </main>
       <Footer lang={lang} />
+      <LucioMount lang={lang} pageContext={{ type: "diy", ref: project.slug }} />
     </>
   );
 }

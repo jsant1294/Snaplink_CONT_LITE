@@ -4,6 +4,7 @@ import type { Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
 import ProjectPlanner from "@/components/southline/ProjectPlanner";
+import LucioMount from "@/components/lucio/LucioMount";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function PlannerPage() {
         <ProjectPlanner lang={lang} contractors={contractors} />
       </main>
       <Footer lang={lang} />
+      <LucioMount lang={lang} pageContext={{ type: "planner" }} />
     </>
   );
 }

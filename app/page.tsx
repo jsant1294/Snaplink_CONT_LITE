@@ -11,6 +11,7 @@ import { DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
 
 import Header from "@/components/southline/Header";
 import Hero from "@/components/southline/Hero";
+import LocalDiscovery from "@/components/southline/LocalDiscovery";
 import CategoriesGrid from "@/components/southline/CategoriesGrid";
 import TrendingSection from "@/components/southline/TrendingSection";
 import Footer from "@/components/southline/Footer";
@@ -22,8 +23,10 @@ import FeaturedServicesEntryBlock from "@/components/southline/FeaturedServicesE
 import PoweredBySnapLink from "@/components/southline/PoweredBySnapLink";
 import DIYLearningTeaser from "@/components/southline/DIYLearningTeaser";
 import SeasonalIdeasBanner from "@/components/southline/SeasonalIdeasBanner";
+import TestimonialsSection from "@/components/southline/TestimonialsSection";
 import EstimatorBookingSection from "@/components/southline/EstimatorBookingSection";
 import BecomeAProfessionalSection from "@/components/southline/BecomeAProfessionalSection";
+import LucioMount from "@/components/lucio/LucioMount";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +61,10 @@ export default async function HomePage() {
   const featuredProperty = showRealEstateBlock
     ? await resolveFeaturedPropertyWithFallback(demoTenant.id, realEstateContent.featuredPropertyId)
     : null;
+  const featuredContractorId = settings?.homeServices?.featuredContractorId;
+  const featuredContractor = featuredContractorId
+    ? allContractors.find((c) => c.id === featuredContractorId) ?? null
+    : null;
 
   const showFeaturedHomes = !sections || sections.featuredHomes !== false;
   const featuredHomesResult = showFeaturedHomes
@@ -76,32 +83,41 @@ export default async function HomePage() {
     <>
       <Header lang={lang} navItems={navItems} />
       <main>
-        {(!sections || sections.hero) && <Hero lang={lang} hero={hero} />}
+        {(!sections || sections.hero) && <Hero lang={lang} hero={hero} heroImage={settings?.heroImage} />}
+
+        {settings?.localDiscovery?.showOnHomepage !== false && (
+          <LocalDiscovery lang={lang} content={settings?.localDiscovery} />
+        )}
 
         {showRealEstateBlock && (
           <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />
         )}
         {showFeaturedHomes && <FeaturedHomes lang={lang} properties={featuredHomes} />}
 
-        {(!sections || sections.featuredServices) && <FeaturedServicesEntryBlock lang={lang} />}
+        {(!sections || sections.featuredServices) && (
+          <FeaturedServicesEntryBlock lang={lang} content={settings?.homeServices} featuredContractor={featuredContractor} />
+        )}
         {(!sections || sections.featuredPros) && (
           <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
         )}
         {(!sections || sections.poweredBySnaplink) && <PoweredBySnapLink lang={lang} />}
-        {(!sections || sections.categories) && <CategoriesGrid lang={lang} />}
+        {(!sections || sections.categories) && <CategoriesGrid lang={lang} categories={settings?.categories} />}
 
         {(!sections || sections.diyLearning) && <DIYLearningTeaser lang={lang} projects={diyTeaserProjects} />}
-        {(!sections || sections.trending) && <TrendingSection lang={lang} />}
+        {(!sections || sections.trending) && <TrendingSection lang={lang} items={settings?.trendingProjects} />}
+
+        <TestimonialsSection lang={lang} content={settings?.testimonials} />
 
         {settings?.spotlight && settings.spotlight.length > 0 && (
           <CommunitySpotlight lang={lang} items={settings.spotlight} />
         )}
 
-        {(!sections || sections.seasonalIdeas) && <SeasonalIdeasBanner lang={lang} />}
+        {(!sections || sections.seasonalIdeas) && <SeasonalIdeasBanner lang={lang} content={settings?.seasonal} />}
         <EstimatorBookingSection lang={lang} showEstimator={Boolean(showEstimator)} showBooking={Boolean(showBooking)} />
         {(!sections || sections.recruitment) && <BecomeAProfessionalSection lang={lang} />}
       </main>
-      <Footer lang={lang} />
+      <Footer lang={lang} footer={settings?.footer} contact={settings?.contact} />
+      <LucioMount lang={lang} pageContext={{ type: "home" }} />
     </>
   );
 }

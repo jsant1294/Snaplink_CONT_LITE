@@ -6,6 +6,7 @@ import Footer from "@/components/southline/Footer";
 import type { Lang } from "@/lib/southline-i18n";
 import { demoAgents, demoTenant, formatPropertyPrice } from "@/lib/real-estate/fixtures";
 import { listPublishedPropertiesWithFallback } from "@/lib/real-estate/homes-fallback";
+import LucioMount from "@/components/lucio/LucioMount";
 
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 
@@ -39,5 +40,6 @@ export default async function HomesPage({ searchParams }: { searchParams: Promis
       </section>
     </main>
     <Footer lang={lang} />
+    <LucioMount lang={lang} />
   </>;
 }

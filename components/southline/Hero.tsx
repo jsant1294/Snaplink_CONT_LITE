@@ -1,15 +1,18 @@
 import { t, type Lang } from "@/lib/southline-i18n";
-import type { HeroContent } from "@/lib/southline-types";
+import type { CmsImage, HeroContent } from "@/lib/southline-types";
 import Link from "next/link";
+import StartPlanningWithLucioButton from "@/components/lucio/StartPlanningWithLucioButton";
 
 const HERO_IMAGE = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80";
 
 export default function Hero({
   lang,
   hero,
+  heroImage,
 }: {
   lang: Lang;
   hero: HeroContent | null;
+  heroImage?: CmsImage | null;
 }) {
   const title = hero
     ? lang === "es" ? hero.titleEs : hero.titleEn
@@ -30,15 +33,24 @@ export default function Hero({
     ? lang === "es" ? hero.ctaFindProEs : hero.ctaFindProEn
     : t("heroFindPro", lang);
   const tagline = hero?.tagline ?? "Southline Living";
+  const heroMobile = heroImage?.mobileUrl ?? heroImage?.desktopUrl ?? HERO_IMAGE;
+  const heroDesktop = heroImage?.desktopUrl ?? heroImage?.mobileUrl ?? HERO_IMAGE;
+  const heroAlt = lang === "es" ? heroImage?.altEs : heroImage?.altEn;
 
   return (
     <section className="relative overflow-hidden min-h-[85vh] flex items-center">
       {/* Background image */}
       <div className="absolute inset-0">
         <img
-          src={HERO_IMAGE}
-          alt=""
-          className="w-full h-full object-cover"
+          src={heroDesktop}
+          alt={heroAlt ?? ""}
+          className="hidden w-full h-full object-cover md:block"
+          fetchPriority="high"
+        />
+        <img
+          src={heroMobile}
+          alt={heroAlt ?? ""}
+          className="w-full h-full object-cover md:hidden"
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#2a241e]/90 via-[#3c3229]/60 to-[#4a3d30]/20" />
@@ -103,6 +115,7 @@ export default function Hero({
               >
                 {findProLabel}
               </Link>
+              <StartPlanningWithLucioButton lang={lang} />
             </div>
 
             <Link

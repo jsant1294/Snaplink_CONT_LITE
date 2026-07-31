@@ -10,8 +10,14 @@ import DiyEditor from "@/components/southline/admin/DiyEditor";
 import SpotlightEditor from "@/components/southline/admin/SpotlightEditor";
 import AgentProfilesPanel from "@/components/southline/admin/AgentProfilesPanel";
 import RealEstateBlockEditor from "@/components/southline/admin/RealEstateBlockEditor";
+import FaqEditor from "@/components/southline/admin/FaqEditor";
+import FooterEditor from "@/components/southline/admin/FooterEditor";
+import ContactEditor from "@/components/southline/admin/ContactEditor";
+import TestimonialsEditor from "@/components/southline/admin/TestimonialsEditor";
+import LocalDiscoveryEditor from "@/components/southline/admin/LocalDiscoveryEditor";
+import SeoEditor from "@/components/southline/admin/SeoEditor";
 
-type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "realestate";
+type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "realestate" | "faq" | "footer" | "contact" | "testimonials" | "localDiscovery" | "seo";
 
 export default function SouthlineAdminPage() {
   return (
@@ -32,6 +38,12 @@ function SouthlineAdmin({ pin }: { pin: string }) {
     { key: "realestate", label: "Real Estate Block" },
     { key: "diy", label: "DIY Projects" },
     { key: "spotlight", label: "Community Spotlight" },
+    { key: "faq", label: "FAQ" },
+    { key: "footer", label: "Footer" },
+    { key: "contact", label: "Contact" },
+    { key: "testimonials", label: "Testimonials" },
+    { key: "localDiscovery", label: "Local Discovery" },
+    { key: "seo", label: "SEO & Social" },
     { key: "flags", label: "Feature Flags" },
   ];
 
@@ -80,6 +92,12 @@ function SouthlineAdmin({ pin }: { pin: string }) {
           {tab === "realestate" && <RealEstateBlockEditor pin={pin} />}
           {tab === "diy" && <DiyEditor pin={pin} />}
           {tab === "spotlight" && <SpotlightEditor pin={pin} />}
+          {tab === "faq" && <FaqEditor pin={pin} />}
+          {tab === "footer" && <FooterEditor pin={pin} />}
+          {tab === "contact" && <ContactEditor pin={pin} />}
+          {tab === "testimonials" && <TestimonialsEditor pin={pin} />}
+          {tab === "localDiscovery" && <LocalDiscoveryEditor pin={pin} />}
+          {tab === "seo" && <SeoEditor pin={pin} />}
           {tab === "flags" && <FeatureFlagPanel pin={pin} />}
         </div>
       </div>

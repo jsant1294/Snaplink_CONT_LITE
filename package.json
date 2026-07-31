@@ -10,7 +10,7 @@
     "test:real-estate": "node --test tests/real-estate-tenant-isolation.test.mjs tests/real-estate-phase5.test.mjs tests/real-estate-phase6.test.mjs tests/real-estate-phase7.test.mjs tests/real-estate-phase8.test.mjs tests/real-estate-phase9.test.mjs tests/real-estate-phase10.test.mjs tests/real-estate-phase11.test.mjs tests/real-estate-db-integration.test.mjs",
     "test:real-estate:staging-load": "node scripts/real-estate-staging-load-test.mjs",
     "test:agent-profiles": "node --test tests/agent-profiles.test.mjs tests/real-estate-entry-block.test.mjs",
-    "test:southline": "node --test tests/master-refactor-v2.test.mjs tests/master-refactor-v3.test.mjs tests/featured-services.test.mjs tests/snaplink-platform.test.mjs",
+    "test:southline": "node --test tests/master-refactor-v2.test.mjs tests/master-refactor-v3.test.mjs tests/featured-services.test.mjs tests/snaplink-platform.test.mjs tests/lucio.test.mjs",
     "db:push": "drizzle-kit push",
     "db:seed": "node scripts/seed-demos.mjs",
     "db:seed:categories": "node scripts/seed-categories.mjs",
@@ -19,14 +19,19 @@
     "db:seed:agent-profiles-demo": "node scripts/seed-agent-profiles-demo.mjs"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.25",
+    "@ai-sdk/openai": "^4.0.25",
+    "@ai-sdk/react": "^4.0.47",
     "@vercel/blob": "^2.5.0",
+    "ai": "^7.0.44",
     "drizzle-orm": "^0.45.2",
     "next": "^15.5.20",
     "pdf-lib": "^1.17.1",
     "pg": "^8.22.0",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22",

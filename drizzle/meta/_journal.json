@@ -99,6 +99,13 @@
       "when": 1785467899531,
       "tag": "0013_contractor_profession_type",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1785476846349,
+      "tag": "0014_lucio_events",
+      "breakpoints": true
     }
   ]
 }

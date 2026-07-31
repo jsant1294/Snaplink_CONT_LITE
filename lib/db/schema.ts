@@ -939,6 +939,14 @@ export const agentProfiles=pgTable("agent_profiles",{id:text("id").primaryKey(),
 export const agentProfileEvents=pgTable("agent_profile_events",{id:text("id").primaryKey(),agentProfileId:text("agent_profile_id").notNull().references(()=>agentProfiles.id,{onDelete:"cascade"}),eventType:text("event_type").notNull(),anonymousSessionId:text("anonymous_session_id"),referrer:text("referrer"),createdAt:timestamp("created_at",{withTimezone:true,mode:"string"}).notNull().defaultNow()},t=>[index("agent_profile_events_profile_idx").on(t.agentProfileId,t.eventType,t.createdAt)]);
 
 // ---------------------------------------------------------------------------
+// Lucio (smart planning assistant) — anonymous, no-auth analytics events.
+// Same shape/philosophy as agent_profile_events: standalone, Postgres-only,
+// no persisted chat transcripts — only the 12 event types the product spec
+// calls for (widget_opened, flow_selected, search_performed, ...).
+// ---------------------------------------------------------------------------
+export const lucioEvents=pgTable("lucio_events",{id:text("id").primaryKey(),eventType:text("event_type").notNull(),sessionId:text("session_id"),pageType:text("page_type"),pageRef:text("page_ref"),metadata:jsonb("metadata").$type<Record<string,unknown>>().notNull().default({}),createdAt:timestamp("created_at",{withTimezone:true,mode:"string"}).notNull().defaultNow()},t=>[index("lucio_events_type_idx").on(t.eventType,t.createdAt)]);
+
+// ---------------------------------------------------------------------------
 // Lucio Financial Copilot (LFC)
 // All money stored as INTEGER CENTS. Soft-delete only — tax records must stay
 // reconstructable. Categories are data rows so trades/verticals can differ.

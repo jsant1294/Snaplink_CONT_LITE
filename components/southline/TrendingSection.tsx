@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { t, type Lang } from "@/lib/southline-i18n";
+import type { TrendingProjectItem } from "@/lib/southline-types";
 
 const TRENDING_CARDS = [
   {
@@ -22,7 +23,18 @@ const TRENDING_CARDS = [
   },
 ];
 
-export default function TrendingSection({ lang }: { lang: Lang }) {
+export default function TrendingSection({
+  lang,
+  items,
+}: {
+  lang: Lang;
+  items?: TrendingProjectItem[];
+}) {
+  const cmsCards = items
+    ? [...items].filter((item) => item.visible).sort((a, b) => a.sortOrder - b.sortOrder)
+    : null;
+  const cards = cmsCards ?? TRENDING_CARDS;
+
   return (
     <section className="bg-paper py-14 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -36,29 +48,38 @@ export default function TrendingSection({ lang }: { lang: Lang }) {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
-          {TRENDING_CARDS.map((card) => (
-            <Link
-              key={card.titleKey}
-              href={card.href}
-              className="group overflow-hidden rounded-2xl border border-walnut/15 bg-cream shadow-sm transition-shadow hover:shadow-md"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={card.image}
-                  alt=""
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                />
-              </div>
-              <div className="p-5">
-                <h3 className="font-display text-lg text-obsidian">{t(card.titleKey, lang)}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-clay">{t(card.descKey, lang)}</p>
-                <span className="mt-4 inline-flex text-sm font-medium text-olive group-hover:text-obsidian transition-colors">
-                  {t("viewProjects", lang)} →
-                </span>
-              </div>
-            </Link>
-          ))}
+          {cards.map((card) => {
+            const title = "titleKey" in card
+              ? t(card.titleKey, lang)
+              : lang === "es" ? card.titleEs : card.titleEn;
+            const desc = "titleKey" in card
+              ? t(card.descKey, lang)
+              : (lang === "es" ? card.descriptionEs : card.descriptionEn) ?? "";
+
+            return (
+              <Link
+                key={"titleKey" in card ? card.titleKey : card.id}
+                href={"titleKey" in card ? card.href : card.linkUrl}
+                className="group overflow-hidden rounded-2xl border border-walnut/15 bg-cream shadow-sm transition-shadow hover:shadow-md"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={"titleKey" in card ? card.image : card.imageUrl}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-display text-lg text-obsidian">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-clay">{desc}</p>
+                  <span className="mt-4 inline-flex text-sm font-medium text-olive group-hover:text-obsidian transition-colors">
+                    {t("viewProjects", lang)} →
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

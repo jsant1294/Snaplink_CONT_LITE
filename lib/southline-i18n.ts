@@ -357,6 +357,29 @@ export const UI_DEFS = {
   consumerJourneyTitle: { es: "El recorrido del propietario", en: "The Homeowner Journey" },
   professionalJourneyTitle: { es: "El recorrido del profesional", en: "The Professional Journey" },
 
+  // Lucio assistant
+  lucioName: { es: "Lucio", en: "Lucio" },
+  lucioTagline: { es: "Tu asistente de planificación del hogar", en: "Your home-planning assistant" },
+  startPlanningWithLucio: { es: "Empezar a planificar con Lucio", en: "Start Planning with Lucio" },
+  lucioWelcome: {
+    es: "Hola, soy Lucio. Puedo ayudarte a encontrar una casa, encontrar un profesional, planificar un proyecto, o responder preguntas.",
+    en: "Hi, I'm Lucio. I can help you find a home, find a professional, plan a project, or answer questions.",
+  },
+  lucioPromptFindHome: { es: "Quiero encontrar una casa", en: "I want to find a home" },
+  lucioPromptFindPro: { es: "Necesito un profesional", en: "I need a professional" },
+  lucioPromptPlanProject: { es: "Estoy planificando un proyecto", en: "I am planning a project" },
+  lucioPromptCostEstimate: { es: "Quiero un estimado de costo", en: "I want a cost estimate" },
+  lucioPromptDiyHelp: { es: "Necesito ayuda con DIY", en: "I need DIY help" },
+  lucioPromptBook: { es: "Quiero reservar una consulta", en: "I want to book a consultation" },
+  lucioInputPlaceholder: { es: "Escribe tu pregunta...", en: "Type your question..." },
+  lucioSend: { es: "Enviar", en: "Send" },
+  lucioClose: { es: "Cerrar", en: "Close" },
+  lucioConfirmLead: { es: "Confirmar solicitud", en: "Confirm Request" },
+  lucioConfirmBooking: { es: "Confirmar reserva", en: "Confirm Booking" },
+  lucioCancel: { es: "Cancelar", en: "Cancel" },
+  lucioLeadSubmitted: { es: "¡Listo! Tu solicitud fue enviada.", en: "Done! Your request has been sent." },
+  lucioReviewBeforeSending: { es: "Revisa antes de enviar:", en: "Review before sending:" },
+
   // Homepage: DIY Learning
   diyLearningEyebrow: { es: "Aprende", en: "Learn" },
   diyLearningTitle: { es: "Centro de aprendizaje DIY", en: "DIY Learning" },
@@ -406,6 +429,61 @@ export const UI_DEFS = {
   becomeAProJoin: { es: "Únete a Snaplink", en: "Join Snaplink" },
   becomeAProClaim: { es: "Reclama tu negocio", en: "Claim your business" },
   becomeAProLogin: { es: "Acceso profesionales", en: "Professional login" },
+
+  // Contact page + business info
+  contactEyebrow: { es: "Contacto", en: "Contact" },
+  contactHeading: { es: "Hablemos de tu proyecto", en: "Let's talk about your project" },
+  contactBody: {
+    es: "Estamos aquí para ayudarte a dar el siguiente paso en tu proyecto. Llámanos, escríbenos o visítanos.",
+    en: "We're here to help you take the next step on your project. Call, write, or visit us.",
+  },
+  contactBusinessLabel: { es: "Nuestro negocio", en: "Our business" },
+  contactPhoneLabel: { es: "Teléfono", en: "Phone" },
+  contactEmailLabel: { es: "Correo electrónico", en: "Email" },
+  contactWhatsAppLabel: { es: "WhatsApp", en: "WhatsApp" },
+  contactAddressLabel: { es: "Dirección", en: "Address" },
+  contactHoursLabel: { es: "Horario de atención", en: "Business hours" },
+  contactDirectionsLabel: { es: "Cómo llegar", en: "Get directions" },
+  contactCtaLabel: { es: "Contáctanos", en: "Contact us" },
+  contactMethodsLabel: { es: "Canales de contacto", en: "Contact methods" },
+
+  // Testimonials
+  testimonialsEyebrow: { es: "Testimonios", en: "Testimonials" },
+  testimonialsHeading: { es: "Lo que dicen los propietarios", en: "What homeowners say" },
+  testimonialsBody: {
+    es: "Historias reales de proyectos y conexiones a través de Southline Living.",
+    en: "Real stories from projects and connections made through Southline Living.",
+  },
+  testimonialsReviewCta: { es: "Deja una reseña", en: "Leave a review" },
+  testimonialsFeaturedBadge: { es: "Destacado", en: "Featured" },
+
+  // Local discovery (SnapLink directory hand-off)
+  localDiscoveryEyebrow: { es: "Local", en: "Local" },
+  localDiscoveryTitle: {
+    es: "Encuentra profesionales de confianza cerca de ti",
+    en: "Find trusted professionals near you",
+  },
+  localDiscoveryDescription: {
+    es: "Ingresa tu código postal para explorar profesionales locales en SnapLink.",
+    en: "Enter your ZIP code to browse local professionals powered by SnapLink.",
+  },
+  localDiscoveryZipLabel: { es: "Código postal (ZIP)", en: "ZIP code" },
+  localDiscoveryZipPlaceholder: { es: "ej. 75204", en: "e.g. 75204" },
+  localDiscoveryCategoryLabel: { es: "Categoría", en: "Category" },
+  localDiscoveryCategoryAny: { es: "Todas las categorías", en: "All categories" },
+  localDiscoverySubmit: { es: "Continuar a SnapLink", en: "Continue to SnapLink" },
+  localDiscoveryPoweredBy: {
+    es: "Impulsado por la red profesional de SnapLink",
+    en: "Powered by the SnapLink professional network",
+  },
+  localDiscoveryExternalNote: {
+    es: "Continuarás en SnapLink, el directorio de profesionales.",
+    en: "You'll continue to SnapLink, the professional directory.",
+  },
+  localDiscoveryZipError: {
+    es: "Ingresa un código postal válido de EE. UU. (ej. 75204 o 75204-1234).",
+    en: "Enter a valid US ZIP code (e.g. 75204 or 75204-1234).",
+  },
 };
 
 export function t(key: UIKey, lang: Lang): string {

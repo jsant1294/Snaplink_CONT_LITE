@@ -4,6 +4,7 @@ import type { Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
 import BookingFlow from "@/components/southline/BookingFlow";
+import LucioMount from "@/components/lucio/LucioMount";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export default async function BookPage({
         />
       </main>
       <Footer lang={lang} />
+      <LucioMount lang={lang} pageContext={{ type: "book" }} />
     </>
   );
 }
