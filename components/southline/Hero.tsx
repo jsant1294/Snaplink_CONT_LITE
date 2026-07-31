@@ -50,7 +50,7 @@ export default function Hero({
         <img
           src={heroMobile}
           alt={heroAlt ?? ""}
-          className="w-full h-full object-cover md:hidden"
+          className="w-full h-full object-cover object-[62%_center] md:hidden"
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#2a241e]/90 via-[#3c3229]/60 to-[#4a3d30]/20" />
