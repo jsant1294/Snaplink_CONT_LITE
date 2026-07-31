@@ -120,6 +120,13 @@
       "when": 1785523010763,
       "tag": "0016_module_entitlements",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1785525327476,
+      "tag": "0017_contractor_avatar_logo",
+      "breakpoints": true
     }
   ]
 }

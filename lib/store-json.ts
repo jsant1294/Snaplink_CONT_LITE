@@ -147,7 +147,8 @@ export const jsonContractorStore = {
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">>
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">> &
+      import("./types").ContractorProfilePatch
   ): Promise<Contractor | undefined> {
     const list = await readContractors();
     const c = list.find((x) => x.id === id);
@@ -157,6 +158,20 @@ export const jsonContractorStore = {
     if (patch.payments !== undefined) c.payments = patch.payments;
     if (patch.stripeAccountId !== undefined) c.stripeAccountId = patch.stripeAccountId;
     if (patch.stripeOnboardingComplete !== undefined) c.stripeOnboardingComplete = patch.stripeOnboardingComplete;
+    if (patch.businessName !== undefined) c.businessName = patch.businessName;
+    if (patch.ownerName !== undefined) c.ownerName = patch.ownerName;
+    if (patch.tagline !== undefined) c.tagline = patch.tagline || undefined;
+    if (patch.phone !== undefined) c.phone = patch.phone;
+    if (patch.whatsapp !== undefined) c.whatsapp = patch.whatsapp || undefined;
+    if (patch.email !== undefined) c.email = patch.email;
+    if (patch.serviceArea !== undefined) c.serviceArea = patch.serviceArea;
+    if (patch.services !== undefined) c.services = patch.services;
+    if (patch.licenseInfo !== undefined) c.licenseInfo = patch.licenseInfo || undefined;
+    if (patch.reviewsUrl !== undefined) c.reviewsUrl = patch.reviewsUrl || undefined;
+    if (patch.galleryUrl !== undefined) c.galleryUrl = patch.galleryUrl || undefined;
+    if (patch.professionType !== undefined) c.professionType = patch.professionType;
+    if (patch.avatarUrl !== undefined) c.avatarUrl = patch.avatarUrl || undefined;
+    if (patch.logoUrl !== undefined) c.logoUrl = patch.logoUrl || undefined;
     await writeContractors(list);
     return c;
   },

@@ -98,7 +98,11 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
     }
   }
-  const patch: { pin?: string; preferredLanguage?: "en" | "es"; payments?: import("@/lib/types").PaymentMethods } = {};
+  const patch: {
+    pin?: string;
+    preferredLanguage?: "en" | "es";
+    payments?: import("@/lib/types").PaymentMethods;
+  } & import("@/lib/types").ContractorProfilePatch = {};
 
   if (body.pin !== undefined) {
     const pin = String(body.pin).trim();
@@ -113,6 +117,32 @@ export async function PATCH(req: NextRequest) {
   if (body.payments !== undefined && typeof body.payments === "object") {
     patch.payments = body.payments as import("@/lib/types").PaymentMethods;
   }
+
+  // Profile fields (business info, avatar/logo) are operator-only — a
+  // contractor never edits their own listing, per the product model.
+  if (operator) {
+    if (body.businessName !== undefined) patch.businessName = String(body.businessName).trim();
+    if (body.ownerName !== undefined) patch.ownerName = String(body.ownerName).trim();
+    if (body.tagline !== undefined) patch.tagline = String(body.tagline).trim();
+    if (body.phone !== undefined) patch.phone = String(body.phone).trim();
+    if (body.whatsapp !== undefined) patch.whatsapp = String(body.whatsapp).trim();
+    if (body.email !== undefined) patch.email = String(body.email).trim();
+    if (body.serviceArea !== undefined) patch.serviceArea = String(body.serviceArea).trim();
+    if (body.licenseInfo !== undefined) patch.licenseInfo = String(body.licenseInfo).trim();
+    if (body.reviewsUrl !== undefined) patch.reviewsUrl = String(body.reviewsUrl).trim();
+    if (body.galleryUrl !== undefined) patch.galleryUrl = String(body.galleryUrl).trim();
+    if (body.avatarUrl !== undefined) patch.avatarUrl = String(body.avatarUrl).trim();
+    if (body.logoUrl !== undefined) patch.logoUrl = String(body.logoUrl).trim();
+    if (body.services !== undefined && Array.isArray(body.services)) {
+      patch.services = body.services.filter(
+        (s: unknown): s is string => typeof s === "string" && VALID_SERVICE_NAMES.has(s)
+      );
+    }
+    if (body.professionType !== undefined && isValidProfessionType(body.professionType)) {
+      patch.professionType = body.professionType;
+    }
+  }
+
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }

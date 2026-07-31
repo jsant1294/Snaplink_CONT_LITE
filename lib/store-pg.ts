@@ -108,6 +108,8 @@ function rowToContractor(row: ContractorRow): Contractor {
     reviewsUrl: row.reviewsUrl ?? undefined,
     galleryUrl: row.galleryUrl ?? undefined,
     brandColor: row.brandColor ?? undefined,
+    avatarUrl: row.avatarUrl ?? undefined,
+    logoUrl: row.logoUrl ?? undefined,
     stripeAccountId: row.stripeAccountId ?? undefined,
     stripeOnboardingComplete: row.stripeOnboardingComplete,
     createdAt: row.createdAt,
@@ -258,13 +260,16 @@ export const pgContractorStore = {
       reviewsUrl: c.reviewsUrl ?? null,
       galleryUrl: c.galleryUrl ?? null,
       brandColor: c.brandColor ?? null,
+      avatarUrl: c.avatarUrl ?? null,
+      logoUrl: c.logoUrl ?? null,
       createdAt: c.createdAt,
     });
     return c;
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">>
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">> &
+      import("./types").ContractorProfilePatch
   ): Promise<Contractor | undefined> {
     const set: Record<string, unknown> = {};
     if (patch.pin !== undefined) set.pin = patch.pin;
@@ -272,6 +277,20 @@ export const pgContractorStore = {
     if (patch.payments !== undefined) set.payments = patch.payments;
     if (patch.stripeAccountId !== undefined) set.stripeAccountId = patch.stripeAccountId;
     if (patch.stripeOnboardingComplete !== undefined) set.stripeOnboardingComplete = patch.stripeOnboardingComplete;
+    if (patch.businessName !== undefined) set.businessName = patch.businessName;
+    if (patch.ownerName !== undefined) set.ownerName = patch.ownerName;
+    if (patch.tagline !== undefined) set.tagline = patch.tagline || null;
+    if (patch.phone !== undefined) set.phone = patch.phone;
+    if (patch.whatsapp !== undefined) set.whatsapp = patch.whatsapp || null;
+    if (patch.email !== undefined) set.email = patch.email;
+    if (patch.serviceArea !== undefined) set.serviceArea = patch.serviceArea;
+    if (patch.services !== undefined) set.services = patch.services;
+    if (patch.licenseInfo !== undefined) set.licenseInfo = patch.licenseInfo || null;
+    if (patch.reviewsUrl !== undefined) set.reviewsUrl = patch.reviewsUrl || null;
+    if (patch.galleryUrl !== undefined) set.galleryUrl = patch.galleryUrl || null;
+    if (patch.professionType !== undefined) set.professionType = patch.professionType;
+    if (patch.avatarUrl !== undefined) set.avatarUrl = patch.avatarUrl || null;
+    if (patch.logoUrl !== undefined) set.logoUrl = patch.logoUrl || null;
     if (Object.keys(set).length > 0) {
       await db().update(contractors).set(set).where(eq(contractors.id, id));
     }

@@ -50,6 +50,27 @@ export interface PaymentMethods {
   payToName?: string;    // "make checks payable to..."
 }
 
+/** Fields an operator can edit after creation via the profile edit screen. */
+export type ContractorProfilePatch = Partial<
+  Pick<
+    Contractor,
+    | "businessName"
+    | "ownerName"
+    | "tagline"
+    | "phone"
+    | "whatsapp"
+    | "email"
+    | "serviceArea"
+    | "services"
+    | "licenseInfo"
+    | "reviewsUrl"
+    | "galleryUrl"
+    | "professionType"
+    | "avatarUrl"
+    | "logoUrl"
+  >
+>;
+
 export interface Contractor {
   id: string;
   username: string; // /contractor/[username]
@@ -72,6 +93,8 @@ export interface Contractor {
   reviewsUrl?: string;
   galleryUrl?: string;
   brandColor?: string;
+  avatarUrl?: string;
+  logoUrl?: string;
   /** Stripe Connect Express account id, once onboarded — see lib/stripe/config.ts. */
   stripeAccountId?: string;
   stripeOnboardingComplete?: boolean;

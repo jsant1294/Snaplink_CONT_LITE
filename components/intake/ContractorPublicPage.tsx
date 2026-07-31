@@ -72,6 +72,13 @@ export default function ContractorPublicPage({ contractor }: { contractor: Contr
 
       {/* Header */}
       <header className="text-center mb-8">
+        {contractor.logoUrl && (
+          <img
+            src={contractor.logoUrl}
+            alt=""
+            className="mx-auto mb-4 h-16 w-16 rounded-xl object-cover border border-[#B99552]/30"
+          />
+        )}
         <p className="text-[11px] tracking-[0.35em] uppercase text-[#6F552A] font-semibold mb-2">
           {contractor.serviceArea}
         </p>

@@ -40,6 +40,8 @@ export const contractors = pgTable(
     reviewsUrl: text("reviews_url"),
     galleryUrl: text("gallery_url"),
     brandColor: text("brand_color"),
+    avatarUrl: text("avatar_url"),
+    logoUrl: text("logo_url"),
     stripeAccountId: text("stripe_account_id"),
     stripeOnboardingComplete: boolean("stripe_onboarding_complete").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })

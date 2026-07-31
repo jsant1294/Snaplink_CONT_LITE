@@ -190,6 +190,7 @@ function ContractorCard({
       <div className="flex flex-wrap gap-2 mt-2 text-xs">
         <a href={`/contractor/${c.username}`} className="btn-outline !py-1.5 !px-3 !rounded-lg">Public page</a>
         <a href={`/contractor-admin/${c.username}`} className="btn-gold !py-1.5 !px-3 !rounded-lg">Their dashboard</a>
+        <a href={`/contractor-admin/${c.username}/profile`} className="btn-outline !py-1.5 !px-3 !rounded-lg">Edit Profile</a>
         <button onClick={() => setResetting(!resetting)} className="btn-outline !py-1.5 !px-3 !rounded-lg !border-warn/50 !text-warn">
           {resetting ? "Cancel" : "Reset PIN"}
         </button>
