@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { expenseStore } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { toCents, isIsoDate } from "@/lib/money";
 import type { Expense } from "@/lib/money-types";
 
@@ -10,6 +11,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!existing) return NextResponse.json({ error: "Expense not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const body = await req.json();
   const patch: Partial<
@@ -49,6 +52,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!existing) return NextResponse.json({ error: "Expense not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   await expenseStore.softDelete(id);
   return NextResponse.json({ ok: true });
 }

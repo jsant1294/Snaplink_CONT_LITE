@@ -22,6 +22,8 @@ import { pgInvoiceStore } from "./store-invoice-pg";
 import { jsonInvoiceStore } from "./store-invoice-json";
 import { pgEntitlementStore } from "./store-entitlements-pg";
 import { jsonEntitlementStore } from "./store-entitlements-json";
+import { pgLandingPageStore } from "./store-landingpage-pg";
+import { jsonLandingPageStore } from "./store-landingpage-json";
 
 import { usePg } from "./db-url";
 
@@ -49,6 +51,9 @@ export const invoiceStore = usePg ? pgInvoiceStore : jsonInvoiceStore;
 
 // Operator-controlled paid module access — see lib/entitlements.ts
 export const entitlementStore = usePg ? pgEntitlementStore : jsonEntitlementStore;
+
+// Landing page generator — marketing layer on top of the public contractor page
+export const landingPageStore = usePg ? pgLandingPageStore : jsonLandingPageStore;
 
 export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;

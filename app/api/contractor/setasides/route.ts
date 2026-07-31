@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { setAsideStore, contractorStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { toCents, isIsoDate, todayIso } from "@/lib/money";
 import type { TaxSetAside } from "@/lib/money-types";
 
@@ -10,6 +11,8 @@ export async function GET(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   const year = Number(req.nextUrl.searchParams.get("year")) || undefined;
   const setAsides = await setAsideStore.list(contractor.id, year);
   return NextResponse.json({ setAsides });
@@ -22,6 +25,8 @@ export async function POST(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const amountCents = toCents(body.amount);
   if (amountCents <= 0) return NextResponse.json({ error: "Amount must be greater than 0" }, { status: 400 });

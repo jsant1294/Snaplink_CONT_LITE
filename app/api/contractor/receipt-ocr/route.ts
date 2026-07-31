@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { suggestFromReceipt } from "@/lib/ai/receipt-ocr";
 import { ModelGuardError } from "@/lib/ai/model-guard";
 
@@ -14,6 +15,8 @@ export async function POST(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const dataUrl = String(body.dataUrl ?? "");
   if (!dataUrl.startsWith("data:image/")) {

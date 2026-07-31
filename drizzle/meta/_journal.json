@@ -127,6 +127,20 @@
       "when": 1785525327476,
       "tag": "0017_contractor_avatar_logo",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1785529637238,
+      "tag": "0018_contractor_website_gallery",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1785531279562,
+      "tag": "0019_contractor_landing_pages",
+      "breakpoints": true
     }
   ]
 }

@@ -107,6 +107,8 @@ function rowToContractor(row: ContractorRow): Contractor {
     licenseInfo: row.licenseInfo ?? undefined,
     reviewsUrl: row.reviewsUrl ?? undefined,
     galleryUrl: row.galleryUrl ?? undefined,
+    galleryUrls: row.galleryUrls ?? [],
+    website: row.website ?? undefined,
     brandColor: row.brandColor ?? undefined,
     avatarUrl: row.avatarUrl ?? undefined,
     logoUrl: row.logoUrl ?? undefined,
@@ -259,6 +261,8 @@ export const pgContractorStore = {
       licenseInfo: c.licenseInfo ?? null,
       reviewsUrl: c.reviewsUrl ?? null,
       galleryUrl: c.galleryUrl ?? null,
+      galleryUrls: c.galleryUrls ?? [],
+      website: c.website ?? null,
       brandColor: c.brandColor ?? null,
       avatarUrl: c.avatarUrl ?? null,
       logoUrl: c.logoUrl ?? null,
@@ -288,6 +292,8 @@ export const pgContractorStore = {
     if (patch.licenseInfo !== undefined) set.licenseInfo = patch.licenseInfo || null;
     if (patch.reviewsUrl !== undefined) set.reviewsUrl = patch.reviewsUrl || null;
     if (patch.galleryUrl !== undefined) set.galleryUrl = patch.galleryUrl || null;
+    if (patch.galleryUrls !== undefined) set.galleryUrls = patch.galleryUrls;
+    if (patch.website !== undefined) set.website = patch.website || null;
     if (patch.professionType !== undefined) set.professionType = patch.professionType;
     if (patch.avatarUrl !== undefined) set.avatarUrl = patch.avatarUrl || null;
     if (patch.logoUrl !== undefined) set.logoUrl = patch.logoUrl || null;

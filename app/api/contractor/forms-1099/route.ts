@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { form1099Store, leadStore, contractorStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { toCents } from "@/lib/money";
 import { FORM_1099_TYPES, type Form1099Received, type Form1099Type, type Reconciliation } from "@/lib/money-types";
 
@@ -15,6 +16,8 @@ export async function GET(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const taxYear = Number(req.nextUrl.searchParams.get("year")) || new Date().getFullYear();
   const forms = await form1099Store.list(contractor.id, taxYear);
@@ -45,6 +48,8 @@ export async function POST(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const issuerName = String(body.issuerName ?? "").trim();
   if (!issuerName) return NextResponse.json({ error: "Who issued it is required" }, { status: 400 });

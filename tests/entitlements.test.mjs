@@ -19,7 +19,7 @@ test("lib/store.ts exports entitlementStore gated by usePg", async () => {
 test("only real, existing modules are gated — no dead flags", async () => {
   const text = await source("../lib/entitlement-types.ts");
   const keysLine = text.match(/export const MODULE_KEYS: ModuleKey\[\] = \[([^\]]*)\];/)[1];
-  assert.match(text, /"flipbook" \| "mini_campaigns" \| "invoices"/);
+  assert.match(text, /"flipbook" \| "mini_campaigns" \| "invoices" \| "money"/);
   assert.doesNotMatch(keysLine, /booking|reviews|store|analytics/i);
 });
 
@@ -128,4 +128,36 @@ test("the operator roster exposes per-module toggles that POST to the entitlemen
   assert.match(text, /function ModuleToggles/);
   assert.match(text, /method: "POST"/);
   assert.match(text, /api\/contractor\/entitlements/);
+  assert.match(text, /money: "Money"/, "the roster must expose a toggle for the money module too");
+});
+
+test("every money-related route (Lucio Financial Copilot) calls requireModuleEnabled for money", async () => {
+  const routes = [
+    "../app/api/contractor/money-summary/route.ts",
+    "../app/api/contractor/expenses/route.ts",
+    "../app/api/contractor/expenses/[id]/route.ts",
+    "../app/api/contractor/expense-categories/route.ts",
+    "../app/api/contractor/tax-profile/route.ts",
+    "../app/api/contractor/quarterly/route.ts",
+    "../app/api/contractor/receipt-ocr/route.ts",
+    "../app/api/contractor/setasides/route.ts",
+    "../app/api/contractor/setasides/[id]/route.ts",
+    "../app/api/contractor/payees/route.ts",
+    "../app/api/contractor/payees/[id]/route.ts",
+    "../app/api/contractor/forms-1099/route.ts",
+    "../app/api/contractor/forms-1099/[id]/route.ts",
+  ];
+  for (const route of routes) {
+    const text = await source(route);
+    assert.match(text, /requireModuleEnabled\([^,]+,\s*"money"\)/, `${route} must gate on the money module`);
+  }
+});
+
+test("the Money tab is gated behind fetched entitlement state, and MoneyBoard shows a locked state on 403", async () => {
+  const dashboard = await source("../components/admin/Dashboard.tsx");
+  assert.match(dashboard, /modules\.money &&/);
+
+  const board = await source("../components/admin/MoneyBoard.tsx");
+  assert.match(board, /status === 403/, "MoneyBoard must detect a 403 distinctly from an empty list");
+  assert.match(board, /ModuleLocked/, "MoneyBoard must render the shared locked-state component");
 });

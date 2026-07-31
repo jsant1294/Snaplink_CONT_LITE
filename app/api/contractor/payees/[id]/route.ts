@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { payeeStore } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { PAYEE_TYPES, TIN_TYPES, type Payee, type PayeeType, type TinType } from "@/lib/money-types";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -9,6 +10,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!existing) return NextResponse.json({ error: "Payee not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const body = await req.json();
   const patch: Partial<Omit<Payee, "id" | "contractorId" | "createdAt" | "updatedAt">> = {};
@@ -57,6 +60,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!existing) return NextResponse.json({ error: "Payee not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   await payeeStore.softDelete(id);
   return NextResponse.json({ ok: true });
 }

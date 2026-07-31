@@ -5,9 +5,9 @@
 // ---------------------------------------------------------------------------
 
 /** Only modules that actually exist as gated features today. */
-export type ModuleKey = "flipbook" | "mini_campaigns" | "invoices";
+export type ModuleKey = "flipbook" | "mini_campaigns" | "invoices" | "money";
 
-export const MODULE_KEYS: ModuleKey[] = ["flipbook", "mini_campaigns", "invoices"];
+export const MODULE_KEYS: ModuleKey[] = ["flipbook", "mini_campaigns", "invoices", "money"];
 
 /** The only source in use today; kept generic so agent_profiles can join later without a migration. */
 export type ProfessionalSource = "contractor";

@@ -37,12 +37,14 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
     licenseInfo: contractor?.licenseInfo ?? "",
     reviewsUrl: contractor?.reviewsUrl ?? "",
     galleryUrl: contractor?.galleryUrl ?? "",
+    website: contractor?.website ?? "",
   });
   const [professionType, setProfessionType] = useState(contractor?.professionType ?? "contractor");
   const [services, setServices] = useState<Set<string>>(new Set(contractor?.services ?? []));
   const [avatarUrl, setAvatarUrl] = useState(contractor?.avatarUrl ?? "");
   const [logoUrl, setLogoUrl] = useState(contractor?.logoUrl ?? "");
-  const [uploading, setUploading] = useState<"avatar" | "logo" | null>(null);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(contractor?.galleryUrls ?? []);
+  const [uploading, setUploading] = useState<"avatar" | "logo" | "gallery" | null>(null);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -59,11 +61,13 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
       licenseInfo: contractor.licenseInfo ?? "",
       reviewsUrl: contractor.reviewsUrl ?? "",
       galleryUrl: contractor.galleryUrl ?? "",
+      website: contractor.website ?? "",
     });
     setProfessionType(contractor.professionType);
     setServices(new Set(contractor.services ?? []));
     setAvatarUrl(contractor.avatarUrl ?? "");
     setLogoUrl(contractor.logoUrl ?? "");
+    setGalleryUrls(contractor.galleryUrls ?? []);
   }, [contractor]);
 
   function showToast(msg: string) {
@@ -80,7 +84,7 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
     });
   }
 
-  async function uploadImage(kind: "avatar" | "logo", file: File) {
+  async function uploadImage(kind: "avatar" | "logo" | "gallery", file: File) {
     if (!contractor) return;
     setUploading(kind);
     const body = new FormData();
@@ -96,10 +100,26 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
     setUploading(null);
     if (data.url) {
       if (kind === "avatar") setAvatarUrl(data.url);
-      else setLogoUrl(data.url);
+      else if (kind === "logo") setLogoUrl(data.url);
+      else setGalleryUrls((prev) => [...prev, data.url].slice(0, 6));
     } else {
       showToast(data.error ?? "Upload failed");
     }
+  }
+
+  async function uploadGalleryFiles(files: FileList) {
+    const room = 6 - galleryUrls.length;
+    if (room <= 0) return;
+    const picked = Array.from(files)
+      .filter((f) => f.type.startsWith("image/"))
+      .slice(0, room);
+    for (const file of picked) {
+      await uploadImage("gallery", file);
+    }
+  }
+
+  function removeGalleryPhoto(url: string) {
+    setGalleryUrls((prev) => prev.filter((u) => u !== url));
   }
 
   async function save() {
@@ -115,6 +135,7 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
         services: Array.from(services),
         avatarUrl,
         logoUrl,
+        galleryUrls,
       }),
     });
     const data = await res.json();
@@ -154,7 +175,7 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
                     const file = e.target.files?.[0];
                     if (file) uploadImage("avatar", file);
                   }}
-                  className="text-xs text-muted"
+                  className="file-picker"
                 />
               </div>
             </div>
@@ -172,7 +193,7 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
                     const file = e.target.files?.[0];
                     if (file) uploadImage("logo", file);
                   }}
-                  className="text-xs text-muted"
+                  className="file-picker"
                 />
               </div>
             </div>
@@ -212,14 +233,52 @@ function ProfileEditor({ pin, contractor }: { pin: string; contractor: PublicCon
             <label className="label">Google reviews URL</label>
             <input className="input" value={form.reviewsUrl} onChange={set("reviewsUrl")} />
           </div>
+          <div>
+            <label className="label">Website</label>
+            <input className="input" placeholder="https://…" value={form.website} onChange={set("website")} />
+          </div>
           <div className="md:col-span-2">
             <label className="label">Tagline</label>
             <input className="input" value={form.tagline} onChange={set("tagline")} />
           </div>
           <div className="md:col-span-2">
-            <label className="label">Gallery URL</label>
+            <label className="label">Gallery URL (external album link, optional)</label>
             <input className="input" value={form.galleryUrl} onChange={set("galleryUrl")} />
           </div>
+        </div>
+
+        <div className="card p-4">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-gold mb-1">Photo gallery</p>
+          <p className="text-xs text-muted mb-3">
+            Up to 6 trust-building photos shown as a grid on the public page ({galleryUrls.length}/6).
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-3">
+            {galleryUrls.map((url) => (
+              <div key={url} className="group relative aspect-square">
+                <img src={url} alt="" className="h-full w-full rounded-lg object-cover border border-white/10" />
+                <button
+                  onClick={() => removeGalleryPhoto(url)}
+                  className="absolute top-1 right-1 h-5 w-5 rounded-full bg-obsidian/80 text-bone text-xs leading-5 text-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remove photo"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          {galleryUrls.length < 6 && (
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={uploading === "gallery"}
+              onChange={(e) => {
+                if (e.target.files) uploadGalleryFiles(e.target.files);
+                e.target.value = "";
+              }}
+              className="file-picker"
+            />
+          )}
         </div>
 
         <div className="card p-4">

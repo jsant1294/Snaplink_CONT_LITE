@@ -14,6 +14,7 @@ import { mt, bt, ft, qt, type Lang } from "@/lib/i18n";
 import BatchReceipts from "@/components/admin/BatchReceipts";
 import Subs1099 from "@/components/admin/Subs1099";
 import QuarterlyPanel from "@/components/admin/QuarterlyPanel";
+import ModuleLocked from "@/components/admin/ModuleLocked";
 import { serviceLabel } from "@/lib/services";
 
 type PublicContractor = Omit<Contractor, "pin">;
@@ -51,6 +52,7 @@ export default function MoneyBoard({
   const [leads, setLeads] = useState<Lead[]>([]);
   const [profile, setProfile] = useState<TaxProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [locked, setLocked] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showBatch, setShowBatch] = useState(false);
   const [showSubs, setShowSubs] = useState(false);
@@ -88,6 +90,10 @@ export default function MoneyBoard({
         fetch(`/api/contractor/leads?contractor=${username}`, { headers: authHeaders }),
         fetch(`/api/contractor/tax-profile?contractor=${username}`, { headers: authHeaders }),
       ]);
+      if (sRes.status === 403) {
+        setLocked(true);
+        return;
+      }
       if (sRes.ok) setSummary((await sRes.json()).summary);
       if (eRes.ok) setExpenses((await eRes.json()).expenses ?? []);
       if (cRes.ok) {
@@ -236,6 +242,8 @@ export default function MoneyBoard({
     const now = new Date().getFullYear();
     return [now, now - 1, now - 2];
   }, []);
+
+  if (locked) return <ModuleLocked lang={lang} />;
 
   return (
     <main className="min-h-screen max-w-5xl mx-auto px-4 pb-20 pt-8">

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { isOperator, pinFromRequest } from "@/lib/auth";
 
-const KINDS = ["avatar", "logo"] as const;
+const KINDS = ["avatar", "logo", "gallery", "hero"] as const;
 
 /** Operator-only — profile images are edited by the operator, not the contractor. */
 export async function POST(req: NextRequest) {

@@ -270,7 +270,7 @@ export default function Dashboard({
             Pitch page ↗
           </a>
         )}
-        {mode === "scoped" && contractor && (
+        {mode === "scoped" && contractor && modules.money && (
           <a
             href={`/contractor-admin/${contractor.username}/money`}
             className="btn-outline !py-2 text-sm"

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { payeeStore, expenseStore, taxProfileStore, contractorStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { PAYEE_TYPES, TIN_TYPES, type Payee, type PayeeWithTotal, type PayeeType, type TinType } from "@/lib/money-types";
 
 /** GET ?contractor=&year= -> payees with what was paid to each that year. */
@@ -10,6 +11,8 @@ export async function GET(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const year = Number(req.nextUrl.searchParams.get("year")) || new Date().getFullYear();
   const [list, expenses, profile] = await Promise.all([
@@ -36,6 +39,8 @@ export async function POST(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const name = String(body.name ?? "").trim();
   if (!name) return NextResponse.json({ error: "A name is required" }, { status: 400 });

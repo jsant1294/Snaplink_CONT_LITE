@@ -17,6 +17,8 @@ export const UI = {
   viewServices: { en: "View Services", es: "Ver Servicios" },
   beforeAfter: { en: "See Before & After", es: "Ver Antes y Después" },
   readReviews: { en: "Read Reviews", es: "Leer Reseñas" },
+  visitWebsite: { en: "Visit Website", es: "Visitar Sitio Web" },
+  ourWork: { en: "Our Work", es: "Nuestro Trabajo" },
   bookWalkthrough: { en: "Book Walkthrough", es: "Agendar Visita" },
   saveContact: { en: "Save Contact", es: "Guardar Contacto" },
   services: { en: "Services", es: "Servicios" },

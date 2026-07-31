@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { taxProfileStore, contractorStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { ENTITY_TYPES, type EntityType, type TaxProfile } from "@/lib/money-types";
 
 async function loadOrCreate(contractorId: string): Promise<TaxProfile> {
@@ -25,6 +26,8 @@ export async function GET(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const profile = await loadOrCreate(contractor.id);
   return NextResponse.json({ profile });
@@ -36,6 +39,8 @@ export async function PATCH(req: NextRequest) {
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, contractor.id);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractor.id, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const current = await loadOrCreate(contractor.id);
   const next: TaxProfile = { ...current };

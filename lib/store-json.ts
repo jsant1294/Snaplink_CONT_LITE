@@ -169,6 +169,8 @@ export const jsonContractorStore = {
     if (patch.licenseInfo !== undefined) c.licenseInfo = patch.licenseInfo || undefined;
     if (patch.reviewsUrl !== undefined) c.reviewsUrl = patch.reviewsUrl || undefined;
     if (patch.galleryUrl !== undefined) c.galleryUrl = patch.galleryUrl || undefined;
+    if (patch.galleryUrls !== undefined) c.galleryUrls = patch.galleryUrls;
+    if (patch.website !== undefined) c.website = patch.website || undefined;
     if (patch.professionType !== undefined) c.professionType = patch.professionType;
     if (patch.avatarUrl !== undefined) c.avatarUrl = patch.avatarUrl || undefined;
     if (patch.logoUrl !== undefined) c.logoUrl = patch.logoUrl || undefined;

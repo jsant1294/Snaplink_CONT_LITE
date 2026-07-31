@@ -39,6 +39,8 @@ export const contractors = pgTable(
     licenseInfo: text("license_info"),
     reviewsUrl: text("reviews_url"),
     galleryUrl: text("gallery_url"),
+    galleryUrls: jsonb("gallery_urls").$type<string[]>().notNull().default([]),
+    website: text("website"),
     brandColor: text("brand_color"),
     avatarUrl: text("avatar_url"),
     logoUrl: text("logo_url"),
@@ -49,6 +51,38 @@ export const contractors = pgTable(
       .defaultNow(),
   },
   (t) => [uniqueIndex("contractors_username_idx").on(t.username)]
+);
+
+/**
+ * One row per contractor, upserted. Layers a marketing "landing page" treatment
+ * (template-driven copy, hero banner/OG image, published/draft state) on top of
+ * the existing /contractor/[username] page — not a separate hosted route. When
+ * `published` is false (the default), the public page renders exactly as it did
+ * before this table existed.
+ */
+export const contractorLandingPages = pgTable(
+  "contractor_landing_pages",
+  {
+    id: text("id").primaryKey(),
+    contractorId: text("contractor_id").notNull(),
+    templateKey: text("template_key"),
+    published: boolean("published").notNull().default(false),
+    headlineEn: text("headline_en"),
+    headlineEs: text("headline_es"),
+    subheadlineEn: text("subheadline_en"),
+    subheadlineEs: text("subheadline_es"),
+    ctaLabelEn: text("cta_label_en"),
+    ctaLabelEs: text("cta_label_es"),
+    ctaUrl: text("cta_url"),
+    locationText: text("location_text"),
+    hoursText: text("hours_text"),
+    noteText: text("note_text"),
+    /** Also used as the page's Open Graph / link-preview image when published. */
+    heroImageUrl: text("hero_image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("contractor_landing_pages_contractor_idx").on(t.contractorId)]
 );
 
 export const leads = pgTable(

@@ -58,6 +58,15 @@ body {
   .label {
     @apply block text-sm font-medium text-muted mb-1.5;
   }
+  /* Native <input type="file"> buttons don't reliably pick up color-scheme:dark
+     across browsers (Safari especially) — style the button pseudo-element
+     directly so it matches the rest of the dark UI instead of showing plain
+     light OS chrome. */
+  .file-picker {
+    @apply text-xs text-muted file:mr-3 file:cursor-pointer file:rounded-lg file:border
+      file:border-white/15 file:bg-white/5 file:px-3 file:py-1.5 file:text-xs file:font-medium
+      file:text-bone file:transition-colors hover:file:bg-white/10;
+  }
 
   /* Southline Living light-form primitives — reach for these on new/fixed
      Southline forms instead of hand-rolling colors per field. */

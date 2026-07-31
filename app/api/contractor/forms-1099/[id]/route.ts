@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { form1099Store } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { toCents } from "@/lib/money";
 import { FORM_1099_TYPES, type Form1099Received, type Form1099Type } from "@/lib/money-types";
 
@@ -10,6 +11,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!existing) return NextResponse.json({ error: "Form not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const body = await req.json();
   const patch: Partial<Pick<Form1099Received, "taxYear" | "issuerName" | "formType" | "amountCents" | "notes">> = {};
@@ -51,6 +54,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!existing) return NextResponse.json({ error: "Form not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "money");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   await form1099Store.softDelete(id);
   return NextResponse.json({ ok: true });
 }

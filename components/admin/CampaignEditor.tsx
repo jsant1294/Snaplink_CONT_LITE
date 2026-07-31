@@ -108,7 +108,7 @@ export default function CampaignEditor({
           className="input !w-auto !py-1.5 text-xs"
         >
           {STATUSES.map((s) => (
-            <option key={s} value={s}>
+            <option key={s} value={s} className="bg-charcoal">
               {nt(STATUS_KEYS[s], lang)}
             </option>
           ))}
@@ -165,7 +165,7 @@ export default function CampaignEditor({
             const file = e.target.files?.[0];
             if (file) uploadImage(file);
           }}
-          className="text-xs text-muted"
+          className="file-picker"
         />
       </div>
 
@@ -178,7 +178,7 @@ export default function CampaignEditor({
             className="input"
           >
             {CTA_TYPES.map((t) => (
-              <option key={t} value={t}>
+              <option key={t} value={t} className="bg-charcoal">
                 {t}
               </option>
             ))}

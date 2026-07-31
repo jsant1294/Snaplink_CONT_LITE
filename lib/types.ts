@@ -65,6 +65,8 @@ export type ContractorProfilePatch = Partial<
     | "licenseInfo"
     | "reviewsUrl"
     | "galleryUrl"
+    | "galleryUrls"
+    | "website"
     | "professionType"
     | "avatarUrl"
     | "logoUrl"
@@ -92,6 +94,9 @@ export interface Contractor {
   licenseInfo?: string;
   reviewsUrl?: string;
   galleryUrl?: string;
+  /** Up to 6 trust-building photos shown as a grid on the public page. */
+  galleryUrls?: string[];
+  website?: string;
   brandColor?: string;
   avatarUrl?: string;
   logoUrl?: string;

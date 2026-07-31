@@ -218,7 +218,7 @@ export default function FlipbookEditor({
                 className="input !w-auto !py-1.5 text-xs"
               >
                 {PAGE_TYPES.map((pt) => (
-                  <option key={pt} value={pt}>
+                  <option key={pt} value={pt} className="bg-charcoal">
                     {nt(PAGE_TYPE_KEYS[pt], lang)}
                   </option>
                 ))}
@@ -274,7 +274,7 @@ export default function FlipbookEditor({
                   const file = e.target.files?.[0];
                   if (file) uploadImage(page.id, file);
                 }}
-                className="text-xs text-muted"
+                className="file-picker"
               />
             </div>
 
@@ -286,9 +286,9 @@ export default function FlipbookEditor({
                 }
                 className="input !py-1.5 text-xs"
               >
-                <option value="">{nt("noCta", lang)}</option>
+                <option value="" className="bg-charcoal">{nt("noCta", lang)}</option>
                 {CTA_TYPES.map((t) => (
-                  <option key={t} value={t}>
+                  <option key={t} value={t} className="bg-charcoal">
                     {t}
                   </option>
                 ))}

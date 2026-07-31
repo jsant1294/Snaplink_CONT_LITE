@@ -131,6 +131,12 @@ export async function PATCH(req: NextRequest) {
     if (body.licenseInfo !== undefined) patch.licenseInfo = String(body.licenseInfo).trim();
     if (body.reviewsUrl !== undefined) patch.reviewsUrl = String(body.reviewsUrl).trim();
     if (body.galleryUrl !== undefined) patch.galleryUrl = String(body.galleryUrl).trim();
+    if (body.website !== undefined) patch.website = String(body.website).trim();
+    if (body.galleryUrls !== undefined && Array.isArray(body.galleryUrls)) {
+      patch.galleryUrls = body.galleryUrls
+        .filter((u: unknown): u is string => typeof u === "string" && u.trim().length > 0)
+        .slice(0, 6);
+    }
     if (body.avatarUrl !== undefined) patch.avatarUrl = String(body.avatarUrl).trim();
     if (body.logoUrl !== undefined) patch.logoUrl = String(body.logoUrl).trim();
     if (body.services !== undefined && Array.isArray(body.services)) {

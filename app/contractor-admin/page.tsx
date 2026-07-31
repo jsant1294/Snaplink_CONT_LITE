@@ -83,6 +83,7 @@ const MODULE_LABELS: Record<string, string> = {
   flipbook: "Flipbook",
   mini_campaigns: "Campaigns",
   invoices: "Invoices",
+  money: "Money",
 };
 
 function ModuleToggles({ contractorId, pin }: { contractorId: string; pin: string }) {
@@ -191,6 +192,7 @@ function ContractorCard({
         <a href={`/contractor/${c.username}`} className="btn-outline !py-1.5 !px-3 !rounded-lg">Public page</a>
         <a href={`/contractor-admin/${c.username}`} className="btn-gold !py-1.5 !px-3 !rounded-lg">Their dashboard</a>
         <a href={`/contractor-admin/${c.username}/profile`} className="btn-outline !py-1.5 !px-3 !rounded-lg">Edit Profile</a>
+        <a href={`/contractor-admin/${c.username}/landing-page`} className="btn-outline !py-1.5 !px-3 !rounded-lg">Landing Page</a>
         <button onClick={() => setResetting(!resetting)} className="btn-outline !py-1.5 !px-3 !rounded-lg !border-warn/50 !text-warn">
           {resetting ? "Cancel" : "Reset PIN"}
         </button>
