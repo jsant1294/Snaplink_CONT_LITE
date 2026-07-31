@@ -40,6 +40,8 @@ export const contractors = pgTable(
     reviewsUrl: text("reviews_url"),
     galleryUrl: text("gallery_url"),
     brandColor: text("brand_color"),
+    stripeAccountId: text("stripe_account_id"),
+    stripeOnboardingComplete: boolean("stripe_onboarding_complete").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),
@@ -118,6 +120,158 @@ export const estimates = pgTable(
   },
   (t) => [uniqueIndex("estimates_lead_idx").on(t.leadId)]
 );
+
+// ---------------------------------------------------------------------------
+// Contractor self-service: Flipbook (multi-page swipeable brochure).
+// contractorId is an indexed text field, not a real FK — same convention as
+// leads/estimates. flipPages IS a real FK to flipCampaigns because that
+// parent table exists in this same migration.
+// ---------------------------------------------------------------------------
+export const flipCampaigns = pgTable(
+  "flip_campaigns",
+  {
+    id: text("id").primaryKey(),
+    contractorId: text("contractor_id").notNull(),
+    slug: text("slug").notNull(),
+    publicToken: text("public_token").notNull(),
+    title: text("title").notNull().default(""),
+    status: text("status").notNull().default("draft"),
+    shareImageUrl: text("share_image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    publishedAt: timestamp("published_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [
+    index("flip_campaigns_contractor_idx").on(t.contractorId),
+    uniqueIndex("flip_campaigns_token_idx").on(t.publicToken),
+    unique("flip_campaigns_contractor_slug_unique").on(t.contractorId, t.slug),
+  ]
+);
+
+export const flipPages = pgTable(
+  "flip_pages",
+  {
+    id: text("id").primaryKey(),
+    campaignId: text("campaign_id")
+      .notNull()
+      .references(() => flipCampaigns.id, { onDelete: "cascade" }),
+    sortOrder: integer("sort_order").notNull().default(0),
+    pageType: text("page_type").notNull().default("image"),
+    headline: text("headline").notNull().default(""),
+    body: text("body").notNull().default(""),
+    mediaUrl: text("media_url"),
+    ctaType: text("cta_type"),
+    ctaLabel: text("cta_label"),
+    ctaValue: text("cta_value"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("flip_pages_campaign_idx").on(t.campaignId),
+    index("flip_pages_sort_idx").on(t.campaignId, t.sortOrder),
+  ]
+);
+
+// ---------------------------------------------------------------------------
+// Contractor self-service: Mini Campaign (single-page promo with one CTA).
+// contractorId indexed text, no real FK — same convention as leads/estimates.
+// ---------------------------------------------------------------------------
+export const campaigns = pgTable(
+  "campaigns",
+  {
+    id: text("id").primaryKey(),
+    contractorId: text("contractor_id").notNull(),
+    slug: text("slug").notNull(),
+    status: text("status").notNull().default("draft"),
+    titleEn: text("title_en").notNull().default(""),
+    titleEs: text("title_es").notNull().default(""),
+    bodyEn: text("body_en").notNull().default(""),
+    bodyEs: text("body_es").notNull().default(""),
+    mediaUrl: text("media_url"),
+    ctaType: text("cta_type").notNull().default("phone"),
+    ctaValue: text("cta_value").notNull().default(""),
+    startsAt: timestamp("starts_at", { withTimezone: true, mode: "string" }),
+    endsAt: timestamp("ends_at", { withTimezone: true, mode: "string" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("campaigns_contractor_idx").on(t.contractorId),
+    unique("campaigns_contractor_slug_unique").on(t.contractorId, t.slug),
+  ]
+);
+
+// ---------------------------------------------------------------------------
+// Contractor self-service: Invoices (Stripe Connect). Disabled app-side until
+// STRIPE_SECRET_KEY is set — see lib/stripe/config.ts. contractorId/leadId
+// indexed text, no real FK, same convention as leads/estimates/expenses.
+// ---------------------------------------------------------------------------
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: text("id").primaryKey(),
+    contractorId: text("contractor_id").notNull(),
+    leadId: text("lead_id"),
+    publicToken: text("public_token").notNull(),
+    providerInvoiceId: text("provider_invoice_id"),
+    hostedInvoiceUrl: text("hosted_invoice_url"),
+    invoicePdfUrl: text("invoice_pdf_url"),
+    clientName: text("client_name").notNull().default(""),
+    clientEmail: text("client_email").notNull().default(""),
+    amountCents: integer("amount_cents").notNull(),
+    status: text("status").notNull().default("draft"),
+    description: text("description").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("invoices_contractor_idx").on(t.contractorId),
+    uniqueIndex("invoices_token_idx").on(t.publicToken),
+    index("invoices_provider_invoice_idx").on(t.providerInvoiceId),
+  ]
+);
+
+export const stripeCustomerMappings = pgTable(
+  "stripe_customer_mappings",
+  {
+    id: text("id").primaryKey(),
+    contractorId: text("contractor_id").notNull(),
+    stripeAccountId: text("stripe_account_id").notNull(),
+    stripeCustomerId: text("stripe_customer_id"),
+    clientEmail: text("client_email").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    unique("stripe_customer_mappings_account_email_unique").on(t.stripeAccountId, t.clientEmail),
+    index("stripe_customer_mappings_contractor_idx").on(t.contractorId),
+  ]
+);
+
+export const processedWebhookEvents = pgTable("processed_webhook_events", {
+  id: text("id").primaryKey(),
+  eventType: text("event_type").notNull(),
+  processedAt: timestamp("processed_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
+});
 
 // ---------------------------------------------------------------------------
 // SnapLink Real Estate — Phase 2 property management.

@@ -147,7 +147,7 @@ export const jsonContractorStore = {
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments">>
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">>
   ): Promise<Contractor | undefined> {
     const list = await readContractors();
     const c = list.find((x) => x.id === id);
@@ -155,6 +155,8 @@ export const jsonContractorStore = {
     if (patch.pin !== undefined) c.pin = patch.pin;
     if (patch.preferredLanguage !== undefined) c.preferredLanguage = patch.preferredLanguage;
     if (patch.payments !== undefined) c.payments = patch.payments;
+    if (patch.stripeAccountId !== undefined) c.stripeAccountId = patch.stripeAccountId;
+    if (patch.stripeOnboardingComplete !== undefined) c.stripeOnboardingComplete = patch.stripeOnboardingComplete;
     await writeContractors(list);
     return c;
   },

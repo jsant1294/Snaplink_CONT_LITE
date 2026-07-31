@@ -108,6 +108,8 @@ function rowToContractor(row: ContractorRow): Contractor {
     reviewsUrl: row.reviewsUrl ?? undefined,
     galleryUrl: row.galleryUrl ?? undefined,
     brandColor: row.brandColor ?? undefined,
+    stripeAccountId: row.stripeAccountId ?? undefined,
+    stripeOnboardingComplete: row.stripeOnboardingComplete,
     createdAt: row.createdAt,
   };
 }
@@ -262,12 +264,14 @@ export const pgContractorStore = {
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments">>
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">>
   ): Promise<Contractor | undefined> {
     const set: Record<string, unknown> = {};
     if (patch.pin !== undefined) set.pin = patch.pin;
     if (patch.preferredLanguage !== undefined) set.preferredLanguage = patch.preferredLanguage;
     if (patch.payments !== undefined) set.payments = patch.payments;
+    if (patch.stripeAccountId !== undefined) set.stripeAccountId = patch.stripeAccountId;
+    if (patch.stripeOnboardingComplete !== undefined) set.stripeOnboardingComplete = patch.stripeOnboardingComplete;
     if (Object.keys(set).length > 0) {
       await db().update(contractors).set(set).where(eq(contractors.id, id));
     }

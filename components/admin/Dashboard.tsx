@@ -269,6 +269,30 @@ export default function Dashboard({
             {mt("moneyTab", lang)}
           </a>
         )}
+        {mode === "scoped" && contractor && (
+          <a
+            href={`/contractor-admin/${contractor.username}/flipbook`}
+            className="btn-outline !py-2 text-sm"
+          >
+            Flipbook
+          </a>
+        )}
+        {mode === "scoped" && contractor && (
+          <a
+            href={`/contractor-admin/${contractor.username}/campaigns`}
+            className="btn-outline !py-2 text-sm"
+          >
+            Campaigns
+          </a>
+        )}
+        {mode === "scoped" && contractor && (
+          <a
+            href={`/contractor-admin/${contractor.username}/invoices`}
+            className="btn-outline !py-2 text-sm"
+          >
+            Invoices
+          </a>
+        )}
         {mode === "scoped" && (
           <div className="inline-flex rounded-full border border-white/15 overflow-hidden text-xs">
             <button

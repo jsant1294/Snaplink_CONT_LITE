@@ -72,6 +72,9 @@ export interface Contractor {
   reviewsUrl?: string;
   galleryUrl?: string;
   brandColor?: string;
+  /** Stripe Connect Express account id, once onboarded — see lib/stripe/config.ts. */
+  stripeAccountId?: string;
+  stripeOnboardingComplete?: boolean;
   createdAt: string;
 }
 

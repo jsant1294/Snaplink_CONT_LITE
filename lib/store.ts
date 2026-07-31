@@ -14,6 +14,12 @@ import {
 import { pgLeadStore, pgContractorStore, pgEstimateStore } from "./store-pg";
 import { pgExpenseStore, pgCategoryStore, pgTaxProfileStore, pgPayeeStore, pgForm1099Store, pgSetAsideStore } from "./store-money-pg";
 import { jsonExpenseStore, jsonCategoryStore, jsonTaxProfileStore, jsonPayeeStore, jsonForm1099Store, jsonSetAsideStore } from "./store-money-json";
+import { pgFlipCampaignStore, pgFlipPageStore } from "./store-flipbook-pg";
+import { jsonFlipCampaignStore, jsonFlipPageStore } from "./store-flipbook-json";
+import { pgCampaignStore } from "./store-campaign-pg";
+import { jsonCampaignStore } from "./store-campaign-json";
+import { pgInvoiceStore } from "./store-invoice-pg";
+import { jsonInvoiceStore } from "./store-invoice-json";
 
 import { usePg } from "./db-url";
 
@@ -28,6 +34,16 @@ export const taxProfileStore = usePg ? pgTaxProfileStore : jsonTaxProfileStore;
 export const payeeStore = usePg ? pgPayeeStore : jsonPayeeStore;
 export const form1099Store = usePg ? pgForm1099Store : jsonForm1099Store;
 export const setAsideStore = usePg ? pgSetAsideStore : jsonSetAsideStore;
+
+// Flipbook (contractor self-service brochure builder)
+export const flipCampaignStore = usePg ? pgFlipCampaignStore : jsonFlipCampaignStore;
+export const flipPageStore = usePg ? pgFlipPageStore : jsonFlipPageStore;
+
+// Mini Campaign (contractor self-service single-page promo)
+export const campaignStore = usePg ? pgCampaignStore : jsonCampaignStore;
+
+// Invoices (Stripe Connect) — see lib/stripe/config.ts for the enable gate
+export const invoiceStore = usePg ? pgInvoiceStore : jsonInvoiceStore;
 
 export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;

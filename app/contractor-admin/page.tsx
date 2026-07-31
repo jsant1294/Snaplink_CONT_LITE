@@ -116,6 +116,17 @@ function ContractorCard({
         <span className="ml-1 rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gold align-middle">
           {professionTypeLabel(c.professionType, "en")}
         </span>
+        <span
+          className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide align-middle ${
+            c.stripeOnboardingComplete
+              ? "bg-success/10 text-success"
+              : c.stripeAccountId
+                ? "bg-warn/10 text-warn"
+                : "bg-white/5 text-muted"
+          }`}
+        >
+          {c.stripeOnboardingComplete ? "Stripe connected" : c.stripeAccountId ? "Stripe pending" : "No Stripe"}
+        </span>
       </p>
       <p className="text-xs text-muted mb-1">
         /{c.username} ·{" "}
