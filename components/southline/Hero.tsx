@@ -96,22 +96,22 @@ export default function Hero({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-stretch gap-3 sm:gap-4">
               <Link
                 href="#categories"
-                className="w-full sm:w-auto bg-gold text-obsidian font-semibold px-8 py-3.5 rounded-xl text-center hover:bg-goldlight transition-colors shadow-lg"
+                className="w-full sm:w-auto bg-gold text-obsidian font-semibold px-8 py-3.5 rounded-xl text-center hover:bg-goldlight transition-colors shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
               >
                 {exploreLabel}
               </Link>
               <Link
                 href="/planner"
-                className="w-full sm:w-auto bg-cream/10 backdrop-blur-sm border border-cream/20 text-cream font-medium px-8 py-3.5 rounded-xl text-center hover:bg-cream/20 transition-colors"
+                className="w-full sm:w-auto bg-[#3c3229]/60 backdrop-blur-sm border border-cream/20 text-cream font-medium px-8 py-3.5 rounded-xl text-center hover:bg-[#3c3229]/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
               >
                 {planLabel}
               </Link>
               <Link
                 href="/book"
-                className="w-full sm:w-auto border-2 border-gold/50 text-gold font-medium px-8 py-3.5 rounded-xl text-center hover:bg-gold hover:text-[#2a241e] transition-colors"
+                className="w-full sm:w-auto bg-[#3c3229]/60 backdrop-blur-sm border-2 border-gold/70 text-gold font-medium px-8 py-3.5 rounded-xl text-center hover:bg-gold hover:text-[#2a241e] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
               >
                 {findProLabel}
               </Link>
@@ -120,7 +120,7 @@ export default function Hero({
 
             <Link
               href="/homes"
-              className="mt-5 inline-flex items-center gap-1.5 text-sm text-cream/70 underline decoration-cream/30 underline-offset-4 hover:text-gold hover:decoration-gold transition-colors"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm text-cream/90 underline decoration-cream/50 underline-offset-4 hover:text-gold hover:decoration-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e] rounded-sm"
             >
               {t("heroRealEstateLink", lang)}
             </Link>

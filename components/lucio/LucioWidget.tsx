@@ -55,7 +55,7 @@ export default function LucioWidget({ lang, pageContext }: { lang: Lang; pageCon
       <button
         type="button"
         onClick={openLucioWidget}
-        className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-obsidian px-5 py-3 text-sm font-semibold text-cream shadow-[0_12px_28px_rgba(0,0,0,0.28)] transition-transform hover:-translate-y-0.5"
+        className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-obsidian px-5 py-3 text-sm font-semibold text-cream shadow-[0_12px_28px_rgba(0,0,0,0.28)] transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
       >
         <span className="font-display text-gold">{t("lucioName", lang)}</span>
         <span className="hidden sm:inline">{t("startPlanningWithLucio", lang)}</span>
@@ -132,7 +132,7 @@ export default function LucioWidget({ lang, pageContext }: { lang: Lang; pageCon
           onChange={(e) => setInput(e.target.value)}
           placeholder={t("lucioInputPlaceholder", lang)}
           disabled={status === "submitted" || status === "streaming"}
-          className="flex-1 rounded-xl border border-walnut/20 bg-cream px-3 py-2 text-sm text-walnut placeholder:text-clay/70 outline-none focus:border-gold/50 focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:bg-sand disabled:text-clay/50 disabled:cursor-not-allowed"
+          className="flex-1 rounded-xl border border-walnut/20 bg-cream px-3 py-2 text-base text-walnut placeholder:text-clay/70 outline-none focus:border-gold/50 focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:bg-sand disabled:text-clay/50 disabled:cursor-not-allowed"
         />
         <button
           type="submit"

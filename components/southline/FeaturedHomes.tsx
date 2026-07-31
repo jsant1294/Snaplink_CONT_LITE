@@ -33,7 +33,7 @@ export default function FeaturedHomes({ lang, properties }: { lang: Lang; proper
                     src={property.imageUrls[0]}
                     alt={property.title}
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
                 ) : (
                   <div className="h-full w-full bg-sand" />

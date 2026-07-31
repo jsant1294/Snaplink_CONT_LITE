@@ -36,13 +36,13 @@ export default function CategoriesGrid({
                 key={category.id}
                 href={category.linkUrl}
                 aria-label={`${cta ?? title}: ${title}`}
-                className="group relative isolate h-[230px] sm:h-[250px] overflow-hidden rounded-[18px] border border-cream/10 bg-snaplink-charcoal shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-[transform,box-shadow] duration-[225ms] ease-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(37,35,31,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-snaplink-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
+                className="group relative isolate h-[230px] sm:h-[250px] overflow-hidden rounded-[18px] border border-cream/10 bg-snaplink-charcoal shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-[transform,box-shadow] duration-[225ms] ease-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(37,35,31,0.28)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-snaplink-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
               >
                 <img
                   src={category.imageUrl}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[225ms] ease-out group-hover:scale-[1.03]"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[225ms] ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/20 to-black/70 transition-opacity duration-[225ms] ease-out group-hover:opacity-90" />
 
@@ -50,7 +50,7 @@ export default function CategoriesGrid({
                   <span className="absolute right-3 top-3 h-1.5 w-8 rounded-full bg-snaplink-gold/80" />
                 )}
 
-                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 transition-transform duration-[225ms] ease-out group-hover:-translate-y-1">
+                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 transition-transform duration-[225ms] ease-out group-hover:-translate-y-1 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
                   <h3 className="font-display text-xl sm:text-2xl font-semibold leading-none text-snaplink-cream">
                     {title}
                   </h3>

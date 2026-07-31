@@ -67,7 +67,7 @@ export default function TrendingSection({
                     src={"titleKey" in card ? card.image : card.imageUrl}
                     alt=""
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
                 </div>
                 <div className="p-5">

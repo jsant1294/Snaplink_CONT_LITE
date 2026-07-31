@@ -38,7 +38,7 @@ export default function CommunitySpotlight({
               <Link
                 key={item.id}
                 href={item.linkUrl}
-                className="group bg-paper rounded-2xl border border-sand/40 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                className="group bg-paper rounded-2xl border border-sand/40 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
                 <div className="aspect-[16/9] bg-sand/30 flex items-center justify-center text-3xl">
                   {item.imageUrl ? (

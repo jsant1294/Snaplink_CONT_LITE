@@ -108,6 +108,43 @@ test("DiyEditor and SpotlightEditor now reuse the shared .input/.label classes i
   }
 });
 
+test("hero CTA row wraps instead of overlapping, and all 4 buttons have solid/backdropped, non-transparent-on-photo styling", async () => {
+  const text = await source("../components/southline/Hero.tsx");
+  assert.match(text, /flex flex-wrap items-stretch/, "the CTA row must wrap instead of compressing/overlapping now that it holds 4 buttons");
+  assert.doesNotMatch(text, /border-2 border-gold\/50 text-gold font-medium px-8 py-3\.5 rounded-xl text-center hover:bg-gold hover:text-\[#2a241e\] transition-colors"/, "the find-a-pro button must no longer be bare gold-outline-on-photo with no backdrop");
+  assert.match(text, /bg-\[#3c3229\]\/60 backdrop-blur-sm border-2 border-gold\/70/, "the find-a-pro button needs a solid backdrop so it reads regardless of the photo behind it");
+});
+
+test("every hero CTA (including the Lucio button) has a visible keyboard focus ring", async () => {
+  const hero = await source("../components/southline/Hero.tsx");
+  const heroRingCount = [...hero.matchAll(/focus-visible:ring-2 focus-visible:ring-cream/g)].length;
+  assert.ok(heroRingCount >= 4, "expected a focus-visible ring on all 4 Hero-rendered links (3 Links + the real-estate link)");
+  const lucioButton = await source("../components/lucio/StartPlanningWithLucioButton.tsx");
+  assert.match(lucioButton, /focus-visible:ring-2 focus-visible:ring-cream/);
+});
+
+test("decorative card/image hover transforms respect prefers-reduced-motion across public Southline components", async () => {
+  for (const file of [
+    "../components/southline/CommunitySpotlight.tsx",
+    "../components/southline/FeaturedHomes.tsx",
+    "../components/southline/DIYLearningTeaser.tsx",
+    "../components/southline/TrendingSection.tsx",
+    "../components/southline/CategoriesGrid.tsx",
+    "../components/lucio/LucioWidget.tsx",
+  ]) {
+    const text = await source(file);
+    assert.match(text, /motion-reduce:/, `${file} has a hover transform with no motion-reduce guard`);
+  }
+});
+
+test("mobile-critical text inputs use a 16px+ font size to avoid iOS Safari auto-zoom-on-focus", async () => {
+  const homes = await source("../app/homes/page.tsx");
+  assert.doesNotMatch(homes, /<input name="q"[^>]*text-sm/, "the homes search input must not be sub-16px");
+  const lucio = await source("../components/lucio/LucioWidget.tsx");
+  const inputBlock = lucio.slice(lucio.indexOf("value={input}"), lucio.indexOf("value={input}") + 400);
+  assert.doesNotMatch(inputBlock, /text-sm/, "the Lucio chat input must not be sub-16px");
+});
+
 test("Lucio Financial Copilot (tax/payment) code is untouched by this pass", async () => {
   const { execSync } = await import("node:child_process");
   const diff = execSync(
