@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { invoiceStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { toCents } from "@/lib/money";
 import { stripeEnabled } from "@/lib/stripe/config";
 import type { Invoice } from "@/lib/invoice-types";
@@ -10,6 +11,8 @@ export async function GET(req: NextRequest) {
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractorId, "invoices");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   const invoices = await invoiceStore.list(contractorId);
   return NextResponse.json({ invoices });
 }
@@ -23,6 +26,8 @@ export async function POST(req: NextRequest) {
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractorId, "invoices");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const amountCents = toCents(body.amount);
   if (amountCents <= 0) return NextResponse.json({ error: "Amount must be greater than 0" }, { status: 400 });

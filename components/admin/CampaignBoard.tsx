@@ -5,6 +5,7 @@ import type { Contractor } from "@/lib/types";
 import type { Campaign, CampaignStatus } from "@/lib/campaign-types";
 import { nt, type Lang } from "@/lib/i18n";
 import CampaignEditor from "@/components/admin/CampaignEditor";
+import ModuleLocked from "@/components/admin/ModuleLocked";
 
 type PublicContractor = Omit<Contractor, "pin">;
 
@@ -33,6 +34,7 @@ export default function CampaignBoard({
   const lang: Lang = contractor?.preferredLanguage ?? "en";
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [locked, setLocked] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const contractorId = contractor?.id ?? "";
 
@@ -44,8 +46,13 @@ export default function CampaignBoard({
     if (!contractorId) return;
     setLoading(true);
     fetch(`/api/contractor/campaigns?contractorId=${contractorId}`, { headers: headers() })
-      .then((r) => r.json())
-      .then((d) => {
+      .then(async (r) => {
+        if (r.status === 403) {
+          setLocked(true);
+          setLoading(false);
+          return;
+        }
+        const d = await r.json();
         setCampaigns(d.campaigns ?? []);
         setLoading(false);
       })
@@ -79,6 +86,7 @@ export default function CampaignBoard({
   const editing = campaigns.find((c) => c.id === editingId);
 
   if (!contractor) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
+  if (locked) return <ModuleLocked lang={lang} />;
 
   return (
     <div>

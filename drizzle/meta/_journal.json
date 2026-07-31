@@ -113,6 +113,13 @@
       "when": 1785508522631,
       "tag": "0015_contractor_modules",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1785523010763,
+      "tag": "0016_module_entitlements",
+      "breakpoints": true
     }
   ]
 }

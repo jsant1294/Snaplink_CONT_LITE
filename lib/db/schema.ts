@@ -274,6 +274,45 @@ export const processedWebhookEvents = pgTable("processed_webhook_events", {
 });
 
 // ---------------------------------------------------------------------------
+// Operator-controlled paid module access. professionalSource/professionalId is
+// a deliberately generic pair (not a contractors FK) so this same table can
+// cover agent_profiles later without a migration — only "contractor" values
+// are written today. Modules default OFF; only an operator mutation flips
+// them (see lib/entitlements.ts).
+// ---------------------------------------------------------------------------
+export const professionalModuleEntitlements = pgTable(
+  "professional_module_entitlements",
+  {
+    id: text("id").primaryKey(),
+    professionalSource: text("professional_source").notNull().default("contractor"),
+    professionalId: text("professional_id").notNull(),
+    moduleKey: text("module_key").notNull(),
+    enabled: boolean("enabled").notNull().default(false),
+    enabledBy: text("enabled_by"),
+    enabledAt: timestamp("enabled_at", { withTimezone: true, mode: "string" }),
+    disabledAt: timestamp("disabled_at", { withTimezone: true, mode: "string" }),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("professional_module_entitlements_unique").on(
+      t.professionalSource,
+      t.professionalId,
+      t.moduleKey
+    ),
+    index("professional_module_entitlements_professional_idx").on(
+      t.professionalSource,
+      t.professionalId
+    ),
+  ]
+);
+
+// ---------------------------------------------------------------------------
 // SnapLink Real Estate — Phase 2 property management.
 //
 // Tenant/organization/brokerage/agent parent tables are intentionally not

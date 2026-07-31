@@ -145,8 +145,17 @@ export default function Dashboard({
   const [loading, setLoading] = useState(true);
   const [busyLead, setBusyLead] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [modules, setModules] = useState<Record<string, boolean>>({});
 
   const authHeaders = useMemo(() => ({ "x-snaplink-pin": pin }), [pin]);
+
+  useEffect(() => {
+    if (mode !== "scoped" || !contractor) return;
+    fetch(`/api/contractor/entitlements?contractorId=${contractor.id}`, { headers: authHeaders })
+      .then((r) => r.json())
+      .then((d) => setModules(d.modules ?? {}))
+      .catch(() => setModules({}));
+  }, [mode, contractor, authHeaders]);
 
   const load = useCallback(async () => {
     const qs = mode === "scoped" && contractor ? `?contractor=${contractor.username}` : "";
@@ -269,7 +278,7 @@ export default function Dashboard({
             {mt("moneyTab", lang)}
           </a>
         )}
-        {mode === "scoped" && contractor && (
+        {mode === "scoped" && contractor && modules.flipbook && (
           <a
             href={`/contractor-admin/${contractor.username}/flipbook`}
             className="btn-outline !py-2 text-sm"
@@ -277,7 +286,7 @@ export default function Dashboard({
             Flipbook
           </a>
         )}
-        {mode === "scoped" && contractor && (
+        {mode === "scoped" && contractor && modules.mini_campaigns && (
           <a
             href={`/contractor-admin/${contractor.username}/campaigns`}
             className="btn-outline !py-2 text-sm"
@@ -285,7 +294,7 @@ export default function Dashboard({
             Campaigns
           </a>
         )}
-        {mode === "scoped" && contractor && (
+        {mode === "scoped" && contractor && modules.invoices && (
           <a
             href={`/contractor-admin/${contractor.username}/invoices`}
             className="btn-outline !py-2 text-sm"

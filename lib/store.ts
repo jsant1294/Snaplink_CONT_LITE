@@ -20,6 +20,8 @@ import { pgCampaignStore } from "./store-campaign-pg";
 import { jsonCampaignStore } from "./store-campaign-json";
 import { pgInvoiceStore } from "./store-invoice-pg";
 import { jsonInvoiceStore } from "./store-invoice-json";
+import { pgEntitlementStore } from "./store-entitlements-pg";
+import { jsonEntitlementStore } from "./store-entitlements-json";
 
 import { usePg } from "./db-url";
 
@@ -44,6 +46,9 @@ export const campaignStore = usePg ? pgCampaignStore : jsonCampaignStore;
 
 // Invoices (Stripe Connect) — see lib/stripe/config.ts for the enable gate
 export const invoiceStore = usePg ? pgInvoiceStore : jsonInvoiceStore;
+
+// Operator-controlled paid module access — see lib/entitlements.ts
+export const entitlementStore = usePg ? pgEntitlementStore : jsonEntitlementStore;
 
 export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;

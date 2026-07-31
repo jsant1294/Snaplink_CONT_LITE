@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { campaignStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { slugify } from "@/lib/slugify";
 import type { Campaign, CampaignCtaType } from "@/lib/campaign-types";
 
@@ -11,6 +12,8 @@ export async function GET(req: NextRequest) {
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractorId, "mini_campaigns");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   const campaigns = await campaignStore.list(contractorId);
   return NextResponse.json({ campaigns });
 }
@@ -21,6 +24,8 @@ export async function POST(req: NextRequest) {
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractorId, "mini_campaigns");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const titleEn = String(body.titleEn ?? "").slice(0, 120) || "Untitled Campaign";
   const ctaType: CampaignCtaType = CTA_TYPES.includes(body.ctaType) ? body.ctaType : "phone";

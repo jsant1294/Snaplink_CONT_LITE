@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { campaignStore } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import type { CampaignCtaType } from "@/lib/campaign-types";
 
 const CTA_TYPES: CampaignCtaType[] = ["url", "phone", "sms", "whatsapp"];
@@ -11,6 +12,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!campaign) return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, campaign.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(campaign.contractorId, "mini_campaigns");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   return NextResponse.json({ campaign });
 }
 
@@ -20,6 +23,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!existing) return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, existing.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(existing.contractorId, "mini_campaigns");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const body = await req.json();
   const patch: Record<string, unknown> = {};

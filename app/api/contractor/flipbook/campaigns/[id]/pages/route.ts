@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { flipCampaignStore, flipPageStore, newId } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import type { FlipPage, FlipPageType, FlipCtaType } from "@/lib/flipbook-types";
 
 const PAGE_TYPES: FlipPageType[] = ["cover", "image", "text_image", "offer", "cta", "contact"];
@@ -12,6 +13,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!campaign) return NextResponse.json({ error: "Flipbook not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, campaign.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(campaign.contractorId, "flipbook");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
   const pages = await flipPageStore.listByCampaign(id);
   return NextResponse.json({ pages });
 }
@@ -22,6 +25,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!campaign) return NextResponse.json({ error: "Flipbook not found" }, { status: 404 });
   const denied = await authorizeContractorId(req, campaign.contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(campaign.contractorId, "flipbook");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const body = await req.json();
   const pageType: FlipPageType = PAGE_TYPES.includes(body.pageType) ? body.pageType : "image";

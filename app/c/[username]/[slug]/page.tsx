@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { contractorStore, campaignStore } from "@/lib/store";
+import { isModuleEnabled } from "@/lib/entitlements";
 import type { Campaign } from "@/lib/campaign-types";
 import type { Lang } from "@/lib/southline-i18n";
 
@@ -39,6 +40,7 @@ export async function generateMetadata({
   if (!contractor) return {};
   const campaign = await campaignStore.getBySlug(contractor.id, slug);
   if (!campaign || !isLive(campaign)) return {};
+  if (!(await isModuleEnabled(contractor.id, "mini_campaigns"))) return {};
   return { title: campaign.titleEn };
 }
 
@@ -52,6 +54,9 @@ export default async function CampaignPage({
   if (!contractor) notFound();
   const campaign = await campaignStore.getBySlug(contractor.id, slug);
   if (!campaign || !isLive(campaign)) notFound();
+  // Disabling the module makes live campaigns unavailable without deleting
+  // their data — re-enabling restores access immediately.
+  if (!(await isModuleEnabled(contractor.id, "mini_campaigns"))) notFound();
 
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;

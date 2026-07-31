@@ -65,7 +65,7 @@ function MasterView({ pin }: { pin: string }) {
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           {contractors.map((c) => (
-            <ContractorCard key={c.id} c={c} onPatch={patchContractor} onToast={showToast} />
+            <ContractorCard key={c.id} c={c} pin={pin} onPatch={patchContractor} onToast={showToast} />
           ))}
         </div>
       </section>
@@ -79,12 +79,65 @@ function MasterView({ pin }: { pin: string }) {
   );
 }
 
+const MODULE_LABELS: Record<string, string> = {
+  flipbook: "Flipbook",
+  mini_campaigns: "Campaigns",
+  invoices: "Invoices",
+};
+
+function ModuleToggles({ contractorId, pin }: { contractorId: string; pin: string }) {
+  const [modules, setModules] = useState<Record<string, boolean>>({});
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/contractor/entitlements?contractorId=${contractorId}`, {
+      headers: { "x-snaplink-pin": pin },
+    })
+      .then((r) => r.json())
+      .then((d) => setModules(d.modules ?? {}))
+      .catch(() => setModules({}));
+  }, [contractorId, pin]);
+
+  async function toggle(moduleKey: string) {
+    setBusyKey(moduleKey);
+    const enabled = !modules[moduleKey];
+    const res = await fetch("/api/contractor/entitlements", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-snaplink-pin": pin },
+      body: JSON.stringify({ contractorId, moduleKey, enabled }),
+    });
+    setBusyKey(null);
+    if (res.ok) setModules((m) => ({ ...m, [moduleKey]: enabled }));
+  }
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-1.5 border-t border-white/10 pt-3">
+      {Object.entries(MODULE_LABELS).map(([key, label]) => (
+        <button
+          key={key}
+          onClick={() => toggle(key)}
+          disabled={busyKey === key}
+          className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+            modules[key]
+              ? "border-success/40 bg-success/10 text-success"
+              : "border-white/10 bg-white/5 text-muted"
+          }`}
+        >
+          {label}: {modules[key] ? "On" : "Off"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ContractorCard({
   c,
+  pin,
   onPatch,
   onToast,
 }: {
   c: PublicContractor;
+  pin: string;
   onPatch: (id: string, patch: { pin?: string; preferredLanguage?: "en" | "es" }) => Promise<boolean>;
   onToast: (msg: string) => void;
 }) {
@@ -161,6 +214,7 @@ function ContractorCard({
           </button>
         </div>
       )}
+      <ModuleToggles contractorId={c.id} pin={pin} />
     </div>
   );
 }

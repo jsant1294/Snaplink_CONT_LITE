@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
 import { canAccessContractor } from "@/lib/auth";
+import { isModuleEnabled } from "@/lib/entitlements";
 import { getStripe, stripeEnabled } from "@/lib/stripe/config";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
@@ -10,7 +11,8 @@ export async function GET(req: NextRequest) {
   const contractorId = req.nextUrl.searchParams.get("contractorId") ?? "";
   const pin = req.nextUrl.searchParams.get("pin") ?? "";
   const contractor = await contractorStore.getById(contractorId);
-  if (!contractor || !canAccessContractor(pin, contractor) || !stripeEnabled() || !contractor.stripeAccountId) {
+  const moduleEnabled = contractor ? await isModuleEnabled(contractorId, "invoices") : false;
+  if (!contractor || !canAccessContractor(pin, contractor) || !stripeEnabled() || !contractor.stripeAccountId || !moduleEnabled) {
     return NextResponse.redirect(`${APP_URL}/contractor-admin/${contractor?.username ?? ""}/invoices`);
   }
   const stripe = await getStripe();

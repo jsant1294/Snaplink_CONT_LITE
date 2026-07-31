@@ -5,6 +5,7 @@ import type { Contractor } from "@/lib/types";
 import type { Invoice } from "@/lib/invoice-types";
 import { formatCents } from "@/lib/money";
 import { nt, type Lang } from "@/lib/i18n";
+import ModuleLocked from "@/components/admin/ModuleLocked";
 
 type PublicContractor = Omit<Contractor, "pin">;
 
@@ -25,6 +26,7 @@ export default function InvoiceBoard({
   const [status, setStatus] = useState<Status | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [locked, setLocked] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -47,10 +49,16 @@ export default function InvoiceBoard({
     if (!contractorId) return;
     setLoading(true);
     Promise.all([
-      fetch(`/api/contractor/invoices/status?contractorId=${contractorId}`, { headers: headers() }).then((r) => r.json()),
-      fetch(`/api/contractor/invoices?contractorId=${contractorId}`, { headers: headers() }).then((r) => r.json()),
+      fetch(`/api/contractor/invoices/status?contractorId=${contractorId}`, { headers: headers() }),
+      fetch(`/api/contractor/invoices?contractorId=${contractorId}`, { headers: headers() }),
     ])
-      .then(([s, i]) => {
+      .then(async ([statusRes, invoicesRes]) => {
+        if (statusRes.status === 403 || invoicesRes.status === 403) {
+          setLocked(true);
+          setLoading(false);
+          return;
+        }
+        const [s, i] = await Promise.all([statusRes.json(), invoicesRes.json()]);
         setStatus(s);
         setInvoices(i.invoices ?? []);
         setLoading(false);
@@ -108,7 +116,9 @@ export default function InvoiceBoard({
     }
   }
 
-  if (!contractor || loading || !status) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
+  if (!contractor || loading) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
+  if (locked) return <ModuleLocked lang={lang} />;
+  if (!status) return <p className="text-sm text-muted">{nt("loading", lang)}</p>;
 
   if (!status.stripeEnabled) {
     return (

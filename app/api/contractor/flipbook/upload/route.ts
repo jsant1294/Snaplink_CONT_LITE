@@ -1,13 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
+import { MODULE_KEYS, type ModuleKey } from "@/lib/entitlement-types";
 
+// Shared by Flipbook and Mini Campaigns — the caller declares which module
+// it's uploading for so the right entitlement gets checked.
 export async function POST(req: NextRequest) {
   const form = await req.formData();
   const contractorId = String(form.get("contractorId") ?? "");
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+
+  const moduleKey = form.get("module");
+  if (typeof moduleKey !== "string" || !MODULE_KEYS.includes(moduleKey as ModuleKey)) {
+    return NextResponse.json({ error: "A valid module is required" }, { status: 400 });
+  }
+  const moduleDenied = await requireModuleEnabled(contractorId, moduleKey as ModuleKey);
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const file = form.get("file");
   if (!(file instanceof File) || !file.type.startsWith("image/")) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { stripeEnabled } from "@/lib/stripe/config";
 
 export async function GET(req: NextRequest) {
@@ -8,6 +9,8 @@ export async function GET(req: NextRequest) {
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractorId, "invoices");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const enabled = stripeEnabled();
   if (!enabled) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { flipCampaignStore, flipPageStore } from "@/lib/store";
 import { authorizeContractorId } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import type { FlipPageType, FlipCtaType } from "@/lib/flipbook-types";
 
 const PAGE_TYPES: FlipPageType[] = ["cover", "image", "text_image", "offer", "cta", "contact"];
@@ -13,6 +14,8 @@ async function authorizeForPage(req: NextRequest, pageId: string) {
   if (!campaign) return { error: NextResponse.json({ error: "Flipbook not found" }, { status: 404 }) };
   const denied = await authorizeContractorId(req, campaign.contractorId);
   if (denied) return { error: NextResponse.json({ error: denied }, { status: 401 }) };
+  const moduleDenied = await requireModuleEnabled(campaign.contractorId, "flipbook");
+  if (moduleDenied) return { error: NextResponse.json({ error: moduleDenied }, { status: 403 }) };
   return { page };
 }
 

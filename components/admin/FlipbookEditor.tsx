@@ -137,6 +137,7 @@ export default function FlipbookEditor({
   async function uploadImage(id: string, file: File) {
     const form = new FormData();
     form.append("contractorId", contractorId);
+    form.append("module", "flipbook");
     form.append("file", file);
     const res = await fetch("/api/contractor/flipbook/upload", {
       method: "POST",

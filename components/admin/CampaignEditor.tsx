@@ -85,6 +85,7 @@ export default function CampaignEditor({
   async function uploadImage(file: File) {
     const form = new FormData();
     form.append("contractorId", campaign.contractorId);
+    form.append("module", "mini_campaigns");
     form.append("file", file);
     const res = await fetch("/api/contractor/flipbook/upload", {
       method: "POST",

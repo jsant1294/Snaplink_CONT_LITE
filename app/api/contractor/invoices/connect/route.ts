@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
 import { authorizeContractorId, pinFromRequest } from "@/lib/auth";
+import { requireModuleEnabled } from "@/lib/entitlements";
 import { getStripe, stripeEnabled } from "@/lib/stripe/config";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
@@ -20,6 +21,8 @@ export async function POST(req: NextRequest) {
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
   const denied = await authorizeContractorId(req, contractorId);
   if (denied) return NextResponse.json({ error: denied }, { status: 401 });
+  const moduleDenied = await requireModuleEnabled(contractorId, "invoices");
+  if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const contractor = await contractorStore.getById(contractorId);
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
