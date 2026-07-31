@@ -258,6 +258,30 @@ export const UI_DEFS = {
     es: "¡Gracias! Un operador revisará tu solicitud en breve.",
     en: "Thanks! An operator will review your request shortly.",
   },
+
+  // Homepage real estate entry block
+  navRealEstate: { es: "Bienes Raíces", en: "Real Estate" },
+  heroRealEstateLink: {
+    es: "¿Buscas una casa? Explora propiedades locales.",
+    en: "Looking for a home? Explore local listings.",
+  },
+  exploreHomes: { es: "Explorar propiedades", en: "Explore homes" },
+  findAnAgent: { es: "Encontrar un agente", en: "Find an agent" },
+  exploreCommunities: { es: "Explorar comunidades", en: "Explore communities" },
+  viewProperty: { es: "Ver propiedad", en: "View property" },
+  verifiedAgent: { es: "Verificado", en: "Verified" },
+  realEstateNoProperty: {
+    es: "Aún no hay una propiedad destacada.",
+    en: "No featured property yet.",
+  },
+  realEstateRecruitmentHeadline: {
+    es: "¿Eres profesional inmobiliario?",
+    en: "Are you a real estate professional?",
+  },
+  realEstateRecruitmentBody: {
+    es: "Crea tu presencia digital y permite que compradores y vendedores locales te encuentren con un perfil Snaplink.",
+    en: "Build your digital presence and get discovered by local buyers and sellers with a Snaplink Profile.",
+  },
 };
 
 export function t(key: UIKey, lang: Lang): string {

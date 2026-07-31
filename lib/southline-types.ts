@@ -35,11 +35,26 @@ export interface SpotlightItem {
   categoryEn: string;
 }
 
+/** Content for the homepage real estate entry block (property + agents + copy).
+ *  Featured agents reuse the top-level featuredAgentProfileIds list; visibility
+ *  reuses sections.featuredAgents — both predate this block and gated the same
+ *  real estate content before it existed in this combined form. */
+export interface RealEstateBlockSettings {
+  featuredPropertyId: string | null;
+  eyebrowEs: string;
+  eyebrowEn: string;
+  headlineEs: string;
+  headlineEn: string;
+  bodyEs: string;
+  bodyEn: string;
+}
+
 export interface SouthlineSettings {
   hero: HeroContent;
   sections: SectionVisibility;
   featuredContractorIds: string[];
   featuredAgentProfileIds: string[];
+  realEstateBlock: RealEstateBlockSettings;
   featureFlags: Record<string, boolean>;
   seo: {
     titleEs: string;
@@ -83,6 +98,16 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   featuredAgents: true,
 };
 
+export const DEFAULT_REAL_ESTATE_BLOCK: RealEstateBlockSettings = {
+  featuredPropertyId: null,
+  eyebrowEs: "BIENES RAÍCES · EXPERTOS LOCALES",
+  eyebrowEn: "REAL ESTATE · LOCAL EXPERTS",
+  headlineEs: "Encuentra tu próximo hogar con un experto local.",
+  headlineEn: "Find your next home with a local expert.",
+  bodyEs: "Descubre propiedades destacadas, explora comunidades y conecta directamente con profesionales inmobiliarios a través de sus perfiles Snaplink.",
+  bodyEn: "Discover featured properties, explore local communities, and connect directly with real estate professionals through their Snaplink profiles.",
+};
+
 export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
   southline_homepage: true,
   consumer_booking: true,
@@ -111,6 +136,7 @@ export function defaultSouthlineSettings(): SouthlineSettings {
     sections: { ...DEFAULT_SECTIONS },
     featuredContractorIds: [],
     featuredAgentProfileIds: [],
+    realEstateBlock: { ...DEFAULT_REAL_ESTATE_BLOCK },
     featureFlags: { ...DEFAULT_FEATURE_FLAGS },
     seo: { ...DEFAULT_SEO },
     navigation: {
@@ -118,10 +144,10 @@ export function defaultSouthlineSettings(): SouthlineSettings {
         { key: "navHome", href: "/", labelEs: "Inicio", labelEn: "Home", visible: true },
         { key: "navHomes", href: "/homes", labelEs: "Casas", labelEn: "Homes", visible: true },
         { key: "navIdeas", href: "/#categories", labelEs: "Ideas", labelEn: "Ideas", visible: true },
+        { key: "navRealEstate", href: "/#real-estate", labelEs: "Bienes Raíces", labelEn: "Real Estate", visible: true },
         { key: "navProjects", href: "/planner", labelEs: "Proyectos", labelEn: "Projects", visible: true },
         { key: "navDIY", href: "/diy", labelEs: "DIY", labelEn: "DIY", visible: true },
         { key: "navPros", href: "/#professionals", labelEs: "Profesionales", labelEn: "Professionals", visible: true },
-        { key: "navAgents", href: "/agents", labelEs: "Agentes", labelEn: "Agents", visible: true },
         { key: "navBook", href: "/book", labelEs: "Reservar", labelEn: "Book", visible: true },
       ],
     },

@@ -9,8 +9,9 @@ import RecruitmentLeadsViewer from "@/components/southline/admin/RecruitmentLead
 import DiyEditor from "@/components/southline/admin/DiyEditor";
 import SpotlightEditor from "@/components/southline/admin/SpotlightEditor";
 import AgentProfilesPanel from "@/components/southline/admin/AgentProfilesPanel";
+import RealEstateBlockEditor from "@/components/southline/admin/RealEstateBlockEditor";
 
-type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents";
+type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "realestate";
 
 export default function SouthlineAdminPage() {
   return (
@@ -28,6 +29,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
     { key: "featured", label: "Featured Pros" },
     { key: "recruitment", label: "Recruitment Leads" },
     { key: "agents", label: "Agent Profiles" },
+    { key: "realestate", label: "Real Estate Block" },
     { key: "diy", label: "DIY Projects" },
     { key: "spotlight", label: "Community Spotlight" },
     { key: "flags", label: "Feature Flags" },
@@ -75,6 +77,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
           {tab === "featured" && <FeaturedProsPicker pin={pin} />}
           {tab === "recruitment" && <RecruitmentLeadsViewer pin={pin} />}
           {tab === "agents" && <AgentProfilesPanel pin={pin} />}
+          {tab === "realestate" && <RealEstateBlockEditor pin={pin} />}
           {tab === "diy" && <DiyEditor pin={pin} />}
           {tab === "spotlight" && <SpotlightEditor pin={pin} />}
           {tab === "flags" && <FeatureFlagPanel pin={pin} />}

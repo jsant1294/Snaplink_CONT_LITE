@@ -3,7 +3,11 @@ import { contractorStore } from "@/lib/store";
 import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { publicAgentProfile } from "@/lib/agent-profiles/auth";
 import { southlineStore } from "@/lib/southline-store";
+import { demoTenant } from "@/lib/real-estate/fixtures";
+import { propertyRepository } from "@/lib/real-estate/repositories";
+import type { Property } from "@/lib/real-estate/types";
 import type { Lang } from "@/lib/southline-i18n";
+import { DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
 
 import Header from "@/components/southline/Header";
 import Hero from "@/components/southline/Hero";
@@ -12,10 +16,18 @@ import TrendingSection from "@/components/southline/TrendingSection";
 import Footer from "@/components/southline/Footer";
 import FeaturedProfessionals from "@/components/southline/FeaturedProfessionals";
 import CommunitySpotlight from "@/components/southline/CommunitySpotlight";
-import FeaturedAgents from "@/components/southline/FeaturedAgents";
-import AgentRecruitmentSection from "@/components/southline/AgentRecruitmentSection";
+import RealEstateEntryBlock from "@/components/southline/RealEstateEntryBlock";
 
 export const dynamic = "force-dynamic";
+
+async function resolveFeaturedProperty(featuredPropertyId: string | null): Promise<Property | null> {
+  if (featuredPropertyId) {
+    const byId = await propertyRepository.findPropertyById(featuredPropertyId, demoTenant.id).catch(() => null);
+    if (byId) return byId;
+  }
+  const result = await propertyRepository.listPublishedProperties(demoTenant.id, { pageSize: 1 }).catch(() => null);
+  return result?.properties[0] ?? null;
+}
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -39,6 +51,14 @@ export default async function HomePage() {
     ? activeAgentProfiles.filter((a) => featuredAgentIds.has(a.id))
     : activeAgentProfiles
   ).map(publicAgentProfile);
+  const realEstateContent = settings?.realEstateBlock ?? DEFAULT_REAL_ESTATE_BLOCK;
+  // featuredAgents predates this block (it gated the old grid-style section) and
+  // now gates this combined entry block instead — same "show real estate on the
+  // homepage" toggle, still defaults visible so existing settings aren't silently hidden.
+  const showRealEstateBlock = !sections || sections.featuredAgents !== false;
+  const featuredProperty = showRealEstateBlock
+    ? await resolveFeaturedProperty(realEstateContent.featuredPropertyId)
+    : null;
 
   return (
     <>
@@ -49,14 +69,10 @@ export default async function HomePage() {
         {(!sections || sections.featuredPros) && (
           <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
         )}
-        {(!sections || sections.trending) && <TrendingSection lang={lang} />}
-        {/* featuredAgents replaces the old RealEstateDiscovery preview; defaults to
-            visible (undefined !== false) so existing settings files without this
-            new key don't suddenly hide real estate content that was always shown. */}
-        {(!sections || sections.featuredAgents !== false) && (
-          <FeaturedAgents agents={featuredAgents} lang={lang} />
+        {showRealEstateBlock && (
+          <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />
         )}
-        <AgentRecruitmentSection lang={lang} />
+        {(!sections || sections.trending) && <TrendingSection lang={lang} />}
 
         {settings?.spotlight && settings.spotlight.length > 0 && (
           <CommunitySpotlight lang={lang} items={settings.spotlight} />

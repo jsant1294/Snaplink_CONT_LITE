@@ -104,6 +104,13 @@ export default function Hero({
                 {findProLabel}
               </Link>
             </div>
+
+            <Link
+              href="/homes"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm text-cream/70 underline decoration-cream/30 underline-offset-4 hover:text-gold hover:decoration-gold transition-colors"
+            >
+              {t("heroRealEstateLink", lang)}
+            </Link>
           </div>
         </div>
       </div>

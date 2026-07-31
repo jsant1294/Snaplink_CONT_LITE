@@ -19,11 +19,36 @@ async function ensureFile(): Promise<void> {
   }
 }
 
+// A stored settings file predates whatever code shipped after it was first written —
+// a plain JSON.parse silently drops any field or nav item added since (this has already
+// caused two real "the nav doesn't show X" bugs). Merge against current code defaults on
+// every read so new top-level fields, nested objects, and nav entries always appear,
+// while any operator customization (a changed href/label/visibility, or a custom item
+// added via the CMS) is preserved.
+function mergeWithDefaults(stored: Partial<SouthlineSettings>): SouthlineSettings {
+  const defaults = defaultSouthlineSettings();
+  const storedByKey = new Map((stored.navigation?.items ?? []).map((item) => [item.key, item]));
+  const orderedFromDefaults = defaults.navigation.items.map((item) => storedByKey.get(item.key) ?? item);
+  const customExtras = (stored.navigation?.items ?? []).filter(
+    (item) => !defaults.navigation.items.some((d) => d.key === item.key)
+  );
+  return {
+    ...defaults,
+    ...stored,
+    hero: { ...defaults.hero, ...stored.hero },
+    sections: { ...defaults.sections, ...stored.sections },
+    realEstateBlock: { ...defaults.realEstateBlock, ...stored.realEstateBlock },
+    featureFlags: { ...defaults.featureFlags, ...stored.featureFlags },
+    seo: { ...defaults.seo, ...stored.seo },
+    navigation: { items: [...orderedFromDefaults, ...customExtras] },
+  };
+}
+
 async function read(): Promise<SouthlineSettings> {
   await ensureFile();
   try {
     const raw = await fs.readFile(SETTINGS_FILE, "utf-8");
-    return JSON.parse(raw) as SouthlineSettings;
+    return mergeWithDefaults(JSON.parse(raw) as Partial<SouthlineSettings>);
   } catch {
     const defaults = defaultSouthlineSettings();
     await fs.writeFile(SETTINGS_FILE, JSON.stringify(defaults, null, 2), "utf-8");
