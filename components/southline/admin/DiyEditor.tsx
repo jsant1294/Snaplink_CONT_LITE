@@ -110,40 +110,40 @@ function ProjectForm({ pin, initial, onDone }: { pin: string; initial: DIYProjec
     <div className="bg-obsidian border border-white/10 rounded-xl p-4 mb-4 space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-muted block mb-1">Title (ES)</label>
-          <input value={titleEs} onChange={(e) => setTitleEs(e.target.value)} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Title (ES)</label>
+          <input value={titleEs} onChange={(e) => setTitleEs(e.target.value)} className="input" />
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Title (EN)</label>
-          <input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Title (EN)</label>
+          <input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="input" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-muted block mb-1">Description (ES)</label>
-          <textarea value={descEs} onChange={(e) => setDescEs(e.target.value)} rows={2} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Description (ES)</label>
+          <textarea value={descEs} onChange={(e) => setDescEs(e.target.value)} rows={2} className="input" />
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Description (EN)</label>
-          <textarea value={descEn} onChange={(e) => setDescEn(e.target.value)} rows={2} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Description (EN)</label>
+          <textarea value={descEn} onChange={(e) => setDescEn(e.target.value)} rows={2} className="input" />
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="text-xs text-muted block mb-1">Slug</label>
-          <input value={slug} onChange={(e) => setSlug(e.target.value)} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Slug</label>
+          <input value={slug} onChange={(e) => setSlug(e.target.value)} className="input" />
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Difficulty</label>
-          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as "easy" | "medium" | "hard")} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone">
+          <label className="label">Difficulty</label>
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as "easy" | "medium" | "hard")} className="input">
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
           </select>
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Category</label>
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone">
+          <label className="label">Category</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
             <option value="catCocinas">Cocinas</option>
             <option value="catBanos">Baños</option>
             <option value="catPatios">Patios</option>

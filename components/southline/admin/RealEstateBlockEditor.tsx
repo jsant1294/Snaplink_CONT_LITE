@@ -105,7 +105,7 @@ export default function RealEstateBlockEditor({ pin }: { pin: string }) {
         <select
           value={local.featuredPropertyId ?? ""}
           onChange={(e) => setLocal({ ...local, featuredPropertyId: e.target.value || null })}
-          className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone"
+          className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone focus:outline-none focus:ring-2 focus:ring-gold/40"
         >
           <option value="">Auto (first published property)</option>
           {properties.map((p) => (
@@ -121,7 +121,7 @@ export default function RealEstateBlockEditor({ pin }: { pin: string }) {
           {agents.length === 0 && <p className="text-xs text-muted/60 p-2">No active agent profiles yet.</p>}
           {agents.map((agent) => (
             <label key={agent.id} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={selectedAgentIds.includes(agent.id)} onChange={() => toggleAgent(agent.id)} />
+              <input type="checkbox" checked={selectedAgentIds.includes(agent.id)} onChange={() => toggleAgent(agent.id)} className="h-4 w-4 accent-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/40" />
               {agent.name}
             </label>
           ))}

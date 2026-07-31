@@ -107,42 +107,42 @@ function SpotlightForm({ initial, onSave, onCancel }: {
     <div className="bg-obsidian border border-white/10 rounded-xl p-4 mb-4 space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-muted block mb-1">Title (ES)</label>
-          <input value={titleEs} onChange={(e) => setTitleEs(e.target.value)} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Title (ES)</label>
+          <input value={titleEs} onChange={(e) => setTitleEs(e.target.value)} className="input" />
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Title (EN)</label>
-          <input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs text-muted block mb-1">Description (ES)</label>
-          <textarea value={descEs} onChange={(e) => setDescEs(e.target.value)} rows={2} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
-        </div>
-        <div>
-          <label className="text-xs text-muted block mb-1">Description (EN)</label>
-          <textarea value={descEn} onChange={(e) => setDescEn(e.target.value)} rows={2} className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Title (EN)</label>
+          <input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="input" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-muted block mb-1">Category (ES)</label>
-          <input value={categoryEs} onChange={(e) => setCategoryEs(e.target.value)} placeholder="ej. Antes y Después" className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Description (ES)</label>
+          <textarea value={descEs} onChange={(e) => setDescEs(e.target.value)} rows={2} className="input" />
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Category (EN)</label>
-          <input value={categoryEn} onChange={(e) => setCategoryEn(e.target.value)} placeholder="e.g. Before & After" className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Description (EN)</label>
+          <textarea value={descEn} onChange={(e) => setDescEn(e.target.value)} rows={2} className="input" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-muted block mb-1">Link URL</label>
-          <input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="/diy/pintar-habitacion" className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Category (ES)</label>
+          <input value={categoryEs} onChange={(e) => setCategoryEs(e.target.value)} placeholder="ej. Antes y Después" className="input" />
         </div>
         <div>
-          <label className="text-xs text-muted block mb-1">Image URL</label>
-          <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." className="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-sm text-bone" />
+          <label className="label">Category (EN)</label>
+          <input value={categoryEn} onChange={(e) => setCategoryEn(e.target.value)} placeholder="e.g. Before & After" className="input" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label">Link URL</label>
+          <input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="/diy/pintar-habitacion" className="input" />
+        </div>
+        <div>
+          <label className="label">Image URL</label>
+          <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." className="input" />
         </div>
       </div>
       <div className="flex gap-2 justify-end">

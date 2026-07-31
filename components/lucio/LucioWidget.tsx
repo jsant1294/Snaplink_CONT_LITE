@@ -131,9 +131,14 @@ export default function LucioWidget({ lang, pageContext }: { lang: Lang; pageCon
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={t("lucioInputPlaceholder", lang)}
-          className="flex-1 rounded-xl border border-walnut/20 bg-cream px-3 py-2 text-sm text-walnut outline-none focus:border-gold/50"
+          disabled={status === "submitted" || status === "streaming"}
+          className="flex-1 rounded-xl border border-walnut/20 bg-cream px-3 py-2 text-sm text-walnut placeholder:text-clay/70 outline-none focus:border-gold/50 focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:bg-sand disabled:text-clay/50 disabled:cursor-not-allowed"
         />
-        <button type="submit" className="rounded-xl bg-obsidian px-3.5 py-2 text-xs font-semibold text-cream">
+        <button
+          type="submit"
+          disabled={status === "submitted" || status === "streaming" || !input.trim()}
+          className="rounded-xl bg-obsidian px-3.5 py-2 text-xs font-semibold text-cream focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {t("lucioSend", lang)}
         </button>
       </form>

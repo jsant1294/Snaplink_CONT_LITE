@@ -4,7 +4,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+
+  /* Southline Living design tokens — the consumer sub-brand's light palette,
+     mapped onto colors already in tailwind.config.ts (cream/walnut/clay/gold/
+     obsidian/sand/paper/success). Not new colors, not a redesign — a named,
+     reusable reference for the light forms living inside a dark-default app. */
+  --southline-bg: #f1eadf;              /* cream */
+  --southline-surface: #f1eadf;         /* cream */
+  --southline-surface-raised: #e7ddcf;  /* paper — cards atop cream */
+  --southline-text: #5d4635;            /* walnut */
+  --southline-text-muted: #9a614d;      /* clay */
+  --southline-border: rgba(93, 70, 53, 0.2);        /* walnut/20 */
+  --southline-border-strong: rgba(93, 70, 53, 0.4); /* walnut/40 */
+  --southline-accent: #c9a24b;          /* gold */
+  --southline-accent-foreground: #0b0b0d; /* obsidian */
+  --southline-input-bg: #f1eadf;        /* cream */
+  --southline-input-text: #5d4635;      /* walnut */
+  --southline-input-placeholder: rgba(154, 97, 77, 0.7); /* clay/70 */
+  --southline-focus-ring: #0b0b0d;      /* obsidian — real WCAG-compliant focus indicator; gold alone is ~2:1 on cream, under the 3:1 minimum */
+  --southline-focus-accent: #c9a24b;    /* gold — decorative companion border, not the sole indicator */
+  --southline-error: #a93f38;           /* darkened from the app-wide danger red for ~5.1:1 text contrast on cream */
+  --southline-success: #3e9b6e;
+  --southline-disabled-bg: #ddd1c0;     /* sand */
+  --southline-disabled-text: rgba(154, 97, 77, 0.5); /* clay/50 */
+}
 
 body {
   @apply bg-obsidian text-bone font-body antialiased;
@@ -15,18 +40,68 @@ body {
   height: 1px;
 }
 
-.btn-gold {
-  @apply bg-gold text-obsidian font-semibold rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
-}
-.btn-outline {
-  @apply border border-gold/50 text-goldlight rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
-}
-.card {
-  @apply bg-charcoal border border-white/5 rounded-2xl shadow-card;
-}
-.input {
-  @apply w-full bg-slateink border border-white/10 rounded-xl px-4 py-3 text-bone placeholder:text-muted focus:outline-none focus:border-gold/60;
-}
-.label {
-  @apply block text-sm font-medium text-muted mb-1.5;
+@layer components {
+  .btn-gold {
+    @apply bg-gold text-obsidian font-semibold rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
+  }
+  .btn-outline {
+    @apply border border-gold/50 text-goldlight rounded-xl px-4 py-3 text-center active:scale-[0.98] transition;
+  }
+  .card {
+    @apply bg-charcoal border border-white/5 rounded-2xl shadow-card;
+  }
+  .input {
+    @apply w-full bg-slateink border border-white/10 rounded-xl px-4 py-3 text-bone placeholder:text-muted focus:outline-none focus:border-gold/60;
+  }
+  .label {
+    @apply block text-sm font-medium text-muted mb-1.5;
+  }
+
+  /* Southline Living light-form primitives — reach for these on new/fixed
+     Southline forms instead of hand-rolling colors per field. */
+  .southline-input,
+  .southline-select,
+  .southline-textarea {
+    @apply w-full rounded-xl border px-4 py-3 bg-[var(--southline-input-bg)] text-[var(--southline-input-text)]
+      placeholder:text-[var(--southline-input-placeholder)]
+      focus:outline-none focus:border-[var(--southline-focus-accent)]
+      focus-visible:ring-2 focus-visible:ring-[var(--southline-focus-ring)]
+      focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--southline-bg)]
+      disabled:bg-[var(--southline-disabled-bg)] disabled:text-[var(--southline-disabled-text)] disabled:cursor-not-allowed;
+    border-color: var(--southline-border);
+  }
+  .southline-label {
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--southline-text);
+  }
+  .southline-help {
+    @apply text-xs;
+    color: var(--southline-text-muted);
+  }
+  .southline-error-text {
+    @apply text-sm font-medium;
+    color: var(--southline-error);
+  }
+  .southline-success-text {
+    @apply text-sm font-medium;
+    color: var(--southline-success);
+  }
+
+  /* color-scheme is inherited, so scoping it here makes every native form
+     control (select popups, date/file inputs, autofill) under a Southline
+     page render with light OS/browser chrome instead of the app-wide dark
+     default — without touching every page file. Only pages that render the
+     public Southline <header> match; contractor-admin, real-estate, and
+     /southline/admin (none of which render it) keep the correct dark default. */
+  body:has(> header[data-southline-header]) {
+    color-scheme: light;
+  }
+
+  .southline-input:-webkit-autofill,
+  .southline-input:-webkit-autofill:hover,
+  .southline-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--southline-input-text);
+    box-shadow: 0 0 0 1000px var(--southline-input-bg) inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
 }

@@ -97,7 +97,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                   maxLength={6}
                   value={activating[p.id]?.pin ?? ""}
                   onChange={(e) => setActivating({ ...activating, [p.id]: { ...activating[p.id], pin: e.target.value, tier: activating[p.id]?.tier ?? "", planId: activating[p.id]?.planId ?? "" } })}
-                  className="w-28 rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs"
+                  className="w-28 rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs text-bone placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-gold/40"
                 />
                 <select
                   value={activating[p.id]?.planId ?? ""}
@@ -105,7 +105,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                     const plan = plans.find((x) => x.id === e.target.value);
                     setActivating({ ...activating, [p.id]: { pin: activating[p.id]?.pin ?? "", planId: e.target.value, tier: plan ? tierFromPlanName(plan.name) : "" } });
                   }}
-                  className="rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs"
+                  className="rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs text-bone focus:outline-none focus:ring-2 focus:ring-gold/40"
                 >
                   <option value="">Select plan…</option>
                   {plans.map((plan) => <option key={plan.id} value={plan.id}>{plan.name} ({(plan.amountCents / 100).toFixed(2)} {plan.currency}/{plan.billingPeriod})</option>)}
@@ -113,7 +113,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                 <select
                   value={activating[p.id]?.tier ?? ""}
                   onChange={(e) => setActivating({ ...activating, [p.id]: { pin: activating[p.id]?.pin ?? "", planId: activating[p.id]?.planId ?? "", tier: e.target.value } })}
-                  className="rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs"
+                  className="rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs text-bone focus:outline-none focus:ring-2 focus:ring-gold/40"
                 >
                   <option value="">Tier…</option>
                   <option value="basic">Basic</option>

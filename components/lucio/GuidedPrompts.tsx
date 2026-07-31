@@ -24,7 +24,7 @@ export default function GuidedPrompts({
           key={key}
           type="button"
           onClick={() => onSelect(t(key, lang), key)}
-          className="rounded-xl border border-walnut/20 bg-cream px-4 py-2.5 text-left text-sm text-walnut transition-colors hover:border-gold/50 hover:bg-sand/20"
+          className="rounded-xl border border-walnut/20 bg-cream px-4 py-2.5 text-left text-sm text-walnut transition-colors hover:border-gold/50 hover:bg-sand/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
         >
           {t(key, lang)}
         </button>

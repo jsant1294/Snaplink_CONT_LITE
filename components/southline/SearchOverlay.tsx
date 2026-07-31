@@ -53,7 +53,7 @@ export default function SearchOverlay({ lang, onClose }: { lang: Lang; onClose: 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder", lang)}
-            className="w-full bg-transparent text-obsidian placeholder:text-clay/40 outline-none text-sm"
+            className="w-full bg-transparent text-obsidian placeholder:text-clay/40 outline-none text-sm rounded-lg focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           />
         </div>
 
