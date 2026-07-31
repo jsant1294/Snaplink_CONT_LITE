@@ -27,7 +27,11 @@ export function pinStorageKey(username?: string) {
 
 export function storedPin(username?: string): string {
   if (typeof window === "undefined") return "";
-  return sessionStorage.getItem(pinStorageKey(username)) ?? "";
+  // Strips anything but digits — a PIN is always 6 digits, and header values
+  // (unlike the JSON body /api/contractor/auth uses to verify it) reject any
+  // stray whitespace/control character, which otherwise throws a raw fetch()
+  // TypeError with no useful message on every subsequent authenticated call.
+  return (sessionStorage.getItem(pinStorageKey(username)) ?? "").replace(/\D/g, "");
 }
 
 // ---------------------------------------------------------------------------
