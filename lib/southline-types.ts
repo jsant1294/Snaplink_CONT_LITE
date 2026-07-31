@@ -116,12 +116,13 @@ export function defaultSouthlineSettings(): SouthlineSettings {
     navigation: {
       items: [
         { key: "navHome", href: "/", labelEs: "Inicio", labelEn: "Home", visible: true },
-        { key: "navIdeas", href: "#", labelEs: "Ideas", labelEn: "Ideas", visible: true },
-        { key: "navProjects", href: "#", labelEs: "Proyectos", labelEn: "Projects", visible: true },
-        { key: "navDIY", href: "#", labelEs: "DIY", labelEn: "DIY", visible: true },
-        { key: "navPros", href: "#", labelEs: "Profesionales", labelEn: "Professionals", visible: true },
+        { key: "navHomes", href: "/homes", labelEs: "Casas", labelEn: "Homes", visible: true },
+        { key: "navIdeas", href: "/#categories", labelEs: "Ideas", labelEn: "Ideas", visible: true },
+        { key: "navProjects", href: "/planner", labelEs: "Proyectos", labelEn: "Projects", visible: true },
+        { key: "navDIY", href: "/diy", labelEs: "DIY", labelEn: "DIY", visible: true },
+        { key: "navPros", href: "/#professionals", labelEs: "Profesionales", labelEn: "Professionals", visible: true },
         { key: "navAgents", href: "/agents", labelEs: "Agentes", labelEn: "Agents", visible: true },
-        { key: "navBook", href: "#", labelEs: "Reservar", labelEn: "Book", visible: true },
+        { key: "navBook", href: "/book", labelEs: "Reservar", labelEn: "Book", visible: true },
       ],
     },
     spotlight: [],

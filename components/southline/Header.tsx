@@ -35,7 +35,12 @@ export default function Header({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const items = navItems?.filter((i) => i.visible !== false) ?? DEFAULT_NAV;
+  // Stored CMS settings can predate a route existing in code (e.g. an old "#"
+  // placeholder saved before /planner or /diy shipped) and never self-heal —
+  // repair any dead "#" href with the current known-good default for that key.
+  const items = (navItems?.filter((i) => i.visible !== false) ?? DEFAULT_NAV).map((item) =>
+    item.href === "#" ? DEFAULT_NAV.find((d) => d.key === item.key) ?? item : item
+  );
 
   return (
     <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-walnut/15">
