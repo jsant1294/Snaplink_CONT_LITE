@@ -16,6 +16,7 @@ const FLAG_LABELS: Record<string, string> = {
 
 export default function FeatureFlagPanel({ pin }: { pin: string }) {
   const [flags, setFlags] = useState<Record<string, boolean>>({});
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -24,7 +25,11 @@ export default function FeatureFlagPanel({ pin }: { pin: string }) {
       headers: { "x-snaplink-pin": pin },
     })
       .then((r) => r.json())
-      .then((d) => setFlags(d.settings?.featureFlags ?? {}));
+      .then((d) => {
+        if (!d.settings) throw new Error(d.error ?? "Failed to load feature flags");
+        setFlags(d.settings.featureFlags ?? {});
+      })
+      .catch((e) => setLoadError(e instanceof Error ? e.message : "Failed to load feature flags"));
   }, [pin]);
 
   function showToast(msg: string) {
@@ -59,6 +64,7 @@ export default function FeatureFlagPanel({ pin }: { pin: string }) {
         Enable or disable Southline Living features. Disabled features are hidden
         from the consumer experience without removing code.
       </p>
+      {loadError && <p className="text-danger text-sm">{loadError}</p>}
       {Object.entries(FLAG_LABELS).map(([key, label]) => (
         <label
           key={key}

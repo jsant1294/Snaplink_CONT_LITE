@@ -14,14 +14,22 @@ const CTA_TYPES: { value: SouthlineContactCtaType; label: string }[] = [
 
 export default function ContactEditor({ pin }: { pin: string }) {
   const [content, setContent] = useState<SouthlineContactContent | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  useEffect(() => {
+  function load() {
+    setLoadError(null);
     fetch("/api/southline/settings", { headers: { "x-snaplink-pin": pin } })
       .then((r) => r.json())
-      .then((d) => setContent(d.settings.contact));
-  }, [pin]);
+      .then((d) => {
+        if (!d.settings) throw new Error(d.error ?? "Failed to load contact info");
+        setContent(d.settings.contact);
+      })
+      .catch((e) => setLoadError(e instanceof Error ? e.message : "Failed to load contact info"));
+  }
+
+  useEffect(load, [pin]);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -47,6 +55,16 @@ export default function ContactEditor({ pin }: { pin: string }) {
     }
   }
 
+  if (loadError) {
+    return (
+      <div className="text-sm">
+        <p className="text-danger mb-2">{loadError}</p>
+        <button onClick={load} className="btn-outline !py-2 !px-4 text-xs">
+          Retry
+        </button>
+      </div>
+    );
+  }
   if (!content) return <p className="text-muted text-sm">Loading contact info…</p>;
 
   function set(field: keyof SouthlineContactContent, value: string | null) {

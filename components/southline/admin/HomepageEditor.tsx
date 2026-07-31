@@ -34,17 +34,25 @@ type Tab = "hero" | "sections" | "services" | "trending" | "seasonal" | "categor
 
 export default function HomepageEditor({ pin }: { pin: string }) {
   const [settings, setSettings] = useState<SouthlineSettings | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("hero");
 
-  useEffect(() => {
+  function load() {
+    setLoadError(null);
     fetch("/api/southline/settings", {
       headers: { "x-snaplink-pin": pin },
     })
       .then((r) => r.json())
-      .then((d) => setSettings(d.settings));
-  }, [pin]);
+      .then((d) => {
+        if (!d.settings) throw new Error(d.error ?? "Failed to load settings");
+        setSettings(d.settings);
+      })
+      .catch((e) => setLoadError(e instanceof Error ? e.message : "Failed to load settings"));
+  }
+
+  useEffect(load, [pin]);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -70,6 +78,16 @@ export default function HomepageEditor({ pin }: { pin: string }) {
     }
   }
 
+  if (loadError) {
+    return (
+      <div className="text-sm">
+        <p className="text-danger mb-2">{loadError}</p>
+        <button onClick={load} className="btn-outline !py-2 !px-4 text-xs">
+          Retry
+        </button>
+      </div>
+    );
+  }
   if (!settings) {
     return <p className="text-muted text-sm">Loading settings…</p>;
   }

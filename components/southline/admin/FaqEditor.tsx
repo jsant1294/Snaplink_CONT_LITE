@@ -5,14 +5,22 @@ import type { SouthlineFaqContent, SouthlineFaqItem } from "@/lib/southline-type
 
 export default function FaqEditor({ pin }: { pin: string }) {
   const [content, setContent] = useState<SouthlineFaqContent | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  useEffect(() => {
+  function load() {
+    setLoadError(null);
     fetch("/api/southline/settings", { headers: { "x-snaplink-pin": pin } })
       .then((r) => r.json())
-      .then((d) => setContent(d.settings.faq));
-  }, [pin]);
+      .then((d) => {
+        if (!d.settings) throw new Error(d.error ?? "Failed to load FAQ");
+        setContent(d.settings.faq);
+      })
+      .catch((e) => setLoadError(e instanceof Error ? e.message : "Failed to load FAQ"));
+  }
+
+  useEffect(load, [pin]);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -38,6 +46,16 @@ export default function FaqEditor({ pin }: { pin: string }) {
     }
   }
 
+  if (loadError) {
+    return (
+      <div className="text-sm">
+        <p className="text-danger mb-2">{loadError}</p>
+        <button onClick={load} className="btn-outline !py-2 !px-4 text-xs">
+          Retry
+        </button>
+      </div>
+    );
+  }
   if (!content) return <p className="text-muted text-sm">Loading FAQ…</p>;
 
   function updateItem(index: number, patch: Partial<SouthlineFaqItem>) {
