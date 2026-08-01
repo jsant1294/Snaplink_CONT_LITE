@@ -121,6 +121,27 @@ test("the disabled-AI fallback speaks the AI SDK's UI message stream protocol, n
   assert.match(fallbackBlock, /type:\s*"text-end"/);
 });
 
+test("the chat route allows multi-step tool calling so a tool call always gets a chance at a follow-up text reply", async () => {
+  const text = await source("../app/api/lucio/chat/route.ts");
+  // streamText defaults to stopWhen: stepCountIs(1) — without overriding it,
+  // a tool call ends the turn with no text at all, since the model never
+  // gets a second turn to read the tool result and respond in words.
+  assert.match(text, /stopWhen:\s*stepCountIs\(\d+\)/);
+});
+
+test("every Lucio tool whose fields are all-optional (or has none) tolerates a null/undefined input", async () => {
+  const text = await source("../lib/lucio/tools.ts");
+  // Some models (observed with Groq's Llama models) emit the literal JSON
+  // text "null" instead of "{}" for a zero-argument tool call; a bare
+  // z.object({...}) rejects that and the whole tool call errors out.
+  for (const toolName of ["searchHomesTool", "searchProfessionalsTool", "searchDiyProjectsTool", "getServiceCategoriesTool", "startProjectEstimateTool"]) {
+    const start = text.indexOf(`export const ${toolName} = tool({`);
+    assert.ok(start > -1, `${toolName} not found`);
+    const block = text.slice(start, text.indexOf("execute:", start));
+    assert.match(block, /inputSchema:\s*nullableArgs\(/, `${toolName} must use nullableArgs, not a bare z.object`);
+  }
+});
+
 test("Lucio Financial Copilot (tax/payment) code is untouched by this pass", () => {
   const diff = execSync(
     "git diff --name-only 6a59d1a -- app/api/contractor/expenses app/api/contractor/forms-1099 app/api/contractor/quarterly app/api/contractor/setasides app/api/contractor/tax-profile app/api/contractor/payees app/api/contractor/year-end-csv app/api/contractor/year-end-pdf lib/store-money-pg.ts lib/store-money-json.ts lib/payments.ts",

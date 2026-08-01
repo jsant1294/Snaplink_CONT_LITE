@@ -20,9 +20,18 @@ import { searchFaq as searchFaqData, type FaqCategory } from "@/lib/faq";
 
 const langSchema = z.enum(["en", "es"]);
 
+// Some models (observed with Groq's Llama models) emit the literal JSON text
+// "null" instead of "{}" when a tool call has no arguments to fill in —
+// z.object({...}).parse(null) then throws, and the whole tool call fails.
+// Wrapping any schema where every field is optional (or there are none)
+// makes it accept null/undefined the same as an empty object.
+function nullableArgs<T extends z.ZodRawShape>(shape: T) {
+  return z.preprocess((value) => value ?? {}, z.object(shape));
+}
+
 export const searchHomesTool = tool({
   description: "Search published home listings by city or keyword. Use this whenever the visitor asks about homes, listings, or real estate.",
-  inputSchema: z.object({
+  inputSchema: nullableArgs({
     query: z.string().optional().describe("City, neighborhood, or keyword to search for"),
   }),
   execute: async ({ query }) => {
@@ -46,7 +55,7 @@ export const searchHomesTool = tool({
 
 export const searchProfessionalsTool = tool({
   description: "Search local professionals (contractors, remodelers, electricians, etc.) and real-estate agents by profession type or service area. Use this whenever the visitor asks to find or hire a professional.",
-  inputSchema: z.object({
+  inputSchema: nullableArgs({
     professionType: z.string().optional().describe("One of the known profession type ids, e.g. 'electrician', 'landscaper'"),
     serviceArea: z.string().optional().describe("City or area keyword"),
   }),
@@ -83,7 +92,7 @@ export const searchProfessionalsTool = tool({
 
 export const searchDiyProjectsTool = tool({
   description: "Search DIY project guides by keyword or category. Use this for DIY help or when comparing DIY vs hiring a professional.",
-  inputSchema: z.object({
+  inputSchema: nullableArgs({
     query: z.string().optional().describe("Keyword, e.g. 'paint', 'backsplash'"),
   }),
   execute: async ({ query }) => {
@@ -106,7 +115,7 @@ export const searchDiyProjectsTool = tool({
 
 export const getServiceCategoriesTool = tool({
   description: "List the supported profession/service categories on Southline Living.",
-  inputSchema: z.object({}),
+  inputSchema: nullableArgs({}),
   execute: async () => ({
     categories: PROFESSION_TYPES.map((p) => ({ id: p.id, label: p.en })),
   }),
@@ -132,7 +141,7 @@ export const searchFaqTool = tool({
 
 export const startProjectEstimateTool = tool({
   description: "Hand off to the real interactive project cost estimator. Never compute a cost estimate yourself — always use this tool and point the visitor at the real estimator.",
-  inputSchema: z.object({
+  inputSchema: nullableArgs({
     projectType: z.string().optional().describe("Project type keyword, if known, e.g. 'kitchen remodel'"),
   }),
   execute: async ({ projectType }) => ({

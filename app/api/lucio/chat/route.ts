@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { streamText, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, type UIMessage } from "ai";
+import { streamText, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, stepCountIs, type UIMessage } from "ai";
 import { loadLucioConfig, resolveLucioModel } from "@/lib/lucio/config";
 import { lucioTools } from "@/lib/lucio/tools";
 import { detectPromptInjection } from "@/lib/real-estate/ai/guardrails";
@@ -81,6 +81,12 @@ export async function POST(req: NextRequest) {
     system: SYSTEM_PROMPT + contextNote + `\n\nRespond in ${lang === "es" ? "Spanish" : "English"}.`,
     messages: await convertToModelMessages(messages),
     tools: lucioTools,
+    // streamText defaults to stopWhen: stepCountIs(1) — it would stop right
+    // after a tool call with no text reply at all, since the model never
+    // gets a turn to read the tool result and respond. Lucio's system
+    // prompt pushes it toward tools for nearly everything, so without this
+    // most real questions would silently produce zero visible text.
+    stopWhen: stepCountIs(5),
     onFinish: async ({ toolCalls }) => {
       if (!toolCalls?.length) {
         await recordLucioEvent("unanswered_question", { sessionId, pageType: pageContext?.type, pageRef: pageContext?.ref });

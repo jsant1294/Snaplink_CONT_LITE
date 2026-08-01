@@ -4,20 +4,20 @@
 // real-estate module's one-shot content-generation system, so it gets its own
 // small config rather than importing that one wholesale.
 //
-// Credentials are read from the same OPENAI_API_KEY/ANTHROPIC_API_KEY vars the
-// real-estate AI system already uses — they're provider credentials, not
-// feature-specific, so there's no reason to ask for the same secret twice.
+// Credentials are read from OPENAI_API_KEY/ANTHROPIC_API_KEY/GROQ_API_KEY —
+// the same vars the real-estate AI system and ad-hoc testing already use.
+// Groq is the default for local/dev testing (free tier, fast Llama models);
+// swap LUCIO_AI_PROVIDER to openai/anthropic for production quality.
 //
-// Uses the direct @ai-sdk/openai / @ai-sdk/anthropic provider packages rather
-// than AI Gateway's plain "provider/model" strings: Gateway auth defaults to
-// Vercel OIDC (from `vercel env pull`) or a separate AI_GATEWAY_API_KEY, and
-// this project isn't Vercel-linked and already has an OPENAI_API_KEY/
-// ANTHROPIC_API_KEY-based convention elsewhere — matching that is simpler
-// than introducing a third credential scheme.
+// Uses the direct @ai-sdk/openai / @ai-sdk/anthropic / @ai-sdk/groq provider
+// packages rather than AI Gateway's plain "provider/model" strings: this repo
+// already has a provider-API-key-based convention (OPENAI_API_KEY etc.)
+// everywhere else, and Groq isn't behind AI Gateway the same way — matching
+// the existing convention is simpler than mixing credential schemes.
 import "server-only";
 import { resolveLucioConfigValues } from "./config-logic.js";
 
-export type LucioProvider = "openai" | "anthropic" | "disabled";
+export type LucioProvider = "openai" | "anthropic" | "groq" | "disabled";
 
 export interface LucioConfig {
   enabled: boolean;
@@ -41,6 +41,10 @@ export async function resolveLucioModel(config: LucioConfig) {
   if (config.provider === "anthropic") {
     const { createAnthropic } = await import("@ai-sdk/anthropic");
     return createAnthropic({ apiKey: config.credential })(config.modelId);
+  }
+  if (config.provider === "groq") {
+    const { createGroq } = await import("@ai-sdk/groq");
+    return createGroq({ apiKey: config.credential })(config.modelId);
   }
   throw new Error("Lucio AI provider is disabled");
 }
