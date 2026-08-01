@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { streamText, convertToModelMessages, type UIMessage } from "ai";
+import { streamText, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, type UIMessage } from "ai";
 import { loadLucioConfig, resolveLucioModel } from "@/lib/lucio/config";
 import { lucioTools } from "@/lib/lucio/tools";
 import { detectPromptInjection } from "@/lib/real-estate/ai/guardrails";
@@ -54,13 +54,21 @@ export async function POST(req: NextRequest) {
     // Deterministic, honest fallback: no LLM key configured. Guided prompts,
     // FAQ search, and structured search still work through the widget's own
     // client-side flows — this route just can't generate free-text replies yet.
+    // Must still speak the AI SDK's UI message stream protocol (text-start/
+    // text-delta/text-end chunks, x-vercel-ai-ui-message-stream header) —
+    // a plain `{type:"text",...}` SSE body is silently unparseable by
+    // useChat's DefaultChatTransport, which is why no reply ever appeared.
     const fallbackText = lang === "es"
       ? "Puedo ayudarte a buscar casas, profesionales y preguntas frecuentes ahora mismo. La conversación libre todavía necesita una clave de IA que no se ha configurado."
       : "I can help you search homes, professionals, and FAQs right now. Free-form conversation still needs an AI key that hasn't been configured yet.";
-    return new Response(
-      `data: ${JSON.stringify({ type: "text", text: fallbackText })}\n\n`,
-      { headers: { "Content-Type": "text/event-stream" } }
-    );
+    const stream = createUIMessageStream({
+      execute: async ({ writer }) => {
+        writer.write({ type: "text-start", id: "fallback" });
+        writer.write({ type: "text-delta", id: "fallback", delta: fallbackText });
+        writer.write({ type: "text-end", id: "fallback" });
+      },
+    });
+    return createUIMessageStreamResponse({ stream });
   }
 
   const model = await resolveLucioModel(config);

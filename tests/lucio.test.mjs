@@ -107,6 +107,20 @@ test("no dead '#' links or emoji in the new Lucio files", async () => {
   }
 });
 
+test("the disabled-AI fallback speaks the AI SDK's UI message stream protocol, not a hand-rolled SSE body", async () => {
+  const text = await source("../app/api/lucio/chat/route.ts");
+  const fallbackBlock = text.slice(text.indexOf("if (!config.enabled)"), text.indexOf("const model = await resolveLucioModel"));
+  // A bare `data: {"type":"text",...}` chunk (no x-vercel-ai-ui-message-stream
+  // header, no text-start/text-delta/text-end) is silently unparseable by
+  // useChat's DefaultChatTransport — the message sends, no reply ever
+  // appears, and nothing throws. Guard against regressing to that shape.
+  assert.match(fallbackBlock, /createUIMessageStream\(/, "must build the response via the SDK's own stream helper");
+  assert.match(fallbackBlock, /createUIMessageStreamResponse\(/, "must use the SDK's response helper, not a raw new Response(...)");
+  assert.match(fallbackBlock, /type:\s*"text-start"/);
+  assert.match(fallbackBlock, /type:\s*"text-delta"/);
+  assert.match(fallbackBlock, /type:\s*"text-end"/);
+});
+
 test("Lucio Financial Copilot (tax/payment) code is untouched by this pass", () => {
   const diff = execSync(
     "git diff --name-only 6a59d1a -- app/api/contractor/expenses app/api/contractor/forms-1099 app/api/contractor/quarterly app/api/contractor/setasides app/api/contractor/tax-profile app/api/contractor/payees app/api/contractor/year-end-csv app/api/contractor/year-end-pdf lib/store-money-pg.ts lib/store-money-json.ts lib/payments.ts",
