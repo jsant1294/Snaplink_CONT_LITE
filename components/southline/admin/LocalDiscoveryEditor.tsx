@@ -2,12 +2,45 @@
 
 import { useState, useEffect } from "react";
 import type { SouthlineLocalCategory, SouthlineLocalDiscoveryContent } from "@/lib/southline-types";
+import {
+  buildSnaplinkLocalUrl,
+  computeLocalDiscoveryStatus,
+  isValidUsZip,
+  type LocalDiscoveryStatus,
+} from "@/lib/southline-local-discovery";
+import LocalDiscovery from "@/components/southline/LocalDiscovery";
+
+const STATUS_META: Record<LocalDiscoveryStatus, { label: string; className: string }> = {
+  ready: { label: "Ready", className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
+  hidden: { label: "Hidden", className: "bg-white/10 text-muted border-white/20" },
+  warning: { label: "Warning", className: "bg-amber-500/15 text-amber-400 border-amber-500/30" },
+  misconfigured: { label: "Misconfigured", className: "bg-danger/15 text-danger border-danger/30" },
+};
+
+function StatusBadge({ status }: { status: LocalDiscoveryStatus }) {
+  const meta = STATUS_META[status];
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${meta.className}`}>
+      {meta.label}
+    </span>
+  );
+}
 
 export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
   const [content, setContent] = useState<SouthlineLocalDiscoveryContent | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  const [previewLang, setPreviewLang] = useState<"en" | "es">("en");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+
+  const [testZip, setTestZip] = useState("30004");
+  const [testCategoryId, setTestCategoryId] = useState("");
+  const [testUrl, setTestUrl] = useState<string | null>(null);
+  const [testZipError, setTestZipError] = useState<string | null>(null);
+  const [bridgeCheck, setBridgeCheck] = useState<"idle" | "checking" | "reachable" | "unreachable">("idle");
+  const [lastSuccessfulTest, setLastSuccessfulTest] = useState<string | null>(null);
 
   function load() {
     setLoadError(null);
@@ -58,6 +91,9 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
   }
   if (!content) return <p className="text-muted text-sm">Loading local discovery…</p>;
 
+  const status = computeLocalDiscoveryStatus(content);
+  const masterOff = !content.enabled;
+
   function set(field: keyof SouthlineLocalDiscoveryContent, value: string | null | boolean) {
     setContent((current) => (current ? { ...current, [field]: value } : current));
   }
@@ -105,6 +141,7 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
             visible: true,
             featured: false,
             order: current.categories.length,
+            seasonalTag: null,
           },
         ],
       };
@@ -123,25 +160,78 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
     });
   }
 
+  function runTestBridge() {
+    if (!content) return;
+    const normalized = testZip.trim();
+    if (normalized && !isValidUsZip(normalized)) {
+      setTestZipError("Enter a valid US ZIP code (e.g. 30004 or 30004-1234).");
+      setTestUrl(null);
+      return;
+    }
+    setTestZipError(null);
+    const selected = content.categories.find((c) => c.id === testCategoryId) ?? null;
+    const url = buildSnaplinkLocalUrl({
+      baseUrl: content.directoryBaseUrl,
+      locale: previewLang,
+      zip: normalized || null,
+      category: selected?.snaplinkCategory ?? null,
+      route: content.directoryRoute,
+      zipParam: content.zipParam,
+      categoryParam: content.categoryParam,
+      localeParam: content.localeParam,
+      sourceValue: content.sourceValue,
+      placementValue: content.placementValue,
+      preserveUtm: content.preserveUtm !== false,
+      attributionEnabled: content.attributionEnabled !== false,
+    });
+    setTestUrl(url);
+    setBridgeCheck("checking");
+    // Best-effort reachability probe only — the browser cannot read a
+    // cross-origin no-cors response, so a resolved fetch is treated as
+    // "reachable" and a thrown network error as "unreachable". Analytics/
+    // diagnostics failures here never block the CMS or the public redirect.
+    fetch(url, { method: "HEAD", mode: "no-cors" })
+      .then(() => {
+        setBridgeCheck("reachable");
+        setLastSuccessfulTest(new Date().toLocaleString());
+      })
+      .catch(() => setBridgeCheck("unreachable"));
+  }
+
   return (
     <div className="space-y-4">
-      <p className="text-xs text-muted">
-        Local discovery sends visitors from Southline to the SnapLink local directory by ZIP code and
-        category. Categories are entry-point placeholders only — no merchant names, ratings, or counts
-        are fabricated here. Blank Spanish fields fall back to their English value.
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs text-muted max-w-2xl">
+          Local discovery sends visitors from Southline to the SnapLink local directory by ZIP code and
+          category. Categories are entry-point placeholders only — no merchant names, ratings, or counts
+          are fabricated here. Blank Spanish fields fall back to their English value.
+        </p>
+        <StatusBadge status={status} />
+      </div>
 
       <label className="flex items-center justify-between py-3 border-b border-white/5">
-        <span className="text-sm">Local discovery enabled</span>
+        <span className="text-sm font-medium">Local discovery enabled</span>
         <Toggle on={content.enabled} onToggle={() => set("enabled", !content.enabled)} />
       </label>
-      <label className="flex items-center justify-between py-3 border-b border-white/5">
+      <p className="text-xs text-muted -mt-2">
+        Master switch. When off, the homepage section and category cards never render, regardless of the
+        settings below — their values are preserved so nothing is lost while the feature is disabled.
+      </p>
+      <label className={`flex items-center justify-between py-3 border-b border-white/5 ${masterOff ? "opacity-40" : ""}`}>
         <span className="text-sm">Show on homepage</span>
-        <Toggle on={content.showOnHomepage} onToggle={() => set("showOnHomepage", !content.showOnHomepage)} />
+        <Toggle
+          on={content.showOnHomepage}
+          onToggle={() => set("showOnHomepage", !content.showOnHomepage)}
+          disabled={masterOff}
+        />
       </label>
-      <label className="flex items-center justify-between py-3 border-b border-white/5">
+      <label className={`flex items-center justify-between py-3 border-b border-white/5 ${masterOff ? "opacity-40" : ""}`}>
         <span className="text-sm">Show category cards</span>
-        <Toggle on={content.showCategoryCards} onToggle={() => set("showCategoryCards", !content.showCategoryCards)} />
+        <Toggle
+          on={content.showCategoryCards}
+          onToggle={() => set("showCategoryCards", !content.showCategoryCards)}
+          disabled={masterOff}
+        />
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -195,16 +285,73 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="label">SnapLink directory URL</label>
-          <input className="input" value={content.directoryBaseUrl ?? ""} onChange={(e) => set("directoryBaseUrl", e.target.value || null)} placeholder="https://snaplink.southlineone.com/en/local" />
-          <p className="text-xs text-muted mt-1">The locale segment is resolved automatically for each language. Host comes from this trusted CMS setting only.</p>
+      <div className="pt-2 border-t border-white/10">
+        <p className="text-sm font-medium text-gold mb-1 mt-4">SnapLink Local Bridge</p>
+        <p className="text-xs text-muted mb-3">
+          Everything below controls the outbound hand-off to SnapLink Local. The destination host is
+          restricted to the SnapLink allowlist server-side — this cannot be used to redirect visitors
+          anywhere else.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label">Base URL</label>
+            <input className="input" value={content.directoryBaseUrl ?? ""} onChange={(e) => set("directoryBaseUrl", e.target.value || null)} placeholder="https://snaplink.southlineone.com/en/local" />
+            <p className="text-xs text-muted mt-1">The locale segment is resolved automatically for each language.</p>
+          </div>
+          <div>
+            <label className="label">Directory route</label>
+            <input className="input" value={content.directoryRoute ?? ""} onChange={(e) => set("directoryRoute", e.target.value || null)} placeholder="local" />
+          </div>
+          <div>
+            <label className="label">ZIP parameter name</label>
+            <input className="input" value={content.zipParam ?? ""} onChange={(e) => set("zipParam", e.target.value || null)} placeholder="zip" />
+          </div>
+          <div>
+            <label className="label">Category parameter name</label>
+            <input className="input" value={content.categoryParam ?? ""} onChange={(e) => set("categoryParam", e.target.value || null)} placeholder="category" />
+          </div>
+          <div>
+            <label className="label">Locale parameter name (optional)</label>
+            <input className="input" value={content.localeParam ?? ""} onChange={(e) => set("localeParam", e.target.value || null)} placeholder="locale" />
+            <p className="text-xs text-muted mt-1">Locale is already carried in the path (/en/local); set this only if SnapLink also expects it as a query parameter.</p>
+          </div>
+          <div>
+            <label className="label">Default category (id)</label>
+            <input className="input" value={content.defaultCategory ?? ""} onChange={(e) => set("defaultCategory", e.target.value || null)} placeholder="interior-designers" />
+          </div>
+          <div>
+            <label className="label">Source value</label>
+            <input className="input" value={content.sourceValue ?? ""} onChange={(e) => set("sourceValue", e.target.value || null)} placeholder="southline-living" />
+          </div>
+          <div>
+            <label className="label">Placement value</label>
+            <input className="input" value={content.placementValue ?? ""} onChange={(e) => set("placementValue", e.target.value || null)} placeholder="homepage-local-discovery" />
+          </div>
+          <div>
+            <label className="label">Open behavior</label>
+            <select
+              className="input"
+              value={content.openBehavior ?? "same-tab"}
+              onChange={(e) => set("openBehavior", e.target.value as "same-tab" | "new-tab")}
+            >
+              <option value="same-tab">Same tab</option>
+              <option value="new-tab">New tab</option>
+            </select>
+          </div>
+          <div>
+            <label className="label">Fallback URL (internal path)</label>
+            <input className="input" value={content.fallbackUrl ?? ""} onChange={(e) => set("fallbackUrl", e.target.value || null)} placeholder="/" />
+            <p className="text-xs text-muted mt-1">Must start with "/". Keeps visitors on Southline if the bridge is ever misconfigured.</p>
+          </div>
         </div>
-        <div>
-          <label className="label">Default category (id)</label>
-          <input className="input" value={content.defaultCategory ?? ""} onChange={(e) => set("defaultCategory", e.target.value || null)} placeholder="interior-designers" />
-        </div>
+        <label className="flex items-center justify-between py-3 border-b border-white/5 mt-2">
+          <span className="text-sm">Preserve UTM parameters</span>
+          <Toggle on={content.preserveUtm} onToggle={() => set("preserveUtm", !content.preserveUtm)} />
+        </label>
+        <label className="flex items-center justify-between py-3 border-b border-white/5">
+          <span className="text-sm">Enable referral attribution</span>
+          <Toggle on={content.attributionEnabled} onToggle={() => set("attributionEnabled", !content.attributionEnabled)} />
+        </label>
       </div>
 
       <div className="pt-2">
@@ -227,7 +374,7 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
                 </button>
               </div>
               <label className="flex items-center gap-2 text-xs text-muted">
-                Visible
+                Enabled
                 <Toggle on={category.visible} onToggle={() => updateCategory(index, { visible: !category.visible })} />
               </label>
               <label className="flex items-center gap-2 text-xs text-muted">
@@ -246,8 +393,11 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
               <input className="input" value={category.id} onChange={(e) => updateCategory(index, { id: e.target.value })} placeholder="interior-designers" />
             </div>
             <div>
-              <label className="label">SnapLink category</label>
-              <input className="input" value={category.snaplinkCategory ?? ""} onChange={(e) => updateCategory(index, { snaplinkCategory: e.target.value || null })} placeholder="optional SnapLink category slug" />
+              <label className="label">SnapLink slug</label>
+              <input className="input" value={category.snaplinkCategory ?? ""} onChange={(e) => updateCategory(index, { snaplinkCategory: e.target.value || null })} placeholder="canonical SnapLink category slug" />
+              {!category.snaplinkCategory && category.visible && (
+                <p className="text-xs text-amber-500 mt-1">Unmapped — this category is omitted from the SnapLink URL until a slug is set.</p>
+              )}
             </div>
             <div>
               <label className="label">Label (EN)</label>
@@ -273,12 +423,118 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
               <label className="label">Image URL</label>
               <input className="input" value={category.imageUrl ?? ""} onChange={(e) => updateCategory(index, { imageUrl: e.target.value || null })} placeholder="https://..." />
             </div>
+            <div>
+              <label className="label">Seasonal tag (optional)</label>
+              <input className="input" value={category.seasonalTag ?? ""} onChange={(e) => updateCategory(index, { seasonalTag: e.target.value || null })} placeholder="e.g. spring, holiday" />
+            </div>
           </div>
         </div>
       ))}
       <button type="button" onClick={addCategory} className="text-xs bg-gold text-obsidian font-semibold px-3 py-1.5 rounded-lg">
         + Add Category
       </button>
+
+      <div className="pt-4 border-t border-white/10">
+        <p className="text-sm font-medium text-gold mb-1 mt-4">Test Bridge</p>
+        <p className="text-xs text-muted mb-3">
+          Builds the exact outbound URL from the settings above and does a best-effort reachability check.
+          Nothing here is saved until you press Save Local Discovery.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div>
+            <label className="label">ZIP</label>
+            <input className="input" value={testZip} onChange={(e) => setTestZip(e.target.value)} placeholder="30004" />
+          </div>
+          <div>
+            <label className="label">Category</label>
+            <select className="input" value={testCategoryId} onChange={(e) => setTestCategoryId(e.target.value)}>
+              <option value="">All categories</option>
+              {content.categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.labelEn || c.id}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Locale</label>
+            <select className="input" value={previewLang} onChange={(e) => setPreviewLang(e.target.value as "en" | "es")}>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+        </div>
+        {testZipError && <p className="text-xs text-danger mt-2">{testZipError}</p>}
+        <button type="button" onClick={runTestBridge} className="btn-outline !py-2 !px-4 text-xs mt-3">
+          Test Bridge
+        </button>
+        {testUrl && (
+          <div className="mt-3 rounded-lg border border-white/10 bg-charcoal p-3 text-xs">
+            <p className="text-muted mb-1">Generated URL (shown before opening):</p>
+            <p className="break-all text-bone">{testUrl}</p>
+            <div className="mt-2 flex items-center gap-3">
+              <a href={testUrl} target="_blank" rel="noreferrer" className="text-gold font-semibold">
+                Open in new tab
+              </a>
+              <span className="text-muted">
+                {bridgeCheck === "checking" && "Checking…"}
+                {bridgeCheck === "reachable" && "Reachable"}
+                {bridgeCheck === "unreachable" && "Unreachable (network error)"}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="pt-4 border-t border-white/10">
+        <p className="text-sm font-medium text-gold mb-1 mt-4">Diagnostics</p>
+        <div className="grid gap-2 text-xs sm:grid-cols-2">
+          <DiagnosticRow label="Master feature enabled" ok={content.enabled} />
+          <DiagnosticRow label="Homepage visible" ok={content.enabled && content.showOnHomepage} />
+          <DiagnosticRow label="Category cards visible" ok={content.enabled && content.showCategoryCards} />
+          <DiagnosticRow label="Base URL valid" ok={status !== "misconfigured"} />
+          <DiagnosticRow
+            label="Category mappings valid"
+            ok={content.categories.filter((c) => c.visible).some((c) => !!c.snaplinkCategory) || content.categories.filter((c) => c.visible).length === 0}
+          />
+          <DiagnosticRow label="Locale mapping valid" ok={true} />
+          <DiagnosticRow label="Attribution enabled" ok={content.attributionEnabled} />
+          <DiagnosticRow
+            label="Directory route reachable"
+            ok={bridgeCheck === "reachable"}
+            neutral={bridgeCheck === "idle" || bridgeCheck === "checking"}
+          />
+        </div>
+        <p className="text-xs text-muted mt-2">
+          Last successful bridge test: {lastSuccessfulTest ?? "not tested this session"}
+        </p>
+      </div>
+
+      <div className="pt-4 border-t border-white/10">
+        <div className="flex items-center justify-between mt-4 mb-1">
+          <p className="text-sm font-medium text-gold">Preview</p>
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-lg border border-white/10 overflow-hidden text-xs">
+              <button type="button" onClick={() => setPreviewLang("en")} className={`px-3 py-1 ${previewLang === "en" ? "bg-gold text-obsidian" : "text-muted"}`}>EN</button>
+              <button type="button" onClick={() => setPreviewLang("es")} className={`px-3 py-1 ${previewLang === "es" ? "bg-gold text-obsidian" : "text-muted"}`}>ES</button>
+            </div>
+            <div className="flex rounded-lg border border-white/10 overflow-hidden text-xs">
+              <button type="button" onClick={() => setPreviewDevice("desktop")} className={`px-3 py-1 ${previewDevice === "desktop" ? "bg-gold text-obsidian" : "text-muted"}`}>Desktop</button>
+              <button type="button" onClick={() => setPreviewDevice("mobile")} className={`px-3 py-1 ${previewDevice === "mobile" ? "bg-gold text-obsidian" : "text-muted"}`}>Mobile</button>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-muted mb-3">Non-interactive preview — links are disabled here so nothing navigates away from the CMS.</p>
+        {!content.enabled ? (
+          <p className="text-xs text-muted italic">Local discovery is disabled — nothing renders publicly.</p>
+        ) : (
+          <div className={previewDevice === "mobile" ? "max-w-[380px]" : "w-full"}>
+            <div className="pointer-events-none select-none rounded-xl overflow-hidden border border-white/10">
+              <LocalDiscovery lang={previewLang} content={content} />
+            </div>
+          </div>
+        )}
+      </div>
 
       <div>
         <button onClick={save} disabled={busy} className="btn-gold disabled:opacity-40">
@@ -295,12 +551,24 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
   );
 }
 
-function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+function DiagnosticRow({ label, ok, neutral }: { label: string; ok: boolean; neutral?: boolean }) {
+  const color = neutral ? "text-muted" : ok ? "text-emerald-400" : "text-danger";
+  const icon = neutral ? "○" : ok ? "✓" : "✕";
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-white/5 px-3 py-2">
+      <span className="text-muted">{label}</span>
+      <span className={`font-semibold ${color}`}>{icon}</span>
+    </div>
+  );
+}
+
+function Toggle({ on, onToggle, disabled }: { on: boolean; onToggle: () => void; disabled?: boolean }) {
   return (
     <button
       type="button"
       onClick={onToggle}
-      className={`w-10 h-6 rounded-full transition-colors ${on ? "bg-gold" : "bg-white/10"}`}
+      disabled={disabled}
+      className={`w-10 h-6 rounded-full transition-colors ${on ? "bg-gold" : "bg-white/10"} ${disabled ? "cursor-not-allowed" : ""}`}
     >
       <span
         className={`block w-4 h-4 bg-white rounded-full transition-transform mt-0.5 mx-0.5 ${

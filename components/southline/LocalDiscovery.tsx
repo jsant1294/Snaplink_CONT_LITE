@@ -5,10 +5,12 @@ import { t, type Lang } from "@/lib/southline-i18n";
 import type { SouthlineLocalCategory, SouthlineLocalDiscoveryContent } from "@/lib/southline-types";
 import {
   buildSnaplinkLocalUrl,
+  getOrCreateLocalDiscoverySessionId,
   isValidUsZip,
   LOCAL_SEARCH_EVENT,
   normalizeUsZip,
   readApprovedUtmParams,
+  type ApprovedUtmParams,
 } from "@/lib/southline-local-discovery";
 
 export type LocalSearchEventPayload = {
@@ -17,16 +19,30 @@ export type LocalSearchEventPayload = {
   category: string | null;
   destination: "snaplink";
   source: "southline";
+  // --- Attribution (Phase 7) ---
+  placement: string;
+  timestamp: string;
+  sessionId: string;
+  utm: ApprovedUtmParams;
 };
 
 // Deterministic outbound hand-off: calls the optional hook AND fires a
 // window-level `local_search_submitted` CustomEvent carrying only aggregated
 // fields — never the visitor's exact ZIP, which still goes to SnapLink as the
-// user-requested search.
+// user-requested search. Analytics failures must never block navigation, so
+// every step here is wrapped defensively.
 function emitLocalSearch(payload: LocalSearchEventPayload, onSearch?: (p: LocalSearchEventPayload) => void) {
-  onSearch?.(payload);
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent<LocalSearchEventPayload>(LOCAL_SEARCH_EVENT, { detail: payload }));
+  try {
+    onSearch?.(payload);
+  } catch {
+    // never block navigation on a consumer's analytics handler
+  }
+  try {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent<LocalSearchEventPayload>(LOCAL_SEARCH_EVENT, { detail: payload }));
+    }
+  } catch {
+    // never block navigation on analytics dispatch
   }
 }
 
@@ -85,6 +101,25 @@ export default function LocalDiscovery({
     t("localDiscoveryPoweredBy", lang)
   );
 
+  const openBehavior = content.openBehavior ?? "same-tab";
+  const placement = content.placementValue || "homepage-local-discovery";
+
+  // Resolves the canonical SnapLink category slug for a Southline category
+  // placeholder. Southline and SnapLink categories are deliberately allowed to
+  // diverge (Southline may show entry points SnapLink hasn't onboarded yet), so
+  // an unmapped category is omitted from the URL — never forwarded as a guessed
+  // slug SnapLink won't recognize — and a configuration warning is logged.
+  function resolveSnaplinkCategory(selected: SouthlineLocalCategory | null): string | null {
+    if (!selected) return null;
+    if (selected.snaplinkCategory) return selected.snaplinkCategory;
+    if (typeof console !== "undefined") {
+      console.warn(
+        `[local-discovery] category "${selected.id}" has no SnapLink slug mapping; omitting the category filter.`
+      );
+    }
+    return null;
+  }
+
   function directoryUrl({ zip: zipValue, category: categoryValue }: { zip?: string | null; category?: string | null }) {
     return buildSnaplinkLocalUrl({
       baseUrl: content?.directoryBaseUrl,
@@ -94,7 +129,23 @@ export default function LocalDiscovery({
       source: inbound.utm_source ?? null,
       medium: inbound.utm_medium ?? null,
       campaign: inbound.utm_campaign ?? null,
+      route: content?.directoryRoute,
+      zipParam: content?.zipParam,
+      categoryParam: content?.categoryParam,
+      localeParam: content?.localeParam,
+      sourceValue: content?.sourceValue,
+      placementValue: content?.placementValue,
+      preserveUtm: content?.preserveUtm !== false,
+      attributionEnabled: content?.attributionEnabled !== false,
     });
+  }
+
+  function navigate(url: string) {
+    if (openBehavior === "new-tab") {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.assign(url);
+    }
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -106,7 +157,7 @@ export default function LocalDiscovery({
     }
     setError(null);
     const selected = categories.find((c) => c.id === category) ?? null;
-    const snaplinkCategory = selected ? (selected.snaplinkCategory ?? selected.id) : null;
+    const snaplinkCategory = resolveSnaplinkCategory(selected);
     const url = directoryUrl({ zip: normalized, category: snaplinkCategory });
     emitLocalSearch(
       {
@@ -115,20 +166,29 @@ export default function LocalDiscovery({
         category: snaplinkCategory,
         destination: "snaplink",
         source: "southline",
+        placement,
+        timestamp: new Date().toISOString(),
+        sessionId: getOrCreateLocalDiscoverySessionId(),
+        utm: inbound,
       },
       onSearch
     );
-    window.location.assign(url);
+    navigate(url);
   }
 
   function trackCard(c: SouthlineLocalCategory) {
+    const snaplinkCategory = resolveSnaplinkCategory(c);
     emitLocalSearch(
       {
         locale: lang,
         zipProvided: false,
-        category: c.snaplinkCategory ?? c.id,
+        category: snaplinkCategory,
         destination: "snaplink",
         source: "southline",
+        placement,
+        timestamp: new Date().toISOString(),
+        sessionId: getOrCreateLocalDiscoverySessionId(),
+        utm: inbound,
       },
       onSearch
     );
@@ -212,7 +272,9 @@ export default function LocalDiscovery({
             {categories.map((c) => (
               <a
                 key={c.id}
-                href={directoryUrl({ category: c.snaplinkCategory ?? c.id })}
+                href={directoryUrl({ category: c.snaplinkCategory ?? null })}
+                target={openBehavior === "new-tab" ? "_blank" : undefined}
+                rel={openBehavior === "new-tab" ? "noopener noreferrer" : undefined}
                 onClick={() => trackCard(c)}
                 className="group flex flex-col rounded-2xl border border-walnut/15 bg-cream p-5 transition-colors hover:border-gold/60 hover:bg-cream/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold motion-reduce:transition-none"
               >

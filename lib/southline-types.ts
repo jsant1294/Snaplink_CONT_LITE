@@ -282,7 +282,10 @@ export type SouthlineLocalCategory = {
   visible: boolean;
   featured: boolean;
   order: number;
+  seasonalTag: string | null;
 };
+
+export type SouthlineLocalDiscoveryOpenBehavior = "same-tab" | "new-tab";
 
 export type SouthlineLocalDiscoveryContent = {
   enabled: boolean;
@@ -312,6 +315,31 @@ export type SouthlineLocalDiscoveryContent = {
 
   showOnHomepage: boolean;
   showCategoryCards: boolean;
+
+  // --- SnapLink Local Bridge configuration (Phase 3) ---
+  // Path segment appended after the locale (e.g. "local" -> /en/local). Kept
+  // separate from directoryBaseUrl so the host and the route can be reasoned
+  // about independently in diagnostics and the Test Bridge tool.
+  directoryRoute: string | null;
+  // Query parameter names. Defaults match the live SnapLink Local contract;
+  // overriding them lets the bridge follow a future contract change without a
+  // code deploy.
+  zipParam: string | null;
+  categoryParam: string | null;
+  // Locale is carried in the path (/en/local, /es/local) to match the real,
+  // deployed SnapLink Local route. When an operator also sets a locale query
+  // parameter name, it is additionally appended for forward compatibility.
+  localeParam: string | null;
+  // Non-UTM attribution carried on every hand-off, matching the documented
+  // URL contract (?source=...&placement=...).
+  sourceValue: string | null;
+  placementValue: string | null;
+  openBehavior: SouthlineLocalDiscoveryOpenBehavior;
+  // Internal Southline path (must start with "/") shown to visitors instead of
+  // an external redirect when the configured destination cannot be trusted.
+  fallbackUrl: string | null;
+  preserveUtm: boolean;
+  attributionEnabled: boolean;
 };
 
 export type SouthlineTwitterCardType = "summary" | "summary_large_image";
@@ -604,14 +632,14 @@ export const DEFAULT_TESTIMONIALS: SouthlineTestimonialsContent = {
 // SnapLink category slug is left null until an operator maps a real directory
 // category; the redirect then forwards the local category id instead.
 export const DEFAULT_LOCAL_DISCOVERY_CATEGORIES: SouthlineLocalCategory[] = [
-  { id: "builders-remodelers", labelEn: "Builders and Remodelers", labelEs: "Constructores y remodeladores", descriptionEn: "Browse local builders and remodelers", descriptionEs: "Explora constructores y remodeladores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 0 },
-  { id: "architects", labelEn: "Architects", labelEs: "Arquitectos", descriptionEn: "Browse local architects", descriptionEs: "Explora arquitectos locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 1 },
-  { id: "interior-designers", labelEn: "Interior Designers", labelEs: "Diseñadores de interiores", descriptionEn: "Browse local interior designers", descriptionEs: "Explora diseñadores de interiores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 2 },
-  { id: "landscaping", labelEn: "Landscaping", labelEs: "Jardinería y paisajismo", descriptionEn: "Browse local landscaping pros", descriptionEs: "Explora profesionales de jardinería locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 3 },
-  { id: "roofing", labelEn: "Roofing", labelEs: "Techos", descriptionEn: "Browse local roofing pros", descriptionEs: "Explora techadores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 4 },
-  { id: "pools", labelEn: "Pools", labelEs: "Piscinas", descriptionEn: "Browse local pool pros", descriptionEs: "Explora especialistas en piscinas locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 5 },
-  { id: "photography", labelEn: "Photography", labelEs: "Fotografía", descriptionEn: "Browse local photographers", descriptionEs: "Explora fotógrafos locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 6 },
-  { id: "real-estate", labelEn: "Real Estate", labelEs: "Bienes raíces", descriptionEn: "Browse local real estate professionals", descriptionEs: "Explora profesionales inmobiliarios locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 7 },
+  { id: "builders-remodelers", labelEn: "Builders and Remodelers", labelEs: "Constructores y remodeladores", descriptionEn: "Browse local builders and remodelers", descriptionEs: "Explora constructores y remodeladores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 0, seasonalTag: null },
+  { id: "architects", labelEn: "Architects", labelEs: "Arquitectos", descriptionEn: "Browse local architects", descriptionEs: "Explora arquitectos locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 1, seasonalTag: null },
+  { id: "interior-designers", labelEn: "Interior Designers", labelEs: "Diseñadores de interiores", descriptionEn: "Browse local interior designers", descriptionEs: "Explora diseñadores de interiores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 2, seasonalTag: null },
+  { id: "landscaping", labelEn: "Landscaping", labelEs: "Jardinería y paisajismo", descriptionEn: "Browse local landscaping pros", descriptionEs: "Explora profesionales de jardinería locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 3, seasonalTag: null },
+  { id: "roofing", labelEn: "Roofing", labelEs: "Techos", descriptionEn: "Browse local roofing pros", descriptionEs: "Explora techadores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 4, seasonalTag: null },
+  { id: "pools", labelEn: "Pools", labelEs: "Piscinas", descriptionEn: "Browse local pool pros", descriptionEs: "Explora especialistas en piscinas locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 5, seasonalTag: null },
+  { id: "photography", labelEn: "Photography", labelEs: "Fotografía", descriptionEn: "Browse local photographers", descriptionEs: "Explora fotógrafos locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 6, seasonalTag: null },
+  { id: "real-estate", labelEn: "Real Estate", labelEs: "Bienes raíces", descriptionEn: "Browse local real estate professionals", descriptionEs: "Explora profesionales inmobiliarios locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 7, seasonalTag: null },
 ];
 
 export const DEFAULT_LOCAL_DISCOVERY: SouthlineLocalDiscoveryContent = {
@@ -633,6 +661,16 @@ export const DEFAULT_LOCAL_DISCOVERY: SouthlineLocalDiscoveryContent = {
   categories: DEFAULT_LOCAL_DISCOVERY_CATEGORIES.map((category) => ({ ...category })),
   showOnHomepage: true,
   showCategoryCards: true,
+  directoryRoute: "local",
+  zipParam: "zip",
+  categoryParam: "category",
+  localeParam: null,
+  sourceValue: "southline-living",
+  placementValue: "homepage-local-discovery",
+  openBehavior: "same-tab",
+  fallbackUrl: "/",
+  preserveUtm: true,
+  attributionEnabled: true,
 };
 
 // Deep-merges a stored (possibly partial or absent) local-discovery section onto
@@ -660,6 +698,13 @@ export function mergeLocalDiscoveryContent(
     "poweredByLabelEs",
     "directoryBaseUrl",
     "defaultCategory",
+    "directoryRoute",
+    "zipParam",
+    "categoryParam",
+    "localeParam",
+    "sourceValue",
+    "placementValue",
+    "fallbackUrl",
   ] as const) {
     const value = source[field];
     if (typeof value === "string" && value.trim().length === 0) {

@@ -1,3 +1,5 @@
+import { isAllowedSnaplinkHost, isSafeFallbackPath } from "./southline-local-discovery.ts";
+
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
@@ -312,6 +314,7 @@ const LOCAL_CATEGORY_STRING_FIELDS = [
   "icon",
   "imageUrl",
   "snaplinkCategory",
+  "seasonalTag",
 ];
 
 // The redirect host must come from trusted CMS configuration, so the destination
@@ -338,7 +341,7 @@ function validateDestinationUrl(value: unknown): string | null {
 }
 
 function validateLocalDiscovery(patch: Record<string, unknown>): string | null {
-  for (const flag of ["enabled", "showOnHomepage", "showCategoryCards"]) {
+  for (const flag of ["enabled", "showOnHomepage", "showCategoryCards", "preserveUtm", "attributionEnabled"]) {
     if (patch[flag] !== undefined && !isBoolean(patch[flag])) {
       return `localDiscovery.${flag} must be a boolean`;
     }
@@ -351,9 +354,26 @@ function validateLocalDiscovery(patch: Record<string, unknown>): string | null {
   if (patch.directoryBaseUrl !== undefined) {
     const err = validateDestinationUrl(patch.directoryBaseUrl);
     if (err) return `localDiscovery.directoryBaseUrl ${err}`;
+    const hostname = new URL(String(patch.directoryBaseUrl).trim()).hostname;
+    if (!isAllowedSnaplinkHost(hostname)) {
+      return `localDiscovery.directoryBaseUrl host "${hostname}" is not on the SnapLink allowlist`;
+    }
   }
   if (patch.defaultCategory !== undefined && patch.defaultCategory !== null && !isString(patch.defaultCategory)) {
     return "localDiscovery.defaultCategory must be a string or null";
+  }
+  for (const field of ["directoryRoute", "zipParam", "categoryParam", "localeParam", "sourceValue", "placementValue"] as const) {
+    if (patch[field] !== undefined && !isString(patch[field]) && patch[field] !== null) {
+      return `localDiscovery.${field} must be a string or null`;
+    }
+  }
+  if (patch.openBehavior !== undefined && patch.openBehavior !== "same-tab" && patch.openBehavior !== "new-tab") {
+    return 'localDiscovery.openBehavior must be "same-tab" or "new-tab"';
+  }
+  if (patch.fallbackUrl !== undefined && patch.fallbackUrl !== null) {
+    if (!isString(patch.fallbackUrl) || !isSafeFallbackPath(patch.fallbackUrl)) {
+      return "localDiscovery.fallbackUrl must be an internal path starting with \"/\" (no external redirects)";
+    }
   }
   if (patch.categories === undefined) return null;
   if (!Array.isArray(patch.categories)) return "localDiscovery.categories must be an array";

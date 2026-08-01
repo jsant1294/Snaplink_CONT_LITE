@@ -8,9 +8,13 @@ import {
   mergeLocalDiscoveryContent,
 } from "../lib/southline-types.ts";
 import {
+  ALLOWED_SNAPLINK_HOSTS,
   APPROVED_UTM_KEYS,
   buildSnaplinkLocalUrl,
+  computeLocalDiscoveryStatus,
   DEFAULT_ATTRIBUTION,
+  isAllowedSnaplinkHost,
+  isSafeFallbackPath,
   isValidUsZip,
   LOCAL_SEARCH_EVENT,
   normalizeUsZip,
@@ -168,7 +172,7 @@ test("buildSnaplinkLocalUrl forwards ZIP, category, and default attribution", ()
   const url = buildSnaplinkLocalUrl({ locale: "en", zip: "75204", category: "landscaping" });
   assert.equal(
     url,
-    "https://snaplink.southlineone.com/en/local?zip=75204&category=landscaping&utm_source=southline&utm_medium=referral&utm_campaign=local-discovery"
+    "https://snaplink.southlineone.com/en/local?zip=75204&category=landscaping&source=southline-living&placement=homepage-local-discovery&utm_source=southline&utm_medium=referral&utm_campaign=local-discovery"
   );
 });
 
@@ -183,7 +187,7 @@ test("buildSnaplinkLocalUrl matches the Nextdoor attribution example", () => {
   });
   assert.equal(
     url,
-    "https://snaplink.southlineone.com/en/local?zip=75204&category=landscaping&utm_source=nextdoor&utm_medium=paid-social&utm_campaign=local-discovery"
+    "https://snaplink.southlineone.com/en/local?zip=75204&category=landscaping&source=southline-living&placement=homepage-local-discovery&utm_source=nextdoor&utm_medium=paid-social&utm_campaign=local-discovery"
   );
 });
 
@@ -280,7 +284,7 @@ test("the admin shell exposes a Local Discovery tab wired to LocalDiscoveryEdito
 
 test("LocalDiscoveryEditor supports copy, destination, and category CRUD with reorder", async () => {
   const editor = await source("../components/southline/admin/LocalDiscoveryEditor.tsx");
-  assert.match(editor, /SnapLink directory URL/);
+  assert.match(editor, /Base URL/);
   assert.match(editor, /Default category/);
   assert.match(editor, /Add Category/);
   assert.match(editor, /addCategory/);
@@ -290,3 +294,226 @@ test("LocalDiscoveryEditor supports copy, destination, and category CRUD with re
   assert.match(editor, /showOnHomepage/);
   assert.match(editor, /showCategoryCards/);
 });
+
+// --- Phase 2: master toggle correctness -------------------------------------
+
+test("computeLocalDiscoveryStatus: master toggle hides the feature regardless of subordinate toggles", () => {
+  const base = { enabled: false, showOnHomepage: true, showCategoryCards: true, directoryBaseUrl: DEFAULT_LOCAL_DISCOVERY.directoryBaseUrl };
+  assert.equal(computeLocalDiscoveryStatus(base), "hidden");
+});
+
+test("computeLocalDiscoveryStatus: child toggles cannot elevate status above hidden when master is off", () => {
+  const offButFullyConfigured = {
+    enabled: false,
+    showOnHomepage: true,
+    showCategoryCards: true,
+    directoryBaseUrl: DEFAULT_LOCAL_DISCOVERY.directoryBaseUrl,
+    categories: [{ visible: true, snaplinkCategory: "remodeling" }],
+  };
+  assert.equal(computeLocalDiscoveryStatus(offButFullyConfigured), "hidden");
+});
+
+test("computeLocalDiscoveryStatus: ready when enabled, visible, and mapped; warning when unmapped or hidden from homepage; misconfigured on a bad/unapproved host", () => {
+  const mapped = {
+    enabled: true,
+    showOnHomepage: true,
+    showCategoryCards: true,
+    directoryBaseUrl: DEFAULT_LOCAL_DISCOVERY.directoryBaseUrl,
+    categories: [{ visible: true, snaplinkCategory: "remodeling" }],
+  };
+  assert.equal(computeLocalDiscoveryStatus(mapped), "ready");
+
+  const notOnHomepage = { ...mapped, showOnHomepage: false };
+  assert.equal(computeLocalDiscoveryStatus(notOnHomepage), "warning");
+
+  const unmapped = { ...mapped, categories: [{ visible: true, snaplinkCategory: null }] };
+  assert.equal(computeLocalDiscoveryStatus(unmapped), "warning");
+
+  const badHost = { ...mapped, directoryBaseUrl: "https://evil.example.com/en/local" };
+  assert.equal(computeLocalDiscoveryStatus(badHost), "misconfigured");
+
+  const malformed = { ...mapped, directoryBaseUrl: "not a url" };
+  assert.equal(computeLocalDiscoveryStatus(malformed), "misconfigured");
+});
+
+// --- Phase 3 / 11: bridge configuration + host allowlist ---------------------
+
+test("ALLOWED_SNAPLINK_HOSTS only contains the production SnapLink host and local dev hosts", () => {
+  assert.deepEqual([...ALLOWED_SNAPLINK_HOSTS], ["snaplink.southlineone.com", "localhost", "127.0.0.1"]);
+  assert.equal(isAllowedSnaplinkHost("snaplink.southlineone.com"), true);
+  assert.equal(isAllowedSnaplinkHost("localhost"), true);
+  assert.equal(isAllowedSnaplinkHost("evil.example.com"), false);
+});
+
+test("validateSouthlineSettings rejects a directoryBaseUrl host that is not on the SnapLink allowlist", () => {
+  assert.match(
+    validateSouthlineSettings({ localDiscovery: { directoryBaseUrl: "https://evil.example.com/en/local" } }),
+    /not on the SnapLink allowlist/
+  );
+  assert.equal(validateSouthlineSettings({ localDiscovery: { directoryBaseUrl: "https://snaplink.southlineone.com/en/local" } }), null);
+});
+
+test("buildSnaplinkLocalUrl falls back to the default destination when the configured host is not allowlisted (never an open redirect)", () => {
+  const url = buildSnaplinkLocalUrl({ baseUrl: "https://evil.example.com/en/local", locale: "en" });
+  assert.equal(new URL(url).hostname, "snaplink.southlineone.com");
+  assert.ok(!url.includes("evil.example.com"));
+});
+
+test("buildSnaplinkLocalUrl honors configurable route and parameter names", () => {
+  const url = buildSnaplinkLocalUrl({
+    baseUrl: "https://snaplink.southlineone.com",
+    locale: "en",
+    zip: "30004",
+    category: "remodeling",
+    route: "directory",
+    zipParam: "postal_code",
+    categoryParam: "svc",
+    attributionEnabled: false,
+    preserveUtm: false,
+  });
+  assert.ok(url.startsWith("https://snaplink.southlineone.com/en/directory?"));
+  assert.ok(url.includes("postal_code=30004"));
+  assert.ok(url.includes("svc=remodeling"));
+  assert.ok(!url.includes("zip="));
+  assert.ok(!url.includes("category="));
+});
+
+test("buildSnaplinkLocalUrl includes source and placement when attribution is enabled, using configured values", () => {
+  const url = buildSnaplinkLocalUrl({
+    locale: "en",
+    sourceValue: "nextdoor-ad",
+    placementValue: "seasonal-banner",
+    preserveUtm: false,
+  });
+  assert.ok(url.includes("source=nextdoor-ad"));
+  assert.ok(url.includes("placement=seasonal-banner"));
+  assert.ok(!url.includes("utm_"));
+});
+
+test("buildSnaplinkLocalUrl omits source and placement when attribution is disabled", () => {
+  const url = buildSnaplinkLocalUrl({ locale: "en", attributionEnabled: false, preserveUtm: false });
+  assert.ok(!url.includes("source="));
+  assert.ok(!url.includes("placement="));
+});
+
+test("buildSnaplinkLocalUrl appends an optional locale query parameter without dropping the path-based locale", () => {
+  const url = buildSnaplinkLocalUrl({ locale: "es", localeParam: "locale", preserveUtm: false, attributionEnabled: false });
+  assert.ok(url.startsWith("https://snaplink.southlineone.com/es/local?"));
+  assert.ok(url.includes("locale=es"));
+});
+
+// --- Phase 6: category mapping omission (no guessed slugs) -------------------
+
+test("buildSnaplinkLocalUrl omits the category filter entirely when no category is supplied (missing mapping never crashes)", () => {
+  const url = buildSnaplinkLocalUrl({ locale: "en", category: null, preserveUtm: false, attributionEnabled: false });
+  assert.ok(!url.includes("category="));
+  assert.doesNotThrow(() => buildSnaplinkLocalUrl({ locale: "en", category: undefined }));
+});
+
+test("LocalDiscovery omits unmapped categories from the outbound URL and logs a configuration warning instead of guessing a slug", async () => {
+  const section = await source("../components/southline/LocalDiscovery.tsx");
+  assert.match(section, /function resolveSnaplinkCategory/);
+  assert.match(section, /if \(selected\.snaplinkCategory\) return selected\.snaplinkCategory;/);
+  assert.match(section, /console\.warn/);
+  assert.doesNotMatch(section, /selected\.snaplinkCategory \?\? selected\.id/);
+});
+
+// --- Phase 6: fallback path safety -------------------------------------------
+
+test("isSafeFallbackPath only accepts internal paths, never a second external redirect", () => {
+  assert.equal(isSafeFallbackPath("/"), true);
+  assert.equal(isSafeFallbackPath("/contact"), true);
+  assert.equal(isSafeFallbackPath("https://evil.example.com"), false);
+  assert.equal(isSafeFallbackPath("//evil.example.com"), false);
+  assert.equal(isSafeFallbackPath("javascript:alert(1)"), false);
+  assert.equal(isSafeFallbackPath(""), false);
+  assert.equal(isSafeFallbackPath(null), false);
+});
+
+test("validateSouthlineSettings rejects an external fallbackUrl and accepts an internal path", () => {
+  assert.match(
+    validateSouthlineSettings({ localDiscovery: { fallbackUrl: "https://evil.example.com" } }),
+    /fallbackUrl must be an internal path/
+  );
+  assert.equal(validateSouthlineSettings({ localDiscovery: { fallbackUrl: "/contact" } }), null);
+  assert.equal(validateSouthlineSettings({ localDiscovery: { fallbackUrl: null } }), null);
+});
+
+// --- Phase 9: preview + Test Bridge tool -------------------------------------
+
+test("LocalDiscoveryEditor renders EN/ES desktop/mobile previews and a Test Bridge tool with the generated URL shown before opening", async () => {
+  const editor = await source("../components/southline/admin/LocalDiscoveryEditor.tsx");
+  assert.match(editor, /previewLang/);
+  assert.match(editor, /previewDevice/);
+  assert.match(editor, /"desktop" \| "mobile"/);
+  assert.match(editor, /Test Bridge/);
+  assert.match(editor, /Generated URL \(shown before opening\)/);
+  assert.match(editor, /pointer-events-none/);
+});
+
+// --- Phase 10: diagnostics ----------------------------------------------------
+
+test("LocalDiscoveryEditor renders a diagnostics panel covering every required readiness signal", async () => {
+  const editor = await source("../components/southline/admin/LocalDiscoveryEditor.tsx");
+  assert.match(editor, /Diagnostics/);
+  assert.match(editor, /Master feature enabled/);
+  assert.match(editor, /Homepage visible/);
+  assert.match(editor, /Category cards visible/);
+  assert.match(editor, /Base URL valid/);
+  assert.match(editor, /Category mappings valid/);
+  assert.match(editor, /Locale mapping valid/);
+  assert.match(editor, /Attribution enabled/);
+  assert.match(editor, /Directory route reachable/);
+  assert.match(editor, /Last successful bridge test/);
+});
+
+test("LocalDiscoveryEditor visually disables the homepage/category-card toggles when the master switch is off, without resetting their values", async () => {
+  const editor = await source("../components/southline/admin/LocalDiscoveryEditor.tsx");
+  assert.match(editor, /masterOff \? "opacity-40" : ""/);
+  assert.match(editor, /disabled=\{masterOff\}/);
+});
+
+// --- Phase 7: attribution -----------------------------------------------------
+
+test("LocalSearchEventPayload records source, placement, locale, category, timestamp, session id, and UTM — analytics failures never block navigation", async () => {
+  const section = await source("../components/southline/LocalDiscovery.tsx");
+  assert.match(section, /placement: string;/);
+  assert.match(section, /timestamp: string;/);
+  assert.match(section, /sessionId: string;/);
+  assert.match(section, /utm: ApprovedUtmParams;/);
+  assert.match(section, /getOrCreateLocalDiscoverySessionId/);
+  assert.match(section, /try \{\s*onSearch\?\.\(payload\);/);
+  assert.match(section, /never block navigation/);
+});
+
+test("getOrCreateLocalDiscoverySessionId never throws even without a window/session storage", async () => {
+  const local = await import("../lib/southline-local-discovery.ts");
+  assert.doesNotThrow(() => local.getOrCreateLocalDiscoverySessionId());
+  assert.equal(typeof local.getOrCreateLocalDiscoverySessionId(), "string");
+});
+
+// --- Phase 12 / backward compatibility ---------------------------------------
+
+test("mergeLocalDiscoveryContent backfills every new SnapLink Local Bridge field with a safe default for settings saved before this bridge existed", () => {
+  const legacyStored = {
+    enabled: true,
+    showOnHomepage: true,
+    showCategoryCards: true,
+    directoryBaseUrl: "https://snaplink.southlineone.com/en/local",
+    defaultCategory: null,
+    categories: DEFAULT_LOCAL_DISCOVERY_CATEGORIES.map((c) => ({ ...c })),
+    // Intentionally missing every Phase 3 bridge field below, simulating a
+    // settings row persisted before this feature shipped.
+  };
+  const merged = mergeLocalDiscoveryContent(legacyStored);
+  assert.equal(merged.directoryRoute, "local");
+  assert.equal(merged.zipParam, "zip");
+  assert.equal(merged.categoryParam, "category");
+  assert.equal(merged.sourceValue, "southline-living");
+  assert.equal(merged.placementValue, "homepage-local-discovery");
+  assert.equal(merged.openBehavior, "same-tab");
+  assert.equal(merged.fallbackUrl, "/");
+  assert.equal(merged.preserveUtm, true);
+  assert.equal(merged.attributionEnabled, true);
+});
+
