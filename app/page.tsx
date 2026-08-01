@@ -12,6 +12,7 @@ import { DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
 import Header from "@/components/southline/Header";
 import Hero from "@/components/southline/Hero";
 import LocalDiscovery from "@/components/southline/LocalDiscovery";
+import SnapLinkLocalPromo from "@/components/southline/SnapLinkLocalPromo";
 import CategoriesGrid from "@/components/southline/CategoriesGrid";
 import TrendingSection from "@/components/southline/TrendingSection";
 import Footer from "@/components/southline/Footer";
@@ -88,6 +89,8 @@ export default async function HomePage() {
         {settings?.localDiscovery?.showOnHomepage !== false && (
           <LocalDiscovery lang={lang} content={settings?.localDiscovery} />
         )}
+
+        {(!sections || sections.localPromo !== false) && <SnapLinkLocalPromo lang={lang} />}
 
         {showRealEstateBlock && (
           <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />

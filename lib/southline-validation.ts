@@ -314,6 +314,7 @@ const LOCAL_CATEGORY_STRING_FIELDS = [
   "icon",
   "imageUrl",
   "snaplinkCategory",
+  "internalSlug",
   "seasonalTag",
 ];
 
@@ -362,6 +363,11 @@ function validateLocalDiscovery(patch: Record<string, unknown>): string | null {
   if (patch.defaultCategory !== undefined && patch.defaultCategory !== null && !isString(patch.defaultCategory)) {
     return "localDiscovery.defaultCategory must be a string or null";
   }
+  if (patch.internalDirectoryRoute !== undefined && patch.internalDirectoryRoute !== null) {
+    if (!isString(patch.internalDirectoryRoute) || !isSafeFallbackPath(patch.internalDirectoryRoute)) {
+      return 'localDiscovery.internalDirectoryRoute must be an internal path starting with "/" (no external redirects)';
+    }
+  }
   for (const field of ["directoryRoute", "zipParam", "categoryParam", "localeParam", "sourceValue", "placementValue"] as const) {
     if (patch[field] !== undefined && !isString(patch[field]) && patch[field] !== null) {
       return `localDiscovery.${field} must be a string or null`;
@@ -396,6 +402,9 @@ function validateLocalDiscovery(patch: Record<string, unknown>): string | null {
       if (value !== undefined && !isString(value) && value !== null) {
         return `localDiscovery.categories[${i}].${field} must be a string or null`;
       }
+    }
+    if (category.destination !== undefined && category.destination !== "southline" && category.destination !== "snaplink") {
+      return `localDiscovery.categories[${i}].destination must be "southline" or "snaplink"`;
     }
     if (!isBoolean(category.visible)) return `localDiscovery.categories[${i}].visible must be a boolean`;
     if (!isBoolean(category.featured)) return `localDiscovery.categories[${i}].featured must be a boolean`;

@@ -1,0 +1,71 @@
+{
+  "modules": [
+    {
+      "name": "Homepage and marketing",
+      "status": "functional-but-incomplete",
+      "confidence": "high",
+      "evidence": [
+        "app/page.tsx",
+        "app/snaplink/page.tsx"
+      ]
+    },
+    {
+      "name": "Booking and consultation flow",
+      "status": "functional-but-incomplete",
+      "confidence": "high",
+      "evidence": [
+        "components/southline/BookingFlow.tsx",
+        "app/api/contractor/leads/route.ts"
+      ]
+    },
+    {
+      "name": "Contractor lead board",
+      "status": "functional",
+      "confidence": "high",
+      "evidence": [
+        "components/admin/Dashboard.tsx"
+      ]
+    },
+    {
+      "name": "Flipbooks",
+      "status": "hidden-behind-entitlement",
+      "confidence": "high",
+      "evidence": [
+        "app/api/contractor/flipbook/campaigns/route.ts"
+      ]
+    },
+    {
+      "name": "Mini campaigns",
+      "status": "hidden-behind-entitlement",
+      "confidence": "high",
+      "evidence": [
+        "app/api/contractor/campaigns/route.ts"
+      ]
+    },
+    {
+      "name": "Invoices",
+      "status": "hidden-behind-entitlement-and-environment-dependent",
+      "confidence": "high",
+      "evidence": [
+        "app/api/contractor/invoices/route.ts"
+      ]
+    },
+    {
+      "name": "Southline CMS",
+      "status": "functional",
+      "confidence": "high",
+      "evidence": [
+        "app/southline/admin/page.tsx"
+      ]
+    },
+    {
+      "name": "Real-estate CRM",
+      "status": "functional-but-incomplete",
+      "confidence": "high",
+      "evidence": [
+        "app/real-estate",
+        "lib/db/schema.ts"
+      ]
+    }
+  ]
+}

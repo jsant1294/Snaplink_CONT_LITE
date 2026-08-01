@@ -24,6 +24,7 @@ export interface SectionVisibility {
   featuredHomes: boolean;
   featuredServices: boolean;
   poweredBySnaplink: boolean;
+  localPromo: boolean;
   diyLearning: boolean;
   seasonalIdeas: boolean;
   costEstimator: boolean;
@@ -270,6 +271,11 @@ export type SouthlineTestimonialsContent = {
   reviewCtaUrl: string | null;
 };
 
+/** Routing ownership for a local-discovery category. Only `destination`
+ *  decides where a category routes — a missing/empty SnapLink slug is never a
+ *  routing decision (see southline-local-discovery.ts). */
+export type LocalDiscoveryDestination = "southline" | "snaplink";
+
 export type SouthlineLocalCategory = {
   id: string;
   labelEn: string;
@@ -278,7 +284,21 @@ export type SouthlineLocalCategory = {
   descriptionEs: string | null;
   icon: string | null;
   imageUrl: string | null;
+  /**
+   * Canonical SnapLink Local category slug.
+   * Used only when destination === "snaplink".
+   */
   snaplinkCategory: string | null;
+  /**
+   * Explicit routing ownership. Defaults to "southline" when omitted for
+   * backward compatibility — a missing value never opens SnapLink.
+   */
+  destination?: LocalDiscoveryDestination;
+  /**
+   * Canonical Southline category slug, forwarded to the internal directory.
+   * Used only when destination === "southline". Defaults to the category id.
+   */
+  internalSlug?: string | null;
   visible: boolean;
   featured: boolean;
   order: number;
@@ -309,6 +329,9 @@ export type SouthlineLocalDiscoveryContent = {
   poweredByLabelEs: string | null;
 
   directoryBaseUrl: string | null;
+  // Internal Southline directory route for Southline-owned categories.
+  // Example: /results (professional search). Must start with "/".
+  internalDirectoryRoute: string | null;
   defaultCategory: string | null;
 
   categories: SouthlineLocalCategory[];
@@ -478,6 +501,7 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   featuredHomes: true,
   featuredServices: true,
   poweredBySnaplink: true,
+  localPromo: true,
   diyLearning: true,
   seasonalIdeas: true,
   costEstimator: true,
@@ -627,20 +651,49 @@ export const DEFAULT_TESTIMONIALS: SouthlineTestimonialsContent = {
   reviewCtaUrl: null,
 };
 
-// Category placeholders only — these are entry points into the SnapLink local
-// directory, never fabricated merchants, ratings, counts, or availability. The
-// SnapLink category slug is left null until an operator maps a real directory
-// category; the redirect then forwards the local category id instead.
+// Category placeholders only — these are entry points, never fabricated
+// merchants, ratings, counts, or availability. Routing ownership is explicit:
+// `destination` decides where a category goes, and only `destination` does.
+// Southline-owned categories stay on Southline (internalSlug maps to a real
+// /results service-category id so the internal filter actually returns pros);
+// Photography is the shipped SnapLink-owned entry point. A missing SnapLink
+// slug is never a routing decision — it cannot push a Southline category out.
 export const DEFAULT_LOCAL_DISCOVERY_CATEGORIES: SouthlineLocalCategory[] = [
-  { id: "builders-remodelers", labelEn: "Builders and Remodelers", labelEs: "Constructores y remodeladores", descriptionEn: "Browse local builders and remodelers", descriptionEs: "Explora constructores y remodeladores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 0, seasonalTag: null },
-  { id: "architects", labelEn: "Architects", labelEs: "Arquitectos", descriptionEn: "Browse local architects", descriptionEs: "Explora arquitectos locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 1, seasonalTag: null },
-  { id: "interior-designers", labelEn: "Interior Designers", labelEs: "Diseñadores de interiores", descriptionEn: "Browse local interior designers", descriptionEs: "Explora diseñadores de interiores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 2, seasonalTag: null },
-  { id: "landscaping", labelEn: "Landscaping", labelEs: "Jardinería y paisajismo", descriptionEn: "Browse local landscaping pros", descriptionEs: "Explora profesionales de jardinería locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: true, order: 3, seasonalTag: null },
-  { id: "roofing", labelEn: "Roofing", labelEs: "Techos", descriptionEn: "Browse local roofing pros", descriptionEs: "Explora techadores locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 4, seasonalTag: null },
-  { id: "pools", labelEn: "Pools", labelEs: "Piscinas", descriptionEn: "Browse local pool pros", descriptionEs: "Explora especialistas en piscinas locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 5, seasonalTag: null },
-  { id: "photography", labelEn: "Photography", labelEs: "Fotografía", descriptionEn: "Browse local photographers", descriptionEs: "Explora fotógrafos locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 6, seasonalTag: null },
-  { id: "real-estate", labelEn: "Real Estate", labelEs: "Bienes raíces", descriptionEn: "Browse local real estate professionals", descriptionEs: "Explora profesionales inmobiliarios locales", icon: null, imageUrl: null, snaplinkCategory: null, visible: true, featured: false, order: 7, seasonalTag: null },
+  { id: "builders-remodelers", labelEn: "Builders and Remodelers", labelEs: "Constructores y remodeladores", descriptionEn: "Browse local builders and remodelers", descriptionEs: "Explora constructores y remodeladores locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "remodeling", visible: true, featured: true, order: 0, seasonalTag: null },
+  { id: "architects", labelEn: "Architects", labelEs: "Arquitectos", descriptionEn: "Browse local architects", descriptionEs: "Explora arquitectos locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "remodeling", visible: true, featured: true, order: 1, seasonalTag: null },
+  { id: "interior-designers", labelEn: "Interior Designers", labelEs: "Diseñadores de interiores", descriptionEn: "Browse local interior designers", descriptionEs: "Explora diseñadores de interiores locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "remodeling", visible: true, featured: true, order: 2, seasonalTag: null },
+  { id: "landscaping", labelEn: "Landscaping", labelEs: "Jardinería y paisajismo", descriptionEn: "Browse local landscaping pros", descriptionEs: "Explora profesionales de jardinería locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "outdoor", visible: true, featured: true, order: 3, seasonalTag: null },
+  { id: "roofing", labelEn: "Roofing", labelEs: "Techos", descriptionEn: "Browse local roofing pros", descriptionEs: "Explora techadores locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "roof_exterior", visible: true, featured: false, order: 4, seasonalTag: null },
+  { id: "pools", labelEn: "Pools", labelEs: "Piscinas", descriptionEn: "Browse local pool pros", descriptionEs: "Explora especialistas en piscinas locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "outdoor", visible: true, featured: false, order: 5, seasonalTag: null },
+  { id: "photography", labelEn: "Photography", labelEs: "Fotografía", descriptionEn: "Browse local photographers", descriptionEs: "Explora fotógrafos locales", icon: null, imageUrl: null, snaplinkCategory: "photography", destination: "snaplink", internalSlug: "photography", visible: true, featured: false, order: 6, seasonalTag: null },
+  { id: "real-estate", labelEn: "Real Estate", labelEs: "Bienes raíces", descriptionEn: "Explore local real-estate professionals", descriptionEs: "Explora profesionales inmobiliarios locales", icon: null, imageUrl: null, snaplinkCategory: null, destination: "southline", internalSlug: "real-estate", visible: true, featured: false, order: 7, seasonalTag: null },
 ];
+
+const DEFAULT_LOCAL_CATEGORY_BY_ID = new Map(
+  DEFAULT_LOCAL_DISCOVERY_CATEGORIES.map((category) => [category.id, category])
+);
+
+// Backfills routing ownership for stored categories that predate it. The
+// critical rule: a missing `destination` defaults to "southline" — it never
+// opens SnapLink. Ship defaults win only for known ids, so legacy rows behave
+// like today's shipped config (incl. Photography → SnapLink) while custom
+// operator categories keep their own settings.
+export function normalizeLocalDiscoveryCategory(
+  category: SouthlineLocalCategory
+): SouthlineLocalCategory {
+  const shipped = DEFAULT_LOCAL_CATEGORY_BY_ID.get(category.id);
+  const isPhotography = category.id === "photography";
+  return {
+    ...category,
+    destination: category.destination ?? (isPhotography ? "snaplink" : "southline"),
+    internalSlug: category.internalSlug?.trim()
+      ? category.internalSlug
+      : shipped?.internalSlug?.trim() || category.id.trim(),
+    snaplinkCategory: isPhotography
+      ? category.snaplinkCategory?.trim() || shipped?.snaplinkCategory || "photography"
+      : category.snaplinkCategory ?? null,
+  };
+}
 
 export const DEFAULT_LOCAL_DISCOVERY: SouthlineLocalDiscoveryContent = {
   enabled: true,
@@ -657,6 +710,7 @@ export const DEFAULT_LOCAL_DISCOVERY: SouthlineLocalDiscoveryContent = {
   poweredByLabelEn: null,
   poweredByLabelEs: null,
   directoryBaseUrl: "https://snaplink.southlineone.com/en/local",
+  internalDirectoryRoute: "/results",
   defaultCategory: null,
   categories: DEFAULT_LOCAL_DISCOVERY_CATEGORIES.map((category) => ({ ...category })),
   showOnHomepage: true,
@@ -668,7 +722,7 @@ export const DEFAULT_LOCAL_DISCOVERY: SouthlineLocalDiscoveryContent = {
   sourceValue: "southline-living",
   placementValue: "homepage-local-discovery",
   openBehavior: "same-tab",
-  fallbackUrl: "/",
+  fallbackUrl: "/results",
   preserveUtm: true,
   attributionEnabled: true,
 };
@@ -697,6 +751,7 @@ export function mergeLocalDiscoveryContent(
     "poweredByLabelEn",
     "poweredByLabelEs",
     "directoryBaseUrl",
+    "internalDirectoryRoute",
     "defaultCategory",
     "directoryRoute",
     "zipParam",
@@ -716,7 +771,7 @@ export function mergeLocalDiscoveryContent(
     ...source,
     ...normalized,
     categories: source.categories
-      ? source.categories
+      ? source.categories.map(normalizeLocalDiscoveryCategory)
       : defaults.categories.map((category) => ({ ...category })),
   };
 }

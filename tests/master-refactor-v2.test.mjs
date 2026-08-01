@@ -7,15 +7,26 @@ const source = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
 test("profession types cover the trade/design/build taxonomy but exclude realtor and mortgage_broker (served by the separate agent-profiles system)", async () => {
   const text = await source("../lib/profession-types.ts");
+  const tradesBlock = text.slice(
+    text.indexOf("export const PROFESSION_TYPES"),
+    text.indexOf("\n];", text.indexOf("export const PROFESSION_TYPES"))
+  );
   for (const id of ["contractor", "remodeler", "home_builder", "interior_designer", "architect", "landscaper", "electrician", "plumber", "hvac", "roofing", "painting", "flooring", "cabinet_maker", "home_inspector", "window_company", "solar", "pool_builder"]) {
-    assert.match(text, new RegExp(`id: "${id}"`), `missing profession type: ${id}`);
+    assert.match(tradesBlock, new RegExp(`id: "${id}"`), `missing profession type: ${id}`);
   }
-  assert.doesNotMatch(text, /id: "realtor"|id: "mortgage_broker"/);
+  // realtor/mortgage_broker may legitimately appear elsewhere in this file
+  // (LICENSED_PROFESSION_TYPES, for agent_profiles) — only PROFESSION_TYPES
+  // itself (the trades taxonomy) must exclude them.
+  assert.doesNotMatch(tradesBlock, /id: "realtor"|id: "mortgage_broker"/);
 });
 
 test("every profession type has at least two placeholder photo variants, and no card can render blank or with an emoji", async () => {
   const text = await source("../lib/profession-types.ts");
-  const idMatches = [...text.matchAll(/id: "([a-z_]+)", en:/g)].map((m) => m[1]);
+  const tradesBlock = text.slice(
+    text.indexOf("export const PROFESSION_TYPES"),
+    text.indexOf("\n];", text.indexOf("export const PROFESSION_TYPES"))
+  );
+  const idMatches = [...tradesBlock.matchAll(/id: "([a-z_]+)", en:/g)].map((m) => m[1]);
   assert.ok(idMatches.length >= 17);
   for (const id of idMatches) {
     const block = text.slice(text.indexOf(`  ${id}: [`), text.indexOf("],", text.indexOf(`  ${id}: [`)));

@@ -54,6 +54,39 @@ export function professionTypeLabel(id: string, lang: "en" | "es"): string {
   return match[lang];
 }
 
+// ---------------------------------------------------------------------------
+// Licensed profession taxonomy for the canonical agent_profiles model.
+// agent_profiles is the home of realtor/mortgage-broker/etc. licensed pros
+// (deliberately absent from PROFESSION_TYPES above, which stays trades-only)
+// AND can hold any trade type from PROFESSION_TYPES — so a Southline listing
+// can be a general contractor, an architect, or a realtor from one model.
+// ---------------------------------------------------------------------------
+
+export const LICENSED_PROFESSION_TYPES: ProfessionType[] = [
+  { id: "realtor", en: "Realtor", es: "Agente de Bienes Raíces" },
+  { id: "mortgage_broker", en: "Mortgage Broker", es: "Corredor Hipotecario" },
+  { id: "home_inspector", en: "Home Inspector", es: "Inspector de Casas" },
+  { id: "property_manager", en: "Property Manager", es: "Administrador de Propiedades" },
+  { id: "appraiser", en: "Appraiser", es: "Avaluador" },
+  { id: "surveyor", en: "Surveyor", es: "Agrimensor" },
+];
+
+export const DEFAULT_AGENT_PROFESSION_TYPE = "realtor";
+
+const LICENSED_IDS = new Set(LICENSED_PROFESSION_TYPES.map((p) => p.id));
+
+/** A valid agent_profiles.professionType: any licensed id OR any trade id. */
+export function isValidAgentProfessionType(id: unknown): id is string {
+  return typeof id === "string" && (LICENSED_IDS.has(id) || PROFESSION_IDS.has(id));
+}
+
+/** Label for an agent_profiles.professionType — licensed set first, trades second. */
+export function agentProfessionTypeLabel(id: string, lang: "en" | "es"): string {
+  const licensed = LICENSED_PROFESSION_TYPES.find((p) => p.id === id);
+  if (licensed) return licensed[lang];
+  return professionTypeLabel(id, lang);
+}
+
 // 2-3 verified (HTTP 200 as of authoring) Unsplash photos per category, card-scale.
 // Multiple variants per category exist so that several professionals of the same
 // profession type never render the identical placeholder photo side by side.

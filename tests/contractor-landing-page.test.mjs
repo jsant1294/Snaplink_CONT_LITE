@@ -19,7 +19,15 @@ test("lib/store.ts exports landingPageStore gated by usePg", async () => {
 
 test("every profession type has a landing template, and the fallback is contractor", async () => {
   const professionText = await source("../lib/profession-types.ts");
-  const ids = [...professionText.matchAll(/\{ id: "([a-z_]+)",/g)].map((m) => m[1]);
+  // Scoped to PROFESSION_TYPES (trades) only — LICENSED_PROFESSION_TYPES
+  // (realtor, mortgage_broker, etc., for agent_profiles) lives in the same
+  // file with the same `{ id: "x", ... }` shape but is out of scope for the
+  // contractor landing-page generator.
+  const tradesBlock = professionText.slice(
+    professionText.indexOf("export const PROFESSION_TYPES"),
+    professionText.indexOf("\n];", professionText.indexOf("export const PROFESSION_TYPES"))
+  );
+  const ids = [...tradesBlock.matchAll(/\{ id: "([a-z_]+)",/g)].map((m) => m[1]);
   assert.ok(ids.length > 10, "sanity check that the profession list parsed");
 
   const templatesText = await source("../lib/landing-templates.ts");

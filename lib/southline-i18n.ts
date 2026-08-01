@@ -167,6 +167,19 @@ export const UI_DEFS = {
     es: "No encontramos resultados para tu búsqueda.",
     en: "No results found for your search.",
   },
+  resultsTitle: { es: "Profesionales del hogar", en: "Home Services & Professionals" },
+  resultsSubtitle: {
+    es: "Profesionales locales de confianza para tu próximo proyecto.",
+    en: "Trusted local professionals for your next project.",
+  },
+  resultsEmpty: {
+    es: "No encontramos profesionales que coincidan con tu búsqueda.",
+    en: "No professionals matched your search.",
+  },
+  resultsAll: { es: "Todos los servicios", en: "All services" },
+  resultsFilterLabel: { es: "Filtrar por servicio", en: "Filter by service" },
+  resultsViewAll: { es: "Ver todos los resultados", en: "View all results" },
+  licensedProfessional: { es: "Profesional certificado", en: "Licensed Professional" },
 
   // DIY
   diyTitle: { es: "Proyectos DIY", en: "DIY Projects" },
@@ -457,6 +470,22 @@ export const UI_DEFS = {
   testimonialsReviewCta: { es: "Deja una reseña", en: "Leave a review" },
   testimonialsFeaturedBadge: { es: "Destacado", en: "Featured" },
 
+  // Homepage: SnapLink Local cross-promo
+  localPromoEyebrow: { es: "SnapLink Local", en: "SnapLink Local" },
+  localPromoTitle: {
+    es: "¿Buscas más que servicios para el hogar?",
+    en: "Looking for more than home services?",
+  },
+  localPromoBody: {
+    es: "Southline Living se especializa en todo lo que necesitas para ser dueño y cuidar de tu hogar. Cuando quieras explorar el resto de tu vecindario — restaurantes, comercios, servicios y más — SnapLink Local reúne opciones locales verificadas en un solo lugar.",
+    en: "Southline Living specializes in everything you need to own and care for your home. When you're ready to explore the rest of your neighborhood — restaurants, shops, services, and more — SnapLink Local brings verified local options together in one place.",
+  },
+  localPromoCta: { es: "Explorar SnapLink Local", en: "Explore SnapLink Local" },
+  localPromoPoweredBy: {
+    es: "Impulsado por la red SnapLink",
+    en: "Powered by the SnapLink Network",
+  },
+
   // Local discovery (SnapLink directory hand-off)
   localDiscoveryEyebrow: { es: "Local", en: "Local" },
   localDiscoveryTitle: {
@@ -483,6 +512,10 @@ export const UI_DEFS = {
   localDiscoveryZipError: {
     es: "Ingresa un código postal válido de EE. UU. (ej. 75204 o 75204-1234).",
     en: "Enter a valid US ZIP code (e.g. 75204 or 75204-1234).",
+  },
+  localDiscoveryRoutingError: {
+    es: "No se pudo abrir esa selección. Inténtalo de nuevo.",
+    en: "Couldn't open that selection. Please try again.",
   },
 };
 

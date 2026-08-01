@@ -74,10 +74,12 @@ export default function Hero({
             </p>
 
             <div className="max-w-lg mb-8">
-              <div className="relative">
+              <form action="/results" className="relative">
                 <input
                   type="text"
+                  name="q"
                   placeholder={searchPrompt}
+                  aria-label={searchPrompt}
                   className="w-full bg-[#3c3229]/30 backdrop-blur-sm border border-cream/20 rounded-2xl px-5 py-4 pl-12 text-cream placeholder:text-cream/40 focus:outline-none focus:border-gold focus-visible:ring-2 focus-visible:ring-cream text-base shadow-lg"
                 />
                 <svg
@@ -93,7 +95,7 @@ export default function Hero({
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-              </div>
+              </form>
             </div>
 
             <div className="flex flex-wrap items-stretch gap-3 sm:gap-4">

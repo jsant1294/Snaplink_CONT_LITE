@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { SouthlineLocalCategory, SouthlineLocalDiscoveryContent } from "@/lib/southline-types";
+import type { LocalDiscoveryDestination, SouthlineLocalCategory, SouthlineLocalDiscoveryContent } from "@/lib/southline-types";
 import {
-  buildSnaplinkLocalUrl,
+  buildDiscoveryTarget,
   computeLocalDiscoveryStatus,
   isValidUsZip,
   type LocalDiscoveryStatus,
@@ -138,6 +138,8 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
             icon: null,
             imageUrl: null,
             snaplinkCategory: null,
+            destination: "southline",
+            internalSlug: null,
             visible: true,
             featured: false,
             order: current.categories.length,
@@ -170,41 +172,60 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
     }
     setTestZipError(null);
     const selected = content.categories.find((c) => c.id === testCategoryId) ?? null;
-    const url = buildSnaplinkLocalUrl({
-      baseUrl: content.directoryBaseUrl,
-      locale: previewLang,
-      zip: normalized || null,
-      category: selected?.snaplinkCategory ?? null,
-      route: content.directoryRoute,
-      zipParam: content.zipParam,
-      categoryParam: content.categoryParam,
-      localeParam: content.localeParam,
-      sourceValue: content.sourceValue,
-      placementValue: content.placementValue,
-      preserveUtm: content.preserveUtm !== false,
-      attributionEnabled: content.attributionEnabled !== false,
-    });
-    setTestUrl(url);
+    let target: { url: string; external: boolean };
+    try {
+      target = buildDiscoveryTarget({
+        settings: {
+          internalDirectoryRoute: content.internalDirectoryRoute,
+          directoryBaseUrl: content.directoryBaseUrl,
+          directoryRoute: content.directoryRoute,
+          zipParam: content.zipParam,
+          categoryParam: content.categoryParam,
+          localeParam: content.localeParam,
+          sourceValue: content.sourceValue,
+          placementValue: content.placementValue,
+          preserveUtm: content.preserveUtm !== false,
+          attributionEnabled: content.attributionEnabled !== false,
+          fallbackUrl: content.fallbackUrl,
+        },
+        locale: previewLang,
+        zip: normalized || null,
+        category: selected,
+      });
+    } catch {
+      setTestUrl(null);
+      setBridgeCheck("idle");
+      setTestZipError("Couldn't build that route — check the category destination and slug.");
+      return;
+    }
+    setTestUrl(target.url);
     setBridgeCheck("checking");
-    // Best-effort reachability probe only — the browser cannot read a
-    // cross-origin no-cors response, so a resolved fetch is treated as
-    // "reachable" and a thrown network error as "unreachable". Analytics/
-    // diagnostics failures here never block the CMS or the public redirect.
-    fetch(url, { method: "HEAD", mode: "no-cors" })
-      .then(() => {
-        setBridgeCheck("reachable");
-        setLastSuccessfulTest(new Date().toLocaleString());
-      })
-      .catch(() => setBridgeCheck("unreachable"));
+    if (target.external) {
+      // Best-effort reachability probe only — the browser cannot read a
+      // cross-origin no-cors response, so a resolved fetch is treated as
+      // "reachable" and a thrown network error as "unreachable". Diagnostics
+      // failures here never block the CMS or the public redirect.
+      fetch(target.url, { method: "HEAD", mode: "no-cors" })
+        .then(() => {
+          setBridgeCheck("reachable");
+          setLastSuccessfulTest(new Date().toLocaleString());
+        })
+        .catch(() => setBridgeCheck("unreachable"));
+    } else {
+      // Internal route — the destination is Southline itself; no probe needed.
+      setBridgeCheck("reachable");
+      setLastSuccessfulTest(new Date().toLocaleString());
+    }
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted max-w-2xl">
-          Local discovery sends visitors from Southline to the SnapLink local directory by ZIP code and
-          category. Categories are entry-point placeholders only — no merchant names, ratings, or counts
-          are fabricated here. Blank Spanish fields fall back to their English value.
+          Local discovery sends visitors to the right destination per category: Southline-owned categories
+          stay on the internal Southline directory, SnapLink-owned categories (like Photography) hand off
+          to SnapLink Local. Categories are entry-point placeholders only — no merchant names, ratings, or
+          counts are fabricated here. Only the per-category "destination" decides where a visitor goes.
         </p>
         <StatusBadge status={status} />
       </div>
@@ -286,17 +307,23 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
       </div>
 
       <div className="pt-2 border-t border-white/10">
-        <p className="text-sm font-medium text-gold mb-1 mt-4">SnapLink Local Bridge</p>
+        <p className="text-sm font-medium text-gold mb-1 mt-4">Routing & Bridge</p>
         <p className="text-xs text-muted mb-3">
-          Everything below controls the outbound hand-off to SnapLink Local. The destination host is
-          restricted to the SnapLink allowlist server-side — this cannot be used to redirect visitors
-          anywhere else.
+          Everything below controls how visitors are handed off: Southline-owned categories go to the
+          internal Southline route above; SnapLink-owned categories hand off to SnapLink Local. The
+          external destination host is restricted to the SnapLink allowlist server-side — this cannot be
+          used to redirect visitors anywhere else.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="label">Base URL</label>
             <input className="input" value={content.directoryBaseUrl ?? ""} onChange={(e) => set("directoryBaseUrl", e.target.value || null)} placeholder="https://snaplink.southlineone.com/en/local" />
-            <p className="text-xs text-muted mt-1">The locale segment is resolved automatically for each language.</p>
+            <p className="text-xs text-muted mt-1">Stored as a bare allowlisted origin; the locale segment is resolved automatically for each language.</p>
+          </div>
+          <div>
+            <label className="label">Internal directory route</label>
+            <input className="input" value={content.internalDirectoryRoute ?? ""} onChange={(e) => set("internalDirectoryRoute", e.target.value || null)} placeholder="/results" />
+            <p className="text-xs text-muted mt-1">Where Southline-owned categories go (must start with "/").</p>
           </div>
           <div>
             <label className="label">Directory route</label>
@@ -340,7 +367,7 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
           </div>
           <div>
             <label className="label">Fallback URL (internal path)</label>
-            <input className="input" value={content.fallbackUrl ?? ""} onChange={(e) => set("fallbackUrl", e.target.value || null)} placeholder="/" />
+            <input className="input" value={content.fallbackUrl ?? ""} onChange={(e) => set("fallbackUrl", e.target.value || null)} placeholder="/results" />
             <p className="text-xs text-muted mt-1">Must start with "/". Keeps visitors on Southline if the bridge is ever misconfigured.</p>
           </div>
         </div>
@@ -393,12 +420,42 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
               <input className="input" value={category.id} onChange={(e) => updateCategory(index, { id: e.target.value })} placeholder="interior-designers" />
             </div>
             <div>
-              <label className="label">SnapLink slug</label>
-              <input className="input" value={category.snaplinkCategory ?? ""} onChange={(e) => updateCategory(index, { snaplinkCategory: e.target.value || null })} placeholder="canonical SnapLink category slug" />
-              {!category.snaplinkCategory && category.visible && (
-                <p className="text-xs text-amber-500 mt-1">Unmapped — this category is omitted from the SnapLink URL until a slug is set.</p>
-              )}
+              <label className="label">Destination (routes this category)</label>
+              <select
+                className="input"
+                value={category.destination ?? "southline"}
+                onChange={(e) =>
+                  updateCategory(index, { destination: e.target.value as LocalDiscoveryDestination })
+                }
+              >
+                <option value="southline">Southline (internal)</option>
+                <option value="snaplink">SnapLink Local (external)</option>
+              </select>
+              <p className="text-xs text-muted mt-1">
+                Only "destination" decides routing — a missing slug never changes where this category goes.
+              </p>
             </div>
+            {(category.destination ?? (category.id === "photography" ? "snaplink" : "southline")) === "snaplink" ? (
+              <div>
+                <label className="label">SnapLink slug (canonical)</label>
+                <input className="input" value={category.snaplinkCategory ?? ""} onChange={(e) => updateCategory(index, { snaplinkCategory: e.target.value || null })} placeholder="canonical SnapLink category slug" />
+                {!category.snaplinkCategory && category.visible && (
+                  <p className="text-xs text-amber-500 mt-1">
+                    SnapLink category missing a slug — visitors will see an error instead of a guessed URL.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div>
+                <label className="label">Internal slug (canonical)</label>
+                <input className="input" value={category.internalSlug ?? ""} onChange={(e) => updateCategory(index, { internalSlug: e.target.value || null })} placeholder="maps to a real /results category, e.g. remodeling" />
+                {!category.internalSlug && category.visible && (
+                  <p className="text-xs text-amber-500 mt-1">
+                    No internal slug — this category falls back to its id when routing internally.
+                  </p>
+                )}
+              </div>
+            )}
             <div>
               <label className="label">Label (EN)</label>
               <input className="input" value={category.labelEn} onChange={(e) => updateCategory(index, { labelEn: e.target.value })} />
@@ -437,8 +494,9 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
       <div className="pt-4 border-t border-white/10">
         <p className="text-sm font-medium text-gold mb-1 mt-4">Test Bridge</p>
         <p className="text-xs text-muted mb-3">
-          Builds the exact outbound URL from the settings above and does a best-effort reachability check.
-          Nothing here is saved until you press Save Local Discovery.
+          Builds the exact destination URL from the settings above — internal for Southline-owned
+          categories, external for SnapLink-owned ones — and does a best-effort reachability check for
+          external targets.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
@@ -494,8 +552,18 @@ export default function LocalDiscoveryEditor({ pin }: { pin: string }) {
           <DiagnosticRow label="Category cards visible" ok={content.enabled && content.showCategoryCards} />
           <DiagnosticRow label="Base URL valid" ok={status !== "misconfigured"} />
           <DiagnosticRow
-            label="Category mappings valid"
-            ok={content.categories.filter((c) => c.visible).some((c) => !!c.snaplinkCategory) || content.categories.filter((c) => c.visible).length === 0}
+            label="Category ownership valid"
+            ok={
+              content.categories.filter((c) => c.visible).length === 0 ||
+              content.categories
+                .filter((c) => c.visible)
+                .every(
+                  (c) =>
+                    ((c.destination ?? (c.id === "photography" ? "snaplink" : "southline")) === "snaplink"
+                      ? !!c.snaplinkCategory?.trim()
+                      : true)
+                )
+            }
           />
           <DiagnosticRow label="Locale mapping valid" ok={true} />
           <DiagnosticRow label="Attribution enabled" ok={content.attributionEnabled} />

@@ -1,0 +1,27 @@
+{
+  "coreTheme": "Get discovered by homeowners near you",
+  "positions": [
+    {
+      "name": "Local discoverability",
+      "message": "Be visible when homeowners need your service"
+    },
+    {
+      "name": "Lead capture",
+      "message": "Turn local interest into a managed lead"
+    },
+    {
+      "name": "Professional trust",
+      "message": "Present your business in a polished, simple experience"
+    },
+    {
+      "name": "Operational simplicity",
+      "message": "Manage leads and customer conversations in one place"
+    }
+  ],
+  "ctaOptions": [
+    "Book a demo",
+    "Start your profile",
+    "Get listed",
+    "Launch your lead funnel"
+  ]
+}

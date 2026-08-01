@@ -1,0 +1,27 @@
+{
+  "bestImmediateOffer": {
+    "name": "Contractor lead generation package",
+    "value": "Profile publishing, lead capture, and workspace access",
+    "priority": 1
+  },
+  "bestMonthlyRevenue": {
+    "name": "Professional subscription bundle",
+    "value": "Workspace access, profile visibility, and lead management",
+    "priority": 2
+  },
+  "bestSetupFee": {
+    "name": "Profile setup and launch package",
+    "value": "Initial profile publishing, service setup, and onboarding",
+    "priority": 3
+  },
+  "bestUpsell": {
+    "name": "Campaign or Flipbook add-on",
+    "value": "Marketing surface for contractors to promote their business",
+    "priority": 4
+  },
+  "bestB2BOffer": {
+    "name": "Real-estate operations package",
+    "value": "CRM workflows, transaction management, and broker/team operations",
+    "priority": 5
+  }
+}

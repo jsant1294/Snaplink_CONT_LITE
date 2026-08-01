@@ -148,6 +148,20 @@
       "when": 1785543655680,
       "tag": "0020_southline_settings_pg",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1785610911999,
+      "tag": "0021_agent_management_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1785617941786,
+      "tag": "0022_agent_profession_type",
+      "breakpoints": true
     }
   ]
 }

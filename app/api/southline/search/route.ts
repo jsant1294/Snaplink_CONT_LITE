@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { contractorStore } from "@/lib/store";
+import { agentProfileStore } from "@/lib/agent-profiles/store";
+import { searchProfessionals } from "@/lib/southline-search";
 import type { DIYProject } from "@/lib/southline-diy";
 
 async function readProjects(): Promise<DIYProject[]> {
@@ -13,31 +15,31 @@ async function readProjects(): Promise<DIYProject[]> {
 }
 
 export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get("q")?.trim().toLowerCase();
-  if (!q || q.length < 2) {
-    return NextResponse.json({ projects: [], contractors: [] });
+  const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
+  const category = req.nextUrl.searchParams.get("category")?.trim() ?? "";
+  if (q.length < 2 && !category) {
+    return NextResponse.json({ projects: [], contractors: [], agents: [] });
   }
 
-  const [projects, contractors] = await Promise.all([
+  const [projects, contractors, agentProfiles] = await Promise.all([
     readProjects(),
     contractorStore.list().catch(() => [] as any[]),
+    agentProfileStore.list().catch(() => [] as any[]),
   ]);
 
-  const matchedProjects = projects.filter(
-    (p) =>
-      p.titleEs.toLowerCase().includes(q) ||
-      p.titleEn.toLowerCase().includes(q) ||
-      p.descEs.toLowerCase().includes(q) ||
-      p.descEn.toLowerCase().includes(q)
-  );
+  const matchedProjects = q
+    ? projects.filter(
+        (p) =>
+          p.titleEs.toLowerCase().includes(q) ||
+          p.titleEn.toLowerCase().includes(q) ||
+          p.descEs.toLowerCase().includes(q) ||
+          p.descEn.toLowerCase().includes(q)
+      )
+    : [];
 
-  const matchedContractors = contractors.filter(
-    (c: any) =>
-      (c.businessName ?? "").toLowerCase().includes(q) ||
-      (c.tagline ?? "").toLowerCase().includes(q) ||
-      (c.serviceArea ?? "").toLowerCase().includes(q) ||
-      (c.services ?? []).some((s: string) => s.toLowerCase().includes(q))
-  );
+  const professionals = searchProfessionals(contractors, agentProfiles, { query: q, category });
+  const agents = professionals.filter((p) => p.kind === "agent");
+  const contractorResults = professionals.filter((p) => p.kind === "contractor");
 
   return NextResponse.json({
     projects: matchedProjects.map((p) => ({
@@ -47,11 +49,7 @@ export async function GET(req: NextRequest) {
       titleEn: p.titleEn,
       difficulty: p.difficulty,
     })),
-    contractors: matchedContractors.map((c: any) => ({
-      id: c.id,
-      username: c.username,
-      businessName: c.businessName,
-      serviceArea: c.serviceArea,
-    })),
+    contractors: contractorResults,
+    agents,
   });
 }

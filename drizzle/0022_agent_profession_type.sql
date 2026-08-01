@@ -1,0 +1,1 @@
+ALTER TABLE "agent_profiles" ADD COLUMN "profession_type" text DEFAULT 'realtor' NOT NULL;

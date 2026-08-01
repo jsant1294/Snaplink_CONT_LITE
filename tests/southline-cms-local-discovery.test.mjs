@@ -46,7 +46,18 @@ test("DEFAULT_LOCAL_DISCOVERY is safe: enabled, homepage + cards on, default dir
   assert.equal(DEFAULT_LOCAL_DISCOVERY.directoryBaseUrl, "https://snaplink.southlineone.com/en/local");
   assert.equal(DEFAULT_LOCAL_DISCOVERY.defaultCategory, null);
   assert.equal(DEFAULT_LOCAL_DISCOVERY.categories.length, 8);
-  assert.ok(DEFAULT_LOCAL_DISCOVERY.categories.every((c) => c.snaplinkCategory === null));
+  assert.equal(DEFAULT_LOCAL_DISCOVERY.internalDirectoryRoute, "/results");
+  // Only `destination` decides routing: photography is the SnapLink-owned entry
+  // point (with a canonical slug); every other category is Southline-owned.
+  const photography = DEFAULT_LOCAL_DISCOVERY.categories.find((c) => c.id === "photography");
+  assert.equal(photography.destination, "snaplink");
+  assert.equal(photography.snaplinkCategory, "photography");
+  assert.ok(
+    DEFAULT_LOCAL_DISCOVERY.categories
+      .filter((c) => c.id !== "photography")
+      .every((c) => c.destination === "southline" && c.snaplinkCategory === null)
+  );
+  assert.ok(DEFAULT_LOCAL_DISCOVERY.categories.every((c) => typeof c.internalSlug === "string"));
   assert.ok(DEFAULT_LOCAL_DISCOVERY.categories.every((c) => c.visible === true));
   assert.ok(DEFAULT_LOCAL_DISCOVERY.categories.every((c) => typeof c.order === "number"));
 });
@@ -261,12 +272,13 @@ test("LocalDiscovery hides when disabled, renders localized copy, respects visib
   assert.match(section, /lang === "es" \? c\.labelEs : c\.labelEn/);
   assert.match(section, /c\.visible !== false/);
   assert.match(section, /a\.order - b\.order \|\| a\.id\.localeCompare\(b\.id\)/);
-  assert.match(section, /localDiscoveryExternalNote/);
+  assert.match(section, /getDiscoveryHelperText/);
   assert.match(section, /localDiscoveryPoweredBy/);
   assert.match(section, /poweredBy/);
   assert.match(section, /window\.location\.assign/);
+  assert.match(section, /router\.push/);
   assert.match(section, /zipProvided: true/);
-  assert.match(section, /destination: "snaplink"/);
+  assert.match(section, /destination: target\.destination/);
   assert.match(section, /source: "southline"/);
   assert.match(section, /LOCAL_SEARCH_EVENT/);
   assert.match(section, /aria-describedby=\{error \? errorId : undefined\}/);
@@ -285,6 +297,7 @@ test("the admin shell exposes a Local Discovery tab wired to LocalDiscoveryEdito
 test("LocalDiscoveryEditor supports copy, destination, and category CRUD with reorder", async () => {
   const editor = await source("../components/southline/admin/LocalDiscoveryEditor.tsx");
   assert.match(editor, /Base URL/);
+  assert.match(editor, /Internal directory route/);
   assert.match(editor, /Default category/);
   assert.match(editor, /Add Category/);
   assert.match(editor, /addCategory/);
@@ -293,6 +306,12 @@ test("LocalDiscoveryEditor supports copy, destination, and category CRUD with re
   assert.match(editor, /order: i \}\)\),/);
   assert.match(editor, /showOnHomepage/);
   assert.match(editor, /showCategoryCards/);
+  assert.match(editor, /Destination \(routes this category\)/);
+  assert.match(editor, /Southline \(internal\)/);
+  assert.match(editor, /SnapLink Local \(external\)/);
+  assert.match(editor, /SnapLink slug \(canonical\)/);
+  assert.match(editor, /Internal slug \(canonical\)/);
+  assert.match(editor, /buildDiscoveryTarget/);
 });
 
 // --- Phase 2: master toggle correctness -------------------------------------
@@ -319,15 +338,18 @@ test("computeLocalDiscoveryStatus: ready when enabled, visible, and mapped; warn
     showOnHomepage: true,
     showCategoryCards: true,
     directoryBaseUrl: DEFAULT_LOCAL_DISCOVERY.directoryBaseUrl,
-    categories: [{ visible: true, snaplinkCategory: "remodeling" }],
+    categories: [{ visible: true, destination: "snaplink", snaplinkCategory: "photography" }],
   };
   assert.equal(computeLocalDiscoveryStatus(mapped), "ready");
 
   const notOnHomepage = { ...mapped, showOnHomepage: false };
   assert.equal(computeLocalDiscoveryStatus(notOnHomepage), "warning");
 
-  const unmapped = { ...mapped, categories: [{ visible: true, snaplinkCategory: null }] };
+  const unmapped = { ...mapped, categories: [{ visible: true, destination: "snaplink", snaplinkCategory: null }] };
   assert.equal(computeLocalDiscoveryStatus(unmapped), "warning");
+
+  const unsluggedSouthline = { ...mapped, categories: [{ visible: true, destination: "southline", snaplinkCategory: null }] };
+  assert.equal(computeLocalDiscoveryStatus(unsluggedSouthline), "warning");
 
   const badHost = { ...mapped, directoryBaseUrl: "https://evil.example.com/en/local" };
   assert.equal(computeLocalDiscoveryStatus(badHost), "misconfigured");
@@ -410,11 +432,13 @@ test("buildSnaplinkLocalUrl omits the category filter entirely when no category 
   assert.doesNotThrow(() => buildSnaplinkLocalUrl({ locale: "en", category: undefined }));
 });
 
-test("LocalDiscovery omits unmapped categories from the outbound URL and logs a configuration warning instead of guessing a slug", async () => {
+test("LocalDiscovery routes through the ownership builders and never guesses a SnapLink slug", async () => {
   const section = await source("../components/southline/LocalDiscovery.tsx");
-  assert.match(section, /function resolveSnaplinkCategory/);
-  assert.match(section, /if \(selected\.snaplinkCategory\) return selected\.snaplinkCategory;/);
-  assert.match(section, /console\.warn/);
+  assert.match(section, /buildDiscoveryTarget/);
+  assert.match(section, /getCategoryDestination/);
+  assert.match(section, /destination: target\.destination/);
+  assert.match(section, /localDiscoveryRoutingError/);
+  assert.doesNotMatch(section, /resolveSnaplinkCategory/);
   assert.doesNotMatch(section, /selected\.snaplinkCategory \?\? selected\.id/);
 });
 
@@ -460,7 +484,7 @@ test("LocalDiscoveryEditor renders a diagnostics panel covering every required r
   assert.match(editor, /Homepage visible/);
   assert.match(editor, /Category cards visible/);
   assert.match(editor, /Base URL valid/);
-  assert.match(editor, /Category mappings valid/);
+  assert.match(editor, /Category ownership valid/);
   assert.match(editor, /Locale mapping valid/);
   assert.match(editor, /Attribution enabled/);
   assert.match(editor, /Directory route reachable/);
@@ -501,9 +525,12 @@ test("mergeLocalDiscoveryContent backfills every new SnapLink Local Bridge field
     showCategoryCards: true,
     directoryBaseUrl: "https://snaplink.southlineone.com/en/local",
     defaultCategory: null,
-    categories: DEFAULT_LOCAL_DISCOVERY_CATEGORIES.map((c) => ({ ...c })),
-    // Intentionally missing every Phase 3 bridge field below, simulating a
-    // settings row persisted before this feature shipped.
+    // Simulates categories persisted before ownership existed: strip the
+    // destination/internalSlug fields entirely.
+    categories: DEFAULT_LOCAL_DISCOVERY_CATEGORIES.map((c) => {
+      const { destination, internalSlug, ...legacy } = c;
+      return legacy;
+    }),
   };
   const merged = mergeLocalDiscoveryContent(legacyStored);
   assert.equal(merged.directoryRoute, "local");
@@ -512,8 +539,17 @@ test("mergeLocalDiscoveryContent backfills every new SnapLink Local Bridge field
   assert.equal(merged.sourceValue, "southline-living");
   assert.equal(merged.placementValue, "homepage-local-discovery");
   assert.equal(merged.openBehavior, "same-tab");
-  assert.equal(merged.fallbackUrl, "/");
+  assert.equal(merged.internalDirectoryRoute, "/results");
+  assert.equal(merged.fallbackUrl, "/results");
   assert.equal(merged.preserveUtm, true);
   assert.equal(merged.attributionEnabled, true);
+  // Ownership backfill: legacy rows inherit today's shipped ownership — a
+  // missing destination is never a reason to open SnapLink.
+  const builders = merged.categories.find((c) => c.id === "builders-remodelers");
+  assert.equal(builders.destination, "southline");
+  assert.equal(builders.internalSlug, "remodeling");
+  const photography = merged.categories.find((c) => c.id === "photography");
+  assert.equal(photography.destination, "snaplink");
+  assert.equal(photography.snaplinkCategory, "photography");
 });
 

@@ -14,13 +14,13 @@ export default async function AgentProfileRoute({ params }: { params: Promise<{ 
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const profile = await agentProfileStore.getBySlug(slug);
-  if (!profile || profile.status !== "active") notFound();
+  if (!profile || profile.status !== "active" || (profile.southlineStatus !== "published" && profile.southlineStatus !== "featured")) notFound();
 
   return (
     <>
       <Header lang={lang} />
       <div className="bg-[#EEE7DA] py-6">
-        <AgentProfilePublicPage profile={publicAgentProfile(profile)} lang={lang} />
+        <AgentProfilePublicPage profile={publicAgentProfile(profile)} lang={lang} variant="southline" />
       </div>
       <Footer lang={lang} />
     </>

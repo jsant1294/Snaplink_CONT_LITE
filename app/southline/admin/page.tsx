@@ -34,7 +34,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
     { key: "homepage", label: "Homepage" },
     { key: "featured", label: "Featured Pros" },
     { key: "recruitment", label: "Recruitment Leads" },
-    { key: "agents", label: "Agent Profiles" },
+    { key: "agents", label: "Agent Management" },
     { key: "realestate", label: "Real Estate Block" },
     { key: "diy", label: "DIY Projects" },
     { key: "spotlight", label: "Community Spotlight" },

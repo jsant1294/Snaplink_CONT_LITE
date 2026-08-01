@@ -956,6 +956,7 @@ function SectionsTab({
     { key: "featuredHomes", label: "Featured homes" },
     { key: "featuredServices", label: "Featured services marketplace" },
     { key: "poweredBySnaplink", label: "Powered by SnapLink" },
+    { key: "localPromo", label: "SnapLink Local cross-promo" },
     { key: "diyLearning", label: "DIY learning" },
     { key: "trending", label: "Trending & editorial" },
     { key: "seasonalIdeas", label: "Seasonal ideas banner" },

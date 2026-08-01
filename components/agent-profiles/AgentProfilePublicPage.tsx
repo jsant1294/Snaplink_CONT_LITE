@@ -12,7 +12,16 @@ function track(id: string, eventType: string) {
   }).catch(() => {});
 }
 
-export default function AgentProfilePublicPage({ profile, lang }: { profile: Omit<AgentProfile, "pin">; lang: Lang }) {
+export default function AgentProfilePublicPage({
+  profile,
+  lang,
+  variant = "snaplink",
+}: {
+  profile: Omit<AgentProfile, "pin">;
+  lang: Lang;
+  /** "southline" adds a CTA back to the full SnapLink profile + booking/website links. */
+  variant?: "southline" | "snaplink";
+}) {
   useEffect(() => {
     track(profile.id, "view");
   }, [profile.id]);
@@ -100,6 +109,26 @@ export default function AgentProfilePublicPage({ profile, lang }: { profile: Omi
 
       {typeof profile.yearsExperience === "number" && (
         <p className="mb-6 text-sm text-[#62584F]">{t("yearsExperience", lang)}: {profile.yearsExperience}</p>
+      )}
+
+      {variant === "southline" && (
+        <div className="mb-6 space-y-2">
+          {profile.bookingLink && (
+            <a href={profile.bookingLink} target="_blank" rel="noreferrer" className="btn-gold block w-full text-center">
+              Book a Consultation
+            </a>
+          )}
+          {profile.website && (
+            <a href={profile.website} target="_blank" rel="noreferrer" className="btn-outline block w-full text-center !border-[#B99552] !bg-[#F5EFE4]/55 !text-[#6F552A]">
+              Visit Website
+            </a>
+          )}
+          {profile.username && (
+            <a href={`/p/${profile.username}`} className="btn-outline block w-full text-center !border-[#B99552] !bg-[#F5EFE4]/55 !text-[#6F552A]">
+              View Full SnapLink Profile
+            </a>
+          )}
+        </div>
       )}
 
       <button onClick={saveContact} className="btn-outline w-full !border-[#B99552] !bg-[#F5EFE4]/55 !text-[#6F552A]">
