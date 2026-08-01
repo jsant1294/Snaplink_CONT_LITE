@@ -60,6 +60,22 @@ export const contractors = pgTable(
  * `published` is false (the default), the public page renders exactly as it did
  * before this table existed.
  */
+/**
+ * Single-row table (id is always "default"). Southline's CMS settings were
+ * previously a JSON file in .data/ — fine for local dev, but Vercel's
+ * serverless functions have a read-only filesystem outside /tmp, so every
+ * read/write in production threw ENOENT. The whole SouthlineSettings object
+ * is stored as one jsonb blob rather than modeled relationally: it's a large,
+ * deeply-nested, frequently-reshaped config object, and this matches how
+ * other loosely-structured blobs (e.g. contractors.payments) are already
+ * stored in this schema.
+ */
+export const southlineSettings = pgTable("southline_settings", {
+  id: text("id").primaryKey(),
+  data: jsonb("data").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+});
+
 export const contractorLandingPages = pgTable(
   "contractor_landing_pages",
   {
