@@ -50,7 +50,7 @@ export default async function ContractorProfilePage({
     <>
       <Header lang={lang} />
       <div className="bg-[#EEE7DA] py-6">
-        <ContractorPublicPage contractor={contractor} landingPage={landingPage} />
+        <ContractorPublicPage contractor={contractor} landingPage={landingPage} lang={lang} />
       </div>
       <Footer lang={lang} />
       <LucioMount lang={lang} pageContext={{ type: "contractor", ref: contractor.username }} />

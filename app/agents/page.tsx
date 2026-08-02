@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { publicAgentProfile } from "@/lib/agent-profiles/auth";
-import { agentProfessionTypeLabel } from "@/lib/profession-types";
+import { agentProfessionTypeLabel, professionPlaceholderPhotoFor } from "@/lib/profession-types";
 import { t, type Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
@@ -31,16 +31,26 @@ export default async function AgentsDirectoryPage() {
         ) : (
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {profiles.map((agent) => (
-              <article key={agent.id} className="rounded-2xl border border-walnut/15 bg-cream p-5 shadow-sm">
-                <p className="inline-block rounded-full border border-walnut/20 bg-sand/25 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.15em] text-[#6F552A]">
-                  {agentProfessionTypeLabel(agent.professionType, lang)}
-                </p>
-                <h2 className="mt-2 font-display text-xl text-obsidian">{agent.name}</h2>
-                {agent.brokerageName && <p className="mt-1 text-sm text-[#6A5F55]">{agent.brokerageName}</p>}
-                {agent.serviceArea && <p className="mt-1 text-xs text-[#6F552A]">{agent.serviceArea}</p>}
-                <Link href={`/agents/${agent.slug}`} className="mt-4 inline-flex rounded-xl border border-walnut/25 px-4 py-2 text-sm font-semibold text-obsidian">
-                  {t("viewProfile", lang)}
-                </Link>
+              <article key={agent.id} className="overflow-hidden rounded-2xl border border-walnut/15 bg-cream shadow-sm">
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src={agent.photoUrl || professionPlaceholderPhotoFor(agent.id, agent.professionType)}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                  <span className="absolute left-3 top-3 rounded-full bg-obsidian/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.15em] text-cream">
+                    {agentProfessionTypeLabel(agent.professionType, lang)}
+                  </span>
+                </div>
+                <div className="p-5">
+                  <h2 className="font-display text-xl text-obsidian">{agent.name}</h2>
+                  {agent.brokerageName && <p className="mt-1 text-sm text-[#6A5F55]">{agent.brokerageName}</p>}
+                  {agent.serviceArea && <p className="mt-1 text-xs text-[#6F552A]">{agent.serviceArea}</p>}
+                  <Link href={`/agents/${agent.slug}`} className="mt-4 inline-flex min-h-[44px] items-center rounded-xl border border-walnut/25 px-4 py-2 text-sm font-semibold text-obsidian focus:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                    {t("viewProfile", lang)}
+                  </Link>
+                </div>
               </article>
             ))}
           </div>

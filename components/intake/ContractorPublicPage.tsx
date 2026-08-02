@@ -10,12 +10,15 @@ import IntakeWizard from "./IntakeWizard";
 export default function ContractorPublicPage({
   contractor,
   landingPage,
+  lang: initialLang = "en",
 }: {
   contractor: Contractor;
   /** Only rendered when `published` — otherwise this page looks exactly as it always has. */
   landingPage?: ContractorLandingPage | null;
+  /** Seeds the page from the site-wide sl_lang cookie; the in-page toggle below still overrides it for this visit. */
+  lang?: Lang;
 }) {
-  const [lang, setLang] = useState<Lang>("en");
+  const [lang, setLang] = useState<Lang>(initialLang);
   const [mode, setMode] = useState<"home" | "intake">("home");
   const [intakeIntent, setIntakeIntent] = useState<"estimate" | "photos" | "walkthrough">("estimate");
 
@@ -64,7 +67,7 @@ export default function ContractorPublicPage({
   }
 
   return (
-    <main className="min-h-screen max-w-md mx-auto px-5 pb-16 pt-6 text-[#2F2923]">
+    <main className="min-h-screen max-w-md mx-auto px-5 pb-16 pt-6 text-[#2F2923] sm:max-w-2xl sm:px-8 sm:pt-10 lg:max-w-4xl">
       {/* Language toggle */}
       <div className="flex justify-end mb-4">
         <div className="inline-flex rounded-full border border-[#B99552]/60 bg-[#F5EFE4]/45 overflow-hidden text-xs">
@@ -132,11 +135,11 @@ export default function ContractorPublicPage({
       </header>
 
       {/* Primary actions */}
-      <div className="space-y-3 mb-6">
-        <button onClick={() => startIntake("estimate")} className="btn-gold w-full text-lg">
+      <div className="space-y-3 mb-6 sm:flex sm:gap-3 sm:space-y-0">
+        <button onClick={() => startIntake("estimate")} className="btn-gold w-full text-lg sm:flex-1">
           {t("requestEstimate", lang)}
         </button>
-        <button onClick={() => startIntake("photos")} className="btn-outline w-full !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55">
+        <button onClick={() => startIntake("photos")} className="btn-outline w-full !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55 sm:flex-1">
           {t("uploadPhotos", lang)}
         </button>
         {ctaLabel && (
@@ -144,7 +147,7 @@ export default function ContractorPublicPage({
             href={lp?.ctaUrl || `tel:${contractor.phone}`}
             target={lp?.ctaUrl ? "_blank" : undefined}
             rel={lp?.ctaUrl ? "noopener noreferrer" : undefined}
-            className="btn-outline w-full block text-center !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55"
+            className="btn-outline w-full block text-center !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55 sm:flex-1"
           >
             {ctaLabel}
           </a>
@@ -173,7 +176,7 @@ export default function ContractorPublicPage({
       </div>
 
       {/* Secondary actions */}
-      <div className="space-y-3">
+      <div className="space-y-3 sm:grid sm:grid-cols-2 sm:gap-3 sm:space-y-0">
         <button
           onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
           className="btn-outline w-full !border-[#B99552] !text-[#6F552A] !bg-[#F5EFE4]/55"
@@ -218,7 +221,7 @@ export default function ContractorPublicPage({
       {/* Services */}
       <section id="services" className="mt-10">
         <h2 className="font-display text-2xl font-semibold text-[#2F2923] mb-4">{t("services", lang)}</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {contractor.services.map((s) => (
             <button
               key={s}
@@ -236,7 +239,7 @@ export default function ContractorPublicPage({
       {contractor.galleryUrls && contractor.galleryUrls.length > 0 && (
         <section className="mt-10">
           <h2 className="font-display text-2xl font-semibold text-[#2F2923] mb-4">{t("ourWork", lang)}</h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-4">
             {contractor.galleryUrls.slice(0, 6).map((url, i) => (
               <img
                 key={url}

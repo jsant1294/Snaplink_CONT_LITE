@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { contractorStore, campaignStore } from "@/lib/store";
 import { isModuleEnabled } from "@/lib/entitlements";
 import type { Campaign } from "@/lib/campaign-types";
-import type { Lang } from "@/lib/southline-i18n";
+import { t, type Lang } from "@/lib/southline-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +82,7 @@ export default async function CampaignPage({
             rel={campaign.ctaType === "url" ? "noopener noreferrer" : undefined}
             className="mt-6 inline-block rounded-full bg-gold px-8 py-3 text-sm font-semibold text-obsidian focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-black/70"
           >
-            {lang === "es" ? "Contactar" : "Contact"}
+            {t("contactCtaLabel", lang)}
           </a>
         </div>
       </div>

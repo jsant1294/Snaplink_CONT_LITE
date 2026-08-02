@@ -59,7 +59,7 @@ export default async function ResultsPage({
               />
               {category && <input type="hidden" name="category" value={category} />}
               <button className="rounded-xl bg-[#2F2923] px-5 py-3 text-sm font-semibold text-[#F5EFE4]">
-                {lang === "es" ? "Buscar" : "Search"}
+                {t("heroSearch", lang)}
               </button>
             </form>
           </div>

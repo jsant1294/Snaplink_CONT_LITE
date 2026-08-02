@@ -232,6 +232,15 @@ export const UI_DEFS = {
     es: "No hay contenido disponible en este momento.",
     en: "No content available at the moment.",
   },
+  noProfessionalsYet: {
+    es: "Aún no tenemos profesionales en esta categoría. Explora todos los servicios disponibles.",
+    en: "We don't have professionals in this category yet. Browse all available services.",
+  },
+  browseAllServices: { es: "Ver todos los servicios", en: "Browse all services" },
+  trustedProfessionalsNetwork: {
+    es: "Profesionales de confianza a través de la red Snaplink",
+    en: "Trusted professionals through the Snaplink network",
+  },
 
   // Agent profiles (Snaplink Profile)
   navAgents: { es: "Agentes", en: "Agents" },
@@ -264,6 +273,8 @@ export const UI_DEFS = {
     es: "Impulsado por Snaplink Profile",
     en: "Powered by Snaplink Profile",
   },
+  visitWebsite: { es: "Visitar sitio web", en: "Visit Website" },
+  viewFullSnaplinkProfile: { es: "Ver perfil completo de SnapLink", en: "View Full SnapLink Profile" },
 
   // Unified professional profile — profession-neutral copy for the shared
   // agent_profiles model, so one identity renders correctly for real estate
