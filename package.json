@@ -26,7 +26,8 @@
     "test:professional-discovery": "node --test tests/professional-discovery.test.mjs tests/home-service-taxonomy.test.mjs tests/southline-search.test.mjs",
     "test:professional-catalog": "node --test tests/professional-catalog.test.mjs",
     "test:professional-intake": "node --test tests/professional-intake.test.mjs",
-    "test:professional-intake-payment": "node --test tests/professional-intake-payment.test.mjs"
+    "test:professional-intake-payment": "node --test tests/professional-intake-payment.test.mjs",
+    "test:contractor-route-500-recovery": "node --test tests/contractor-route-500-recovery.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.25",
