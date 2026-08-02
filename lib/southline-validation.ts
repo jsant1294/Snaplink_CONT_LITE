@@ -451,6 +451,22 @@ function validateSnapLinkPromo(patch: Record<string, unknown>): string | null {
       return `snapLinkPromo.${field} must be a boolean`;
     }
   }
+  for (const field of [
+    "eyebrowEn",
+    "eyebrowEs",
+    "titleEn",
+    "titleEs",
+    "bodyEn",
+    "bodyEs",
+    "ctaLabelEn",
+    "ctaLabelEs",
+    "secondaryLineEn",
+    "secondaryLineEs",
+  ]) {
+    if (patch[field] !== undefined && !isString(patch[field]) && patch[field] !== null) {
+      return `snapLinkPromo.${field} must be a string or null`;
+    }
+  }
   return null;
 }
 

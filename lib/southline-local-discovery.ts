@@ -219,7 +219,6 @@ export type CrossPromoClickEventPayload = {
 
 export type CrossPromoCategory = {
   id: string;
-  emoji: string;
   labelEn: string;
   labelEs: string;
   // SnapLink directory category slug. Left null until an operator confirms the
@@ -231,17 +230,19 @@ export type CrossPromoCategory = {
 // Entry points into the SnapLink Local directory — never fabricated merchants,
 // ratings, or availability. Slugs stay null (see CrossPromoCategory) until real
 // directory categories are confirmed, matching the Local Discovery convention.
+// Text-only by design — no decorative icon field — for a premium editorial
+// look, not a consumer-app icon grid.
 export const DEFAULT_LOCAL_PROMO_CATEGORIES: CrossPromoCategory[] = [
-  { id: "restaurants", emoji: "🍴", labelEn: "Restaurants", labelEs: "Restaurantes", snaplinkCategory: null },
-  { id: "retail", emoji: "🛍", labelEn: "Retail", labelEs: "Comercios", snaplinkCategory: null },
-  { id: "photography", emoji: "📸", labelEn: "Photography", labelEs: "Fotografía", snaplinkCategory: null },
-  { id: "automotive", emoji: "🚗", labelEn: "Automotive", labelEs: "Automotriz", snaplinkCategory: null },
-  { id: "beauty", emoji: "💄", labelEn: "Beauty", labelEs: "Belleza", snaplinkCategory: null },
-  { id: "events", emoji: "🎉", labelEn: "Events", labelEs: "Eventos", snaplinkCategory: null },
-  { id: "medical", emoji: "🩺", labelEn: "Medical", labelEs: "Salud", snaplinkCategory: null },
-  { id: "business-services", emoji: "💼", labelEn: "Business Services", labelEs: "Servicios profesionales", snaplinkCategory: null },
-  { id: "entertainment", emoji: "🎵", labelEn: "Entertainment", labelEs: "Entretenimiento", snaplinkCategory: null },
-  { id: "shopping", emoji: "🛒", labelEn: "Shopping", labelEs: "Compras", snaplinkCategory: null },
+  { id: "restaurants", labelEn: "Restaurants", labelEs: "Restaurantes", snaplinkCategory: null },
+  { id: "retail", labelEn: "Retail", labelEs: "Comercios", snaplinkCategory: null },
+  { id: "photography", labelEn: "Photography", labelEs: "Fotografía", snaplinkCategory: null },
+  { id: "automotive", labelEn: "Automotive", labelEs: "Automotriz", snaplinkCategory: null },
+  { id: "beauty", labelEn: "Beauty", labelEs: "Belleza", snaplinkCategory: null },
+  { id: "events", labelEn: "Events", labelEs: "Eventos", snaplinkCategory: null },
+  { id: "medical", labelEn: "Medical", labelEs: "Salud", snaplinkCategory: null },
+  { id: "business-services", labelEn: "Business Services", labelEs: "Servicios profesionales", snaplinkCategory: null },
+  { id: "entertainment", labelEn: "Entertainment", labelEs: "Entretenimiento", snaplinkCategory: null },
+  { id: "shopping", labelEn: "Shopping", labelEs: "Compras", snaplinkCategory: null },
 ];
 
 // Builds the cross-promo destination: the SnapLink Local directory for the

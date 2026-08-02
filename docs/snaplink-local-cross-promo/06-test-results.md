@@ -68,9 +68,25 @@ for this redesign):
   component would duplicate that existing pattern rather than extend it.
 - No dedicated CMS diagnostics/status badge was added for this section (see
   [03-cms-controls.md](./03-cms-controls.md) "Diagnostics" for why).
-- Headline/body/CTA copy is still sourced from the i18n dictionary, not per-field CMS text
-  inputs — matches this section's pre-existing content model; changing that would be a larger,
-  separate change affecting how every other homepage section stores copy.
+
+## Follow-up: copy fields + no-emoji chips
+
+After initial ship, eyebrow/headline/body/CTA label/secondary-line all became CMS-editable
+(`string | null`, defaulting to `null` = "use the i18n text"), and the `emoji` field was removed
+from `CrossPromoCategory`/`DEFAULT_LOCAL_PROMO_CATEGORIES` entirely (chips are text-only now) —
+both per direction that this is a premium site. 5 more tests added
+(`node --test tests/southline-cross-promo.test.mjs` — **28/28 passing**):
+
+- copy fields default to `null` and are preserved (not silently defaulted) by
+  `mergeSnapLinkPromoContent`
+- settings validation accepts string-or-null copy fields, rejects other types
+- the component resolves each copy field from CMS content with i18n fallback
+- the CMS editor exposes all 10 copy inputs
+- no `emoji` field/property exists in `lib/southline-local-discovery.ts`, and no emoji literal
+  or `chip.emoji` reference exists in the component source
+
+`tsc --noEmit` and `npm run build` re-verified clean after this follow-up (isolated `distDir`,
+reverted immediately after, same as the initial pass).
 
 ## Recommended next slice
 

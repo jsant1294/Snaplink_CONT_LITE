@@ -29,10 +29,12 @@ the section looks, not where it points people.
   Hero/Seasonal/Home Services are already edited in this repo (one CMS editor with per-section
   tabs, not one editor component per homepage section).
 - **Content type**: `SnapLinkPromoContent` in `lib/southline-types.ts`, stored as
-  `SouthlineSettings.snapLinkPromo`. Headline/body/CTA copy stays in the i18n dictionary
-  (`lib/southline-i18n.ts`, `localPromo*` keys) — this section's CMS-editable surface is the
-  image and its presentation, matching the existing "content in i18n, media/layout in CMS"
-  split used by Hero (`heroImage`) and Seasonal.
+  `SouthlineSettings.snapLinkPromo`. Image/layout fields plus eyebrow/headline/body/CTA
+  label/secondary-line copy overrides are all CMS-editable; every copy field defaults to
+  `null`, meaning "use the `lib/southline-i18n.ts` `localPromo*` text" — so existing settings
+  rows render identically until an operator explicitly overrides a field.
+- **Category chips**: text-only (`lib/southline-local-discovery.ts` `CrossPromoCategory`) — no
+  emoji/icon field, per direction that this is a premium site.
 - **Store**: both `lib/southline-store-json.ts` and `lib/southline-store-pg.ts` merge
   `stored.snapLinkPromo` against `DEFAULT_SNAPLINK_PROMO` on every read
   (`mergeSnapLinkPromoContent`), so existing settings rows without this field get it

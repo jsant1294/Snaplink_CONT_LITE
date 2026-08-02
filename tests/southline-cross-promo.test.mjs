@@ -25,7 +25,7 @@ test("CROSS_PROMO_EVENT and CROSS_PROMO_PLACEMENT match the documented contract"
   assert.equal(CROSS_PROMO_PLACEMENT, "homepage-cross-promo");
 });
 
-test("DEFAULT_LOCAL_PROMO_CATEGORIES ships the spec chips, all bilingual with emojis and no guessed slugs", () => {
+test("DEFAULT_LOCAL_PROMO_CATEGORIES ships the spec chips, text-only (no emoji), and no guessed slugs", () => {
   const ids = DEFAULT_LOCAL_PROMO_CATEGORIES.map((c) => c.id);
   assert.deepEqual(ids, [
     "restaurants",
@@ -40,7 +40,7 @@ test("DEFAULT_LOCAL_PROMO_CATEGORIES ships the spec chips, all bilingual with em
     "shopping",
   ]);
   assert.equal(new Set(ids).size, ids.length, "chip ids must be unique");
-  assert.ok(DEFAULT_LOCAL_PROMO_CATEGORIES.every((c) => c.emoji.length > 0));
+  assert.ok(DEFAULT_LOCAL_PROMO_CATEGORIES.every((c) => !("emoji" in c)), "premium site: chips are text-only, no emoji field");
   assert.ok(DEFAULT_LOCAL_PROMO_CATEGORIES.every((c) => typeof c.labelEn === "string" && c.labelEn.length > 0));
   assert.ok(DEFAULT_LOCAL_PROMO_CATEGORIES.every((c) => typeof c.labelEs === "string" && c.labelEs.length > 0));
   assert.ok(
@@ -241,4 +241,57 @@ test("the Homepage admin editor exposes a SnapLink Local Promo tab with image, l
 test("the upload route allowlists the snaplink-promo image kind", async () => {
   const route = await source("../app/api/southline/upload/route.ts");
   assert.match(route, /"snaplink-promo"/);
+});
+
+// --- No emoji (premium site) ---------------------------------------------------
+
+test("category chips are text-only: no emoji field, no emoji rendered", async () => {
+  const lib = await source("../lib/southline-local-discovery.ts");
+  assert.doesNotMatch(lib, /emoji/i);
+  const section = await source("../components/southline/SnapLinkLocalPromo.tsx");
+  assert.doesNotMatch(section, /chip\.emoji/);
+  assert.doesNotMatch(section, /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u, "no emoji literal in the component source");
+});
+
+// --- CMS-editable copy (eyebrow/headline/body/CTA/secondary line) --------------
+
+test("DEFAULT_SNAPLINK_PROMO copy fields default to null (use i18n text) and are preserved by merge", () => {
+  for (const field of [
+    "eyebrowEn", "eyebrowEs", "titleEn", "titleEs",
+    "bodyEn", "bodyEs", "ctaLabelEn", "ctaLabelEs",
+    "secondaryLineEn", "secondaryLineEs",
+  ]) {
+    assert.equal(DEFAULT_SNAPLINK_PROMO[field], null, `${field} must default to null`);
+  }
+  const merged = mergeSnapLinkPromoContent({ titleEn: "Custom headline", ctaLabelEs: "Personalizado" });
+  assert.equal(merged.titleEn, "Custom headline");
+  assert.equal(merged.ctaLabelEs, "Personalizado");
+  assert.equal(merged.titleEs, null, "unset copy fields stay null, not silently defaulted to text");
+});
+
+test("settings validation accepts string-or-null snapLinkPromo copy fields and rejects other types", async () => {
+  const { validateSouthlineSettings } = await import("../lib/southline-validation.ts");
+  assert.equal(validateSouthlineSettings({ snapLinkPromo: { titleEn: "A headline", bodyEs: null } }), null);
+  assert.equal(validateSouthlineSettings({ snapLinkPromo: { titleEn: 42 } }) !== null, true);
+  assert.equal(validateSouthlineSettings({ snapLinkPromo: { ctaLabelEs: [] } }) !== null, true);
+});
+
+test("SnapLinkLocalPromo resolves eyebrow/headline/body/CTA/secondary-line copy from CMS content with i18n fallback", async () => {
+  const section = await source("../components/southline/SnapLinkLocalPromo.tsx");
+  assert.match(section, /promo\.eyebrowEs : promo\.eyebrowEn\) \|\| t\("localPromoEyebrow", lang\)/);
+  assert.match(section, /promo\.titleEs : promo\.titleEn\) \|\| t\("localPromoTitle", lang\)/);
+  assert.match(section, /promo\.bodyEs : promo\.bodyEn\) \|\| t\("localPromoBody", lang\)/);
+  assert.match(section, /promo\.ctaLabelEs : promo\.ctaLabelEn\) \|\| t\("localPromoCta", lang\)/);
+  assert.match(section, /promo\.secondaryLineEs : promo\.secondaryLineEn\) \|\| t\("localPromoPoweredBy", lang\)/);
+});
+
+test("the Homepage admin editor exposes copy fields for the SnapLink Local Promo section", async () => {
+  const editor = await source("../components/southline/admin/HomepageEditor.tsx");
+  for (const label of [
+    "Eyebrow (EN)", "Eyebrow (ES)", "Headline (EN)", "Headline (ES)",
+    "Body (EN)", "Body (ES)", "CTA label (EN)", "CTA label (ES)",
+    "Secondary line (EN)", "Secondary line (ES)",
+  ]) {
+    assert.ok(editor.includes(label), `missing CMS field: ${label}`);
+  }
 });

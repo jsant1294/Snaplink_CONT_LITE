@@ -57,7 +57,7 @@ function emitCrossPromo(payload: CrossPromoClickEventPayload, onExplore?: (p: Cr
   }
 }
 
-function Badge({ lang, tone }: { lang: Lang; tone: "onLight" | "onDark" }) {
+function Badge({ lang, tone, label }: { lang: Lang; tone: "onLight" | "onDark"; label: string }) {
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 ${
@@ -67,7 +67,7 @@ function Badge({ lang, tone }: { lang: Lang; tone: "onLight" | "onDark" }) {
       <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-md bg-gold text-[10px] font-bold text-obsidian">
         S
       </span>
-      <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">{t("localPromoEyebrow", lang)}</span>
+      <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">{label}</span>
     </span>
   );
 }
@@ -100,9 +100,8 @@ function ChipRow({
           href={buildCrossPromoUrl(lang, inbound, chip.snaplinkCategory)}
           {...handOffProps}
           onClick={() => track(chip.id, chip.snaplinkCategory)}
-          className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-[transform,border-color,background-color] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${chipClass}`}
+          className={`inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm font-medium transition-[transform,border-color,background-color] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${chipClass}`}
         >
-          <span aria-hidden="true">{chip.emoji}</span>
           {lang === "es" ? chip.labelEs : chip.labelEn}
         </a>
       ))}
@@ -175,17 +174,27 @@ export default function SnapLinkLocalPromo({
   const isFullBackground = promo.layout === "full-background";
   const tone: "onLight" | "onDark" = isFullBackground ? "onDark" : "onLight";
 
-  const eyebrowNode = promo.showBadge && <Badge lang={lang} tone={tone} />;
+  // CMS copy overrides fall back to the i18n dictionary when unset — same
+  // "empty means use the shipped default" contract as this section's image
+  // fields, so existing settings rows render exactly as before this field
+  // existed.
+  const eyebrowText = (lang === "es" ? promo.eyebrowEs : promo.eyebrowEn) || t("localPromoEyebrow", lang);
+  const titleText = (lang === "es" ? promo.titleEs : promo.titleEn) || t("localPromoTitle", lang);
+  const bodyText = (lang === "es" ? promo.bodyEs : promo.bodyEn) || t("localPromoBody", lang);
+  const ctaLabelText = (lang === "es" ? promo.ctaLabelEs : promo.ctaLabelEn) || t("localPromoCta", lang);
+  const secondaryLineText = (lang === "es" ? promo.secondaryLineEs : promo.secondaryLineEn) || t("localPromoPoweredBy", lang);
+
+  const eyebrowNode = promo.showBadge && <Badge lang={lang} tone={tone} label={eyebrowText} />;
   const titleNode = (
     <h2
       id="snaplink-local-promo-title"
       className={`mt-4 font-display text-3xl leading-tight sm:text-4xl ${isFullBackground ? "text-cream" : "text-obsidian"}`}
     >
-      {t("localPromoTitle", lang)}
+      {titleText}
     </h2>
   );
   const bodyNode = (
-    <p className={`mt-3 ${isFullBackground ? "text-cream/85" : "text-clay"}`}>{t("localPromoBody", lang)}</p>
+    <p className={`mt-3 ${isFullBackground ? "text-cream/85" : "text-clay"}`}>{bodyText}</p>
   );
   const chipsNode = promo.showChips && (
     <ChipRow lang={lang} categories={categories} inbound={inbound} track={track} handOffProps={handOffProps} tone={tone} />
@@ -197,13 +206,13 @@ export default function SnapLinkLocalPromo({
       onClick={() => track(null, null)}
       className="inline-flex items-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-gold/90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-cream motion-reduce:transition-none motion-reduce:active:scale-100"
     >
-      {t("localPromoCta", lang)}
+      {ctaLabelText}
       <span aria-hidden="true">→</span>
     </a>
   );
   const secondaryLineNode = promo.showSecondaryLine && (
     <p className={`mt-6 text-xs uppercase tracking-[0.25em] ${isFullBackground ? "text-cream/70" : "text-clay"}`}>
-      {t("localPromoPoweredBy", lang)}
+      {secondaryLineText}
     </p>
   );
 

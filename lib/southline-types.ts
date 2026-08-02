@@ -94,6 +94,19 @@ export interface SnapLinkPromoContent {
   showBadge: boolean;
   showChips: boolean;
   showSecondaryLine: boolean;
+  // Copy overrides. Null (the shipped default) means "use the i18n dictionary
+  // text" (lib/southline-i18n.ts localPromo* keys) — same as this section's
+  // pre-redesign behavior. Set to override without a code change/redeploy.
+  eyebrowEn: string | null;
+  eyebrowEs: string | null;
+  titleEn: string | null;
+  titleEs: string | null;
+  bodyEn: string | null;
+  bodyEs: string | null;
+  ctaLabelEn: string | null;
+  ctaLabelEs: string | null;
+  secondaryLineEn: string | null;
+  secondaryLineEs: string | null;
 }
 
 export interface HomeServicesContent {
@@ -573,6 +586,16 @@ export const DEFAULT_SNAPLINK_PROMO: SnapLinkPromoContent = {
   showBadge: true,
   showChips: true,
   showSecondaryLine: true,
+  eyebrowEn: null,
+  eyebrowEs: null,
+  titleEn: null,
+  titleEs: null,
+  bodyEn: null,
+  bodyEs: null,
+  ctaLabelEn: null,
+  ctaLabelEs: null,
+  secondaryLineEn: null,
+  secondaryLineEs: null,
 };
 
 // Deep-merges a stored (possibly partial or absent) SnapLink promo section

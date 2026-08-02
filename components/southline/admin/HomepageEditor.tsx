@@ -958,9 +958,96 @@ function SnapLinkPromoTab({
   return (
     <div className="space-y-4">
       <p className="text-xs text-muted">
-        Edit the image-driven SnapLink Local cross-promo section. Headline/body copy comes from the
-        site dictionary (EN/ES) — this tab controls the image and its presentation.
+        Edit the image-driven SnapLink Local cross-promo section — image, layout, and copy. Leave
+        a copy field blank to use the site&apos;s default text.
       </p>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Eyebrow (EN)</label>
+          <input
+            className="input"
+            value={local.eyebrowEn ?? ""}
+            onChange={(e) => setLocal({ ...local, eyebrowEn: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Eyebrow (ES)</label>
+          <input
+            className="input"
+            value={local.eyebrowEs ?? ""}
+            onChange={(e) => setLocal({ ...local, eyebrowEs: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Headline (EN)</label>
+          <textarea
+            className="input !resize-y"
+            rows={2}
+            value={local.titleEn ?? ""}
+            onChange={(e) => setLocal({ ...local, titleEn: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Headline (ES)</label>
+          <textarea
+            className="input !resize-y"
+            rows={2}
+            value={local.titleEs ?? ""}
+            onChange={(e) => setLocal({ ...local, titleEs: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Body (EN)</label>
+          <textarea
+            className="input !resize-y"
+            rows={3}
+            value={local.bodyEn ?? ""}
+            onChange={(e) => setLocal({ ...local, bodyEn: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Body (ES)</label>
+          <textarea
+            className="input !resize-y"
+            rows={3}
+            value={local.bodyEs ?? ""}
+            onChange={(e) => setLocal({ ...local, bodyEs: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">CTA label (EN)</label>
+          <input
+            className="input"
+            value={local.ctaLabelEn ?? ""}
+            onChange={(e) => setLocal({ ...local, ctaLabelEn: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">CTA label (ES)</label>
+          <input
+            className="input"
+            value={local.ctaLabelEs ?? ""}
+            onChange={(e) => setLocal({ ...local, ctaLabelEs: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Secondary line (EN)</label>
+          <input
+            className="input"
+            value={local.secondaryLineEn ?? ""}
+            onChange={(e) => setLocal({ ...local, secondaryLineEn: e.target.value || null })}
+          />
+        </div>
+        <div>
+          <label className="label">Secondary line (ES)</label>
+          <input
+            className="input"
+            value={local.secondaryLineEs ?? ""}
+            onChange={(e) => setLocal({ ...local, secondaryLineEs: e.target.value || null })}
+          />
+        </div>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <ImageField
