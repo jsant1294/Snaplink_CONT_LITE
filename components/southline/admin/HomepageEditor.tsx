@@ -13,6 +13,14 @@ import type {
   TrendingProjectItem,
 } from "@/lib/southline-types";
 import { isSeasonalActive } from "@/lib/seasonal-schedule";
+import {
+  HOME_SERVICE_CATEGORIES,
+  HOME_SERVICE_GROUPS,
+  HOME_SERVICE_SPECIALTIES,
+  LOCAL_DISCOVERY_LEGACY_MAP,
+  getHomeServiceCategory,
+  resolveCategoryId,
+} from "@/lib/home-service-taxonomy";
 import ImageField from "./ImageField";
 
 function isoToLocalInput(iso?: string): string {
@@ -31,7 +39,7 @@ function localInputToIso(value: string): string | undefined {
   return d.toISOString();
 }
 
-type Tab = "hero" | "sections" | "services" | "trending" | "seasonal" | "categories" | "snapLinkPromo";
+type Tab = "hero" | "sections" | "services" | "trending" | "seasonal" | "categories" | "snapLinkPromo" | "taxonomy";
 
 export default function HomepageEditor({ pin }: { pin: string }) {
   const [settings, setSettings] = useState<SouthlineSettings | null>(null);
@@ -101,6 +109,7 @@ export default function HomepageEditor({ pin }: { pin: string }) {
     { key: "categories", label: "Categories" },
     { key: "snapLinkPromo", label: "SnapLink Local Promo" },
     { key: "sections", label: "Sections" },
+    { key: "taxonomy", label: "Taxonomy" },
   ];
 
   return (
@@ -143,6 +152,7 @@ export default function HomepageEditor({ pin }: { pin: string }) {
       {activeTab === "snapLinkPromo" && (
         <SnapLinkPromoTab content={settings.snapLinkPromo} busy={busy} pin={pin} onSave={save} />
       )}
+      {activeTab === "taxonomy" && <TaxonomyTab settings={settings} />}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-charcoal border border-gold/40 rounded-xl px-4 py-2.5 text-sm shadow-card z-50">
@@ -1220,6 +1230,148 @@ function SectionsTab({
           />
         </label>
       ))}
+    </div>
+  );
+}
+
+// Read-only taxonomy view (Professional Discovery, Phase 6). Public category
+// chips and Home Services cards render from lib/home-service-taxonomy.ts — this
+// tab documents the source of truth and flags stored CMS ids that no longer
+// resolve. It deliberately has no save handler: taxonomy is code, not CMS data.
+function TaxonomyTab({ settings }: { settings: SouthlineSettings }) {
+  const activeCount = HOME_SERVICE_CATEGORIES.filter((c) => c.active).length;
+  const configuredLocal = settings.localDiscovery?.categories ?? [];
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-xl border border-white/10 bg-charcoal/60 p-4">
+        <p className="text-sm text-bone font-medium mb-1">Single source of truth</p>
+        <p className="text-xs text-muted">
+          Public category chips (professional directory) and the Home Services cards are
+          rendered from the shared taxonomy (lib/home-service-taxonomy.ts). Read-only —
+          categories live in code, edits happen in the taxonomy slice, not here.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs">
+          <span className="rounded-full bg-cream/10 px-2.5 py-1 text-bone">Groups: {HOME_SERVICE_GROUPS.length}</span>
+          <span className="rounded-full bg-cream/10 px-2.5 py-1 text-bone">Categories: {HOME_SERVICE_CATEGORIES.length}</span>
+          <span className="rounded-full bg-cream/10 px-2.5 py-1 text-bone">Active: {activeCount}</span>
+          <span className="rounded-full bg-cream/10 px-2.5 py-1 text-bone">Specialties: {HOME_SERVICE_SPECIALTIES.length}</span>
+        </div>
+      </div>
+
+      {HOME_SERVICE_GROUPS.map((g) => {
+        const cats = HOME_SERVICE_CATEGORIES.filter((c) => c.parentId === g.id).sort(
+          (a, b) => a.sortOrder - b.sortOrder
+        );
+        if (!cats.length) return null;
+        return (
+          <div key={g.id}>
+            <h4 className="text-sm font-semibold text-bone mb-2">
+              {g.labelEn} · {g.labelEs}{" "}
+              <span className="text-xs text-muted font-normal">({g.id})</span>
+            </h4>
+            <div className="space-y-1.5">
+              {cats.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between rounded-lg border border-white/10 bg-charcoal/40 px-3 py-2 text-xs"
+                >
+                  <div className="min-w-0">
+                    <span className="text-bone font-medium">{c.labelEn}</span>
+                    <span className="text-muted"> · {c.labelEs}</span>
+                    <span className="text-muted/70 ml-2 font-mono">{c.id}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                    <span
+                      className={`px-2 py-0.5 rounded-full ${
+                        c.audience === "contractor"
+                          ? "bg-sage/20 text-sage"
+                          : c.audience === "professional"
+                            ? "bg-gold/15 text-gold"
+                            : "bg-cream/15 text-bone"
+                      }`}
+                    >
+                      {c.audience}
+                    </span>
+                    {c.featured && (
+                      <span className="px-2 py-0.5 rounded-full bg-gold/15 text-gold">featured</span>
+                    )}
+                    {!c.active && (
+                      <span className="px-2 py-0.5 rounded-full bg-danger/15 text-danger">inactive</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      <div>
+        <h4 className="text-sm font-semibold text-bone mb-2">Local Discovery legacy → taxonomy</h4>
+        <p className="text-xs text-muted mb-2">
+          Each legacy Local Discovery slug resolves to a canonical category id.
+        </p>
+        <div className="space-y-1.5">
+          {Object.entries(LOCAL_DISCOVERY_LEGACY_MAP).map(([slug, id]) => {
+            const resolved = getHomeServiceCategory(id);
+            return (
+              <div
+                key={slug}
+                className="flex items-center justify-between rounded-lg border border-white/10 bg-charcoal/40 px-3 py-2 text-xs"
+              >
+                <span className="font-mono text-muted">{slug}</span>
+                <span className="font-mono text-bone">
+                  {id} · {resolved?.labelEn ?? "unresolved"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-semibold text-bone mb-2">Configured Local Discovery categories</h4>
+        <p className="text-xs text-muted mb-2">
+          CMS-stored category ids must resolve to the taxonomy or the card is skipped at render
+          time.
+        </p>
+        {configuredLocal.length === 0 ? (
+          <p className="text-xs text-muted">No custom categories — site defaults apply.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {configuredLocal.map((cat) => {
+              const forwarded = cat.internalSlug || cat.id;
+              const resolved = resolveCategoryId(forwarded);
+              return (
+                <div
+                  key={cat.id}
+                  className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs ${
+                    resolved
+                      ? "border-white/10 bg-charcoal/40"
+                      : "border-danger/40 bg-danger/5"
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <span className="text-bone font-medium">{cat.labelEn}</span>
+                    <span className="text-muted"> · {cat.labelEs}</span>
+                    <span className="text-muted/70 ml-2 font-mono">→ {forwarded}</span>
+                  </div>
+                  <div className="shrink-0 ml-3">
+                    {resolved ? (
+                      <span className="text-sage">
+                        resolves → {resolved} · {getHomeServiceCategory(resolved)?.labelEn}
+                      </span>
+                    ) : (
+                      <span className="text-danger">unknown — skipped</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -170,7 +170,10 @@ test("/results page uses the shared search lib and the uniform ProfessionalCard"
   const page = await source("../app/results/page.tsx");
   assert.match(page, /searchProfessionals/);
   assert.match(page, /ProfessionalCard/);
-  assert.match(page, /SERVICE_CATEGORIES/);
+  // Category chips are sourced from the shared taxonomy (single display source),
+  // not the duplicated SERVICE_CATEGORIES array.
+  assert.match(page, /listSouthlineHomeServices/);
+  assert.doesNotMatch(page, /SERVICE_CATEGORIES/);
   assert.match(page, /resultsAll|resultsFilterLabel/);
   assert.match(page, /agentProfileStore|contractorStore/);
 });

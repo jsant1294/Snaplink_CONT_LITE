@@ -21,7 +21,10 @@
     "db:seed:categories": "node scripts/seed-categories.mjs",
     "db:seed:demo": "node scripts/seed-demo-ridgeline.mjs",
     "db:seed:agent-profiles-system": "node scripts/seed-agent-profiles-system.mjs",
-    "db:seed:agent-profiles-demo": "node scripts/seed-agent-profiles-demo.mjs"
+    "db:seed:agent-profiles-demo": "node scripts/seed-agent-profiles-demo.mjs",
+    "test:taxonomy": "node --test tests/home-service-taxonomy.test.mjs tests/southline-search.test.mjs",
+    "test:professional-discovery": "node --test tests/professional-discovery.test.mjs tests/home-service-taxonomy.test.mjs tests/southline-search.test.mjs",
+    "test:professional-catalog": "node --test tests/professional-catalog.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.25",

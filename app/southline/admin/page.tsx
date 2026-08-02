@@ -16,8 +16,9 @@ import ContactEditor from "@/components/southline/admin/ContactEditor";
 import TestimonialsEditor from "@/components/southline/admin/TestimonialsEditor";
 import LocalDiscoveryEditor from "@/components/southline/admin/LocalDiscoveryEditor";
 import SeoEditor from "@/components/southline/admin/SeoEditor";
+import ProfessionalCatalogPanel from "@/components/southline/admin/ProfessionalCatalogPanel";
 
-type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "realestate" | "faq" | "footer" | "contact" | "testimonials" | "localDiscovery" | "seo";
+type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "realestate" | "faq" | "footer" | "contact" | "testimonials" | "localDiscovery" | "seo" | "catalog";
 
 export default function SouthlineAdminPage() {
   return (
@@ -32,6 +33,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "homepage", label: "Homepage" },
+    { key: "catalog", label: "Professional Catalog" },
     { key: "featured", label: "Featured Pros" },
     { key: "recruitment", label: "Recruitment Leads" },
     { key: "agents", label: "Agent Management" },
@@ -86,6 +88,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
         {/* Content */}
         <div className="bg-charcoal border border-white/5 rounded-2xl p-6">
           {tab === "homepage" && <HomepageEditor pin={pin} />}
+          {tab === "catalog" && <ProfessionalCatalogPanel pin={pin} />}
           {tab === "featured" && <FeaturedProsPicker pin={pin} />}
           {tab === "recruitment" && <RecruitmentLeadsViewer pin={pin} />}
           {tab === "agents" && <AgentProfilesPanel pin={pin} />}

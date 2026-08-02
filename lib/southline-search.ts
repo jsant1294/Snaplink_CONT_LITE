@@ -13,13 +13,25 @@
 //    tagline, area(s), specialties, categories, license state, and the
 //    profession-type label in both languages (so "photographer" / "fotógrafo"
 //    finds a photographer on the unified professional model).
-//  - A category filter matches against SERVICE_CATEGORIES ids. Contractors map
-//    via their services' canonical category; agents map via any category/
-//    specialty equal to the category label, its id, or one of its services.
+//  - A category filter matches against the shared taxonomy (lib/home-service-
+//    taxonomy.ts). Contractors map via their services' canonical category;
+//    agents map via profession, category/specialty labels, ids, or aliases.
+//    The filter value is resolved through the same taxonomy (bilingual labels,
+//    aliases, Local Discovery legacy slugs); unknown values filter to nothing
+//    (never a silent fallback to an unrelated or guessed category).
 // ---------------------------------------------------------------------------
 
-import { SERVICE_CATEGORIES, SERVICE_LIBRARY, getService } from "./services.ts";
+import { SERVICE_LIBRARY, getService } from "./services.ts";
 import { agentProfessionTypeLabel, professionTypeLabel } from "./profession-types.ts";
+import {
+  HOME_SERVICE_CATEGORIES,
+  HOME_SERVICE_SPECIALTIES,
+  categoryMatchTerms,
+  getHomeServiceSpecialty,
+  professionCategoryId,
+  resolveCategoryId,
+  specialtyMatchTerms,
+} from "./home-service-taxonomy.ts";
 import type { Contractor } from "./types.ts";
 import type { AgentProfile } from "./agent-profiles/types.ts";
 
@@ -76,18 +88,18 @@ export function categoryIdsForContractor(contractor: Contractor): string[] {
 }
 
 export function categoryIdsForAgent(profile: AgentProfile): string[] {
+  const set = new Set<string>();
+  const profCat = professionCategoryId(profile.professionType);
+  if (profCat) set.add(profCat);
   const haystack = [...profile.categories, ...profile.specialties].map(normalize);
-  const ids: string[] = [];
-  for (const cat of SERVICE_CATEGORIES) {
-    const label = normalize(cat.en);
-    const labelEs = normalize(cat.es);
-    const serviceNames = SERVICE_LIBRARY.filter((s) => s.category === cat.id).map((s) => normalize(s.name));
-    const hit = haystack.some(
-      (h) => h === label || h === labelEs || h === normalize(cat.id) || serviceNames.includes(h)
-    );
-    if (hit) ids.push(cat.id);
+  for (const cat of HOME_SERVICE_CATEGORIES) {
+    const terms = [cat.labelEn, cat.labelEs, cat.id, ...cat.aliases].map(normalize);
+    const specialtyNames = HOME_SERVICE_SPECIALTIES.filter((s) => s.parentId === cat.id)
+      .flatMap((s) => [s.labelEn, s.labelEs, ...s.aliases])
+      .map(normalize);
+    if (haystack.some((h) => terms.includes(h) || specialtyNames.includes(h))) set.add(cat.id);
   }
-  return ids;
+  return [...set];
 }
 
 /**
@@ -100,14 +112,21 @@ export function searchProfessionals(
   options: ProfessionalSearchOptions = {}
 ): ProfessionalResult[] {
   const q = normalize(options.query ?? "");
-  const category = options.category ?? "";
+  // Resolve the filter through the shared taxonomy (id, legacy slug, label, or
+  // alias). An UNRESOLVED value is preserved as-is so it still filters to an
+  // empty result set — never a silent fallback to an unrelated category.
+  const category = resolveCategoryId(options.category ?? "") ?? options.category ?? "";
   const results: ProfessionalResult[] = [];
 
   for (const c of contractors) {
     const catIds = categoryIdsForContractor(c);
     if (category && !catIds.includes(category)) continue;
+    const profCat = professionCategoryId(c.professionType);
+    const profTerms = profCat ? categoryMatchTerms(profCat) : [];
+    const serviceTerms = c.services.flatMap((s) => specialtyMatchTerms(s));
     const matches = matchesQuery(
-      [c.businessName, c.tagline, c.serviceArea, professionTypeLabel(c.professionType, "en"), professionTypeLabel(c.professionType, "es"), ...c.services],
+      [c.businessName, c.tagline, c.serviceArea, professionTypeLabel(c.professionType, "en"), professionTypeLabel(c.professionType, "es"), ...c.services,
+        ...serviceTerms, ...profTerms],
       q
     );
     if (!matches) continue;
@@ -133,9 +152,20 @@ export function searchProfessionals(
     if (!isSouthlineListedAgent(a)) continue;
     const catIds = categoryIdsForAgent(a);
     if (category && !catIds.includes(category)) continue;
+    const profCat = professionCategoryId(a.professionType);
+    const profTerms = profCat ? categoryMatchTerms(profCat) : [];
+    const categoryTerms = a.categories.flatMap((c) => {
+      const id = resolveCategoryId(c);
+      return id ? categoryMatchTerms(id) : [c];
+    });
+    const specialtyTerms = a.specialties.flatMap((s) => {
+      const sp = getHomeServiceSpecialty(s);
+      return sp ? specialtyMatchTerms(s) : [s];
+    });
     const matches = matchesQuery(
       [a.name, a.displayName, a.brokerageName, a.officeName, a.tagline, a.serviceArea, a.licenseState, ...a.serviceAreas, ...a.specialties, ...a.categories,
-        agentProfessionTypeLabel(a.professionType, "en"), agentProfessionTypeLabel(a.professionType, "es")],
+        agentProfessionTypeLabel(a.professionType, "en"), agentProfessionTypeLabel(a.professionType, "es"),
+        ...categoryTerms, ...specialtyTerms, ...profTerms],
       q
     );
     if (!matches) continue;

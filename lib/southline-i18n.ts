@@ -182,6 +182,15 @@ export const UI_DEFS = {
   resultsFilterLabel: { es: "Filtrar por servicio", en: "Filter by service" },
   resultsViewAll: { es: "Ver todos los resultados", en: "View all results" },
   licensedProfessional: { es: "Profesional certificado", en: "Licensed Professional" },
+  catalogEmptyTitle: {
+    es: "Aún no hay profesionales publicados en esta categoría.",
+    en: "No published professionals are available in this category yet.",
+  },
+  catalogEmptyBody: {
+    es: "Vuelve pronto o explora otro servicio del hogar.",
+    en: "Check back soon or explore another home service.",
+  },
+  catalogEmptyExplore: { es: "Explorar todos los servicios", en: "Explore all services" },
 
   // DIY
   diyTitle: { es: "Proyectos DIY", en: "DIY Projects" },

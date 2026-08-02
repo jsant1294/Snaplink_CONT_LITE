@@ -118,6 +118,10 @@ function validateStringOrNull(patch: Record<string, unknown>, key: string, prefi
   return null;
 }
 
+function isStringArray(v: unknown): v is string[] {
+  return Array.isArray(v) && v.every((x) => typeof x === "string");
+}
+
 function validateContact(patch: Record<string, unknown>): string | null {
   if (patch.enabled !== undefined && !isBoolean(patch.enabled)) {
     return "contact.enabled must be a boolean";
@@ -506,6 +510,20 @@ export function validateSouthlineSettings(patch: unknown): string | null {
     if (!isRecord(patch.snapLinkPromo)) return "snapLinkPromo must be an object";
     const err = validateSnapLinkPromo(patch.snapLinkPromo);
     if (err) return err;
+  }
+  // Operator-curated featured directory controls (ordered lists — position is
+  // the featured order). Values are profile ids, so they must be strings,
+  // and each id may appear at most once — a duplicate would otherwise be a
+  // valid-looking array that renders the same professional's card twice.
+  for (const key of ["featuredContractorIds", "featuredAgentProfileIds"]) {
+    if (patch[key] === undefined) continue;
+    if (!isStringArray(patch[key])) {
+      return `${key} must be an array of strings`;
+    }
+    const ids = patch[key] as string[];
+    if (new Set(ids).size !== ids.length) {
+      return `${key} must not contain duplicate ids`;
+    }
   }
   return null;
 }

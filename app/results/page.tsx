@@ -7,10 +7,12 @@ import ProfessionalCard from "@/components/southline/ProfessionalCard";
 import LucioMount from "@/components/lucio/LucioMount";
 import type { Lang } from "@/lib/southline-i18n";
 import { t } from "@/lib/southline-i18n";
-import { SERVICE_CATEGORIES } from "@/lib/services";
+import { listSouthlineHomeServices } from "@/lib/home-service-taxonomy";
 import { contractorStore } from "@/lib/store";
 import { agentProfileStore } from "@/lib/agent-profiles/store";
+import { southlineStore } from "@/lib/southline-store";
 import { searchProfessionals } from "@/lib/southline-search";
+import { orderProfessionalResults } from "@/lib/southline-professional-catalog";
 
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 
@@ -30,12 +32,24 @@ export default async function ResultsPage({
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
   const { q, category } = await searchParams;
 
-  const [contractors, agentProfiles] = await Promise.all([
+  const [contractors, agentProfiles, settings] = await Promise.all([
     contractorStore.list().catch(() => []),
     agentProfileStore.list().catch(() => []),
+    southlineStore.getSettings().catch(() => null),
   ]);
 
-  const professionals = searchProfessionals(contractors, agentProfiles, { query: q, category });
+  // Catalog adapter re-applies the curated featured order (featuredOrder asc →
+  // updatedAt desc → displayName asc) and marks CMS-featured pros as featured.
+  const professionals = orderProfessionalResults(
+    searchProfessionals(contractors, agentProfiles, { query: q, category }),
+    settings?.featuredContractorIds ?? [],
+    settings?.featuredAgentProfileIds ?? []
+  );
+
+  // Single display source: the shared taxonomy. audience: "both" lists every
+  // active category (contractor + professional) with locale-resolved labels and
+  // stable ids that preserve the /results?category= URL contract.
+  const categories = listSouthlineHomeServices({ locale: lang, audience: "both" });
 
   return (
     <>
@@ -80,7 +94,7 @@ export default async function ResultsPage({
             >
               {t("resultsAll", lang)}
             </Link>
-            {SERVICE_CATEGORIES.map((c) => {
+            {categories.map((c) => {
               const active = category === c.id;
               const href = `?${new URLSearchParams({ ...(q ? { q } : {}), category: c.id }).toString()}`;
               return (
@@ -93,7 +107,7 @@ export default async function ResultsPage({
                       : "bg-[#E4DACB] text-[#62584F] hover:bg-[#D8CBBA]"
                   }`}
                 >
-                  {lang === "es" ? c.es : c.en}
+                  {c.label}
                 </Link>
               );
             })}
@@ -102,8 +116,20 @@ export default async function ResultsPage({
           <div className="mt-8">
             {professionals.length === 0 ? (
               <div className="rounded-[18px] border border-walnut/15 bg-[#E4DACB] p-10 text-center">
-                <h2 className="font-display text-2xl">{t("searchNoResults", lang)}</h2>
-                <p className="mt-2 text-sm text-[#6A5F55]">{t("resultsEmpty", lang)}</p>
+                <h2 className="font-display text-2xl">
+                  {category ? t("catalogEmptyTitle", lang) : t("searchNoResults", lang)}
+                </h2>
+                <p className="mt-2 text-sm text-[#6A5F55]">
+                  {category ? t("catalogEmptyBody", lang) : t("resultsEmpty", lang)}
+                </p>
+                {category && (
+                  <Link
+                    href="/results"
+                    className="mt-6 inline-block rounded-xl bg-[#2F2923] px-6 py-3 text-sm font-semibold text-[#F5EFE4]"
+                  >
+                    {t("catalogEmptyExplore", lang)}
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

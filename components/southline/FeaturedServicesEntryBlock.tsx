@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { t, type Lang } from "@/lib/southline-i18n";
 import { DEMO_FEATURED_PROFESSIONAL } from "@/lib/featured-services-fixtures";
-import { PROFESSION_TYPES, professionTypeLabel, professionPlaceholderPhotoFor } from "@/lib/profession-types";
+import { professionTypeLabel, professionPlaceholderPhotoFor } from "@/lib/profession-types";
+import { listSouthlineHomeServices } from "@/lib/home-service-taxonomy";
 import type { HomeServicesContent } from "@/lib/southline-types";
 import type { Contractor } from "@/lib/types";
 
@@ -49,6 +50,10 @@ export default function FeaturedServicesEntryBlock({
   const subtitle = lang === "es" ? content?.descriptionEs : content?.descriptionEn;
   const requestQuoteLabel = lang === "es" ? content?.primaryCtaLabelEs : content?.primaryCtaLabelEn;
   const requestQuoteHref = content?.primaryCtaUrl ?? "/book";
+  // Home Services cards come from the shared taxonomy (single display source).
+  // Deterministic ordering (group + sortOrder), locale-resolved labels, and each
+  // card links into the real professionals directory filter (/results?category=).
+  const serviceCategories = listSouthlineHomeServices({ locale: lang });
 
   return (
     <section id="services" className="bg-sand/20 py-14 sm:py-20">
@@ -158,16 +163,16 @@ export default function FeaturedServicesEntryBlock({
           </Link>
         </div>
 
-        {/* Category strip — no dedicated professional-search-by-category page exists yet,
-            so every chip points at the real professionals grid rather than a dead link. */}
+        {/* Category cards — sourced from the shared taxonomy; every card points at
+            the real professionals directory filter rather than a dead link. */}
         <div id="service-categories" className="mt-6 flex flex-wrap gap-2">
-          {PROFESSION_TYPES.map((p) => (
+          {serviceCategories.map((c) => (
             <Link
-              key={p.id}
-              href="/#professionals"
+              key={c.id}
+              href={`/results?category=${c.id}`}
               className="rounded-full border border-walnut/20 bg-cream px-3.5 py-1.5 text-xs font-medium text-walnut transition-colors hover:border-olive/40 hover:text-obsidian"
             >
-              {professionTypeLabel(p.id, lang)}
+              {c.label}
             </Link>
           ))}
         </div>

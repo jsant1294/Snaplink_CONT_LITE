@@ -44,16 +44,15 @@ export default async function HomePage() {
 
   const sections = settings?.sections ?? null;
   const hero = settings?.hero ?? null;
-  const featuredIds = new Set(settings?.featuredContractorIds ?? []);
   const navItems = settings?.navigation?.items ?? null;
-  const featuredContractors = featuredIds.size > 0
-    ? allContractors.filter((c) => featuredIds.has(c.id))
-    : allContractors;
   const featuredAgentIds = new Set(settings?.featuredAgentProfileIds ?? []);
   const featuredAgents = (featuredAgentIds.size > 0
     ? activeAgentProfiles.filter((a) => featuredAgentIds.has(a.id))
     : activeAgentProfiles
   ).map(publicAgentProfile);
+  // The professionals section consumes the raw store lists and the curated
+  // featured ids; it orders featured pros first (curated order) itself.
+  const featuredSectionAgents = activeAgentProfiles.map(publicAgentProfile);
   const realEstateContent = settings?.realEstateBlock ?? DEFAULT_REAL_ESTATE_BLOCK;
   // featuredAgents predates this block (it gated the old grid-style section) and
   // now gates this combined entry block instead — same "show real estate on the
@@ -103,7 +102,13 @@ export default async function HomePage() {
           <FeaturedServicesEntryBlock lang={lang} content={settings?.homeServices} featuredContractor={featuredContractor} />
         )}
         {(!sections || sections.featuredPros) && (
-          <FeaturedProfessionals contractors={featuredContractors} lang={lang} />
+          <FeaturedProfessionals
+            contractors={allContractors}
+            agents={featuredSectionAgents}
+            featuredContractorIds={settings?.featuredContractorIds ?? []}
+            featuredAgentProfileIds={settings?.featuredAgentProfileIds ?? []}
+            lang={lang}
+          />
         )}
         {(!sections || sections.poweredBySnaplink) && <PoweredBySnapLink lang={lang} />}
         {(!sections || sections.categories) && <CategoriesGrid lang={lang} categories={settings?.categories} />}

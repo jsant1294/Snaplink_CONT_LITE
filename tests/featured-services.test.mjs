@@ -48,9 +48,10 @@ test("demo featured-professional content is clearly fictional and never reuses a
   }
 });
 
-test("the category strip covers the profession taxonomy and every chip links to a real page, never a dead '#'", async () => {
+test("the category strip is sourced from the shared taxonomy and every chip links to a real page, never a dead '#'", async () => {
   const text = await source("../components/southline/FeaturedServicesEntryBlock.tsx");
-  assert.match(text, /PROFESSION_TYPES\.map/);
+  assert.match(text, /listSouthlineHomeServices/);
+  assert.match(text, /results\?category=/);
   assert.doesNotMatch(text, /href="#"/);
   assert.doesNotMatch(text, /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u);
 });
