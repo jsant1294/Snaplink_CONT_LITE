@@ -20,6 +20,21 @@ function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
 }
 
+function validateFeaturedRentals(patch: Record<string, unknown>): string | null {
+  for (const field of ["eyebrowEn", "eyebrowEs", "headlineEn", "headlineEs", "descriptionEn", "descriptionEs", "ctaEn", "ctaEs"]) {
+    if (patch[field] !== undefined && !isString(patch[field])) {
+      return `featuredRentals.${field} must be a string`;
+    }
+  }
+  if (patch.maxCards !== undefined && (!isFiniteNumber(patch.maxCards) || patch.maxCards < 1 || patch.maxCards > 4)) {
+    return "featuredRentals.maxCards must be a number from 1 to 4";
+  }
+  if (patch.selectedRentalIds !== undefined && (!Array.isArray(patch.selectedRentalIds) || !patch.selectedRentalIds.every(isString))) {
+    return "featuredRentals.selectedRentalIds must be an array of strings";
+  }
+  return null;
+}
+
 function validateFaq(patch: Record<string, unknown>): string | null {
   if (patch.enabled !== undefined && !isBoolean(patch.enabled)) {
     return "faq.enabled must be a boolean";
@@ -419,7 +434,7 @@ function validateLocalDiscovery(patch: Record<string, unknown>): string | null {
 
 const SNAPLINK_PROMO_LAYOUTS = ["image-left", "image-right", "full-background"];
 const SNAPLINK_PROMO_OVERLAYS = ["none", "light", "medium", "strong"];
-const SNAPLINK_PROMO_FOCAL_POINTS = ["left", "center", "right"];
+const SNAPLINK_PROMO_FOCAL_POINTS = ["left", "center", "right", "bottom"];
 const SNAPLINK_PROMO_MOBILE_FOCAL_POINTS = ["top", "center", "bottom"];
 const SNAPLINK_PROMO_ALIGNMENTS = ["left", "right"];
 
@@ -476,6 +491,11 @@ function validateSnapLinkPromo(patch: Record<string, unknown>): string | null {
 
 export function validateSouthlineSettings(patch: unknown): string | null {
   if (!isRecord(patch)) return "Patch must be an object";
+  if (patch.featuredRentals !== undefined) {
+    if (!isRecord(patch.featuredRentals)) return "featuredRentals must be an object";
+    const err = validateFeaturedRentals(patch.featuredRentals);
+    if (err) return err;
+  }
   if (patch.faq !== undefined) {
     if (!isRecord(patch.faq)) return "faq must be an object";
     const err = validateFaq(patch.faq);

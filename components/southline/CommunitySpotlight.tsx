@@ -12,16 +12,16 @@ export default function CommunitySpotlight({
   if (items.length === 0) return null;
 
   return (
-    <section className="bg-sand/20 py-16 sm:py-24">
+    <section className="bg-page py-14 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-xs tracking-[0.35em] uppercase text-gold font-medium mb-3">
+        <div className="southline-section-header text-center">
+          <p className="southline-section-eyebrow">
             {lang === "es" ? "Comunidad" : "Community"}
           </p>
-          <h2 className="font-display text-3xl sm:text-4xl text-obsidian leading-tight">
+          <h2 className="southline-section-title">
             {lang === "es" ? "Proyectos destacados" : "Featured Projects"}
           </h2>
-          <p className="text-clay mt-2 max-w-lg mx-auto">
+          <p className="southline-section-description mx-auto max-w-lg">
             {lang === "es"
               ? "Inspírate con proyectos reales de la comunidad Southline."
               : "Get inspired by real projects from the Southline community."}
@@ -38,23 +38,23 @@ export default function CommunitySpotlight({
               <Link
                 key={item.id}
                 href={item.linkUrl}
-                className="group bg-paper rounded-2xl border border-sand/40 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                className="marketplace-card group hover:shadow-lg hover:-translate-y-0.5 transition-all motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
-                <div className="aspect-[16/9] bg-sand/30 flex items-center justify-center text-3xl">
+                <div className="marketplace-card-media flex items-center justify-center text-3xl">
                   {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={title} className="w-full h-full object-cover" />
+                    <img src={item.imageUrl} alt={title} className="marketplace-image-project" />
                   ) : (
                     <span className="opacity-30">🏠</span>
                   )}
                 </div>
-                <div className="p-4">
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-gold">
+                <div className="marketplace-card-body">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-accent-gold">
                     {category}
                   </span>
-                  <h3 className="font-display text-base text-obsidian mt-1 group-hover:text-gold transition-colors">
+                  <h3 className="marketplace-card-title mt-1 group-hover:text-accent-gold transition-colors">
                     {title}
                   </h3>
-                  {desc && <p className="text-xs text-clay mt-1 line-clamp-2">{desc}</p>}
+                  {desc && <p className="marketplace-card-copy mt-1 line-clamp-2">{desc}</p>}
                 </div>
               </Link>
             );

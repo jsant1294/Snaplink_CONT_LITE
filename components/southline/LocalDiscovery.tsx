@@ -224,16 +224,16 @@ export default function LocalDiscovery({
   }
 
   return (
-    <section aria-labelledby={titleId} className="border-b border-walnut/15 bg-ivory">
+    <section aria-labelledby={titleId} className="bg-page">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-2xl text-center">
           {eyebrow && (
-            <p className="text-xs uppercase tracking-[0.35em] text-gold">{eyebrow}</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-accent-gold">{eyebrow}</p>
           )}
-          <h2 id={titleId} className="mt-3 font-display text-3xl leading-tight text-obsidian sm:text-4xl">
+          <h2 id={titleId} className="mt-3 font-display text-3xl leading-tight text-primary sm:text-4xl">
             {title}
           </h2>
-          <p className="mt-3 text-clay">{description}</p>
+          <p className="mt-3 text-text-muted">{description}</p>
         </div>
 
         <form
@@ -242,7 +242,7 @@ export default function LocalDiscovery({
           className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-[1fr_1fr_auto]"
         >
           <div className="min-w-0">
-            <label htmlFor={zipInputId} className="block text-sm font-medium text-obsidian mb-1.5">
+            <label htmlFor={zipInputId} className="block text-sm font-medium text-primary mb-1.5">
               {t("localDiscoveryZipLabel", lang)}
             </label>
             <input
@@ -255,19 +255,19 @@ export default function LocalDiscovery({
               placeholder={zipPlaceholder}
               aria-describedby={error ? errorId : undefined}
               aria-invalid={error ? true : undefined}
-              className="w-full rounded-xl border border-walnut/25 bg-cream px-4 py-3 text-obsidian placeholder:text-clay/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              className="w-full rounded-xl border border-border-default bg-surface px-4 py-3 text-primary placeholder:text-text-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             />
           </div>
 
           <div className="min-w-0">
-            <label htmlFor={categoryInputId} className="block text-sm font-medium text-obsidian mb-1.5">
+            <label htmlFor={categoryInputId} className="block text-sm font-medium text-primary mb-1.5">
               {t("localDiscoveryCategoryLabel", lang)}
             </label>
             <select
               id={categoryInputId}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-xl border border-walnut/25 bg-cream px-4 py-3 text-obsidian focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              className="w-full rounded-xl border border-border-default bg-surface px-4 py-3 text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               <option value="">{t("localDiscoveryCategoryAny", lang)}</option>
               {categories.map((c) => (
@@ -281,18 +281,18 @@ export default function LocalDiscovery({
           <div className="sm:self-end">
             <button
               type="submit"
-              className="w-full rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-gold/90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-ivory motion-reduce:transition-none motion-reduce:active:scale-100"
+              className="w-full rounded-xl bg-accent-gold px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-accent-gold/90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               {submitLabel}
             </button>
           </div>
         </form>
 
-        <p id={errorId} role="alert" aria-live="assertive" className="mx-auto mt-3 max-w-3xl text-center text-sm font-medium text-danger">
+        <p id={errorId} role="alert" aria-live="assertive" className="mx-auto mt-3 max-w-3xl text-center text-sm font-medium text-state-error">
           {error}
         </p>
 
-        <p className="mx-auto mt-3 max-w-3xl text-center text-xs text-clay">
+        <p className="mx-auto mt-3 max-w-3xl text-center text-xs text-text-muted">
           {getDiscoveryHelperText(lang, selectedCategory)}
         </p>
 
@@ -303,20 +303,20 @@ export default function LocalDiscovery({
                 key={c.id}
                 type="button"
                 onClick={() => handleCategoryClick(c)}
-                className="group flex flex-col rounded-2xl border border-walnut/15 bg-cream p-5 text-left transition-colors hover:border-gold/60 hover:bg-cream/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold motion-reduce:transition-none"
+                className="group flex flex-col rounded-2xl border border-border-default bg-surface p-5 text-left shadow-sm transition-colors hover:border-accent-gold/60 hover:bg-surface-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold motion-reduce:transition-none"
               >
                 {c.icon && (
                   <span aria-hidden="true" className="text-2xl">
                     {c.icon}
                   </span>
                 )}
-                <span className="mt-2 font-display text-lg text-obsidian group-hover:text-gold">
+                <span className="mt-2 font-display text-lg text-primary group-hover:text-accent-gold">
                   {lang === "es" ? c.labelEs : c.labelEn}
                 </span>
-                <span className="mt-1 text-sm text-clay">
+                <span className="mt-1 text-sm text-text-muted">
                   {lang === "es" ? (c.descriptionEs ?? c.descriptionEn) : c.descriptionEn}
                 </span>
-                <span className="mt-3 text-xs font-semibold text-gold">
+                <span className="mt-3 text-xs font-semibold text-accent-gold">
                   {getCategoryCta(lang, c)}
                 </span>
               </button>
@@ -324,7 +324,7 @@ export default function LocalDiscovery({
           </div>
         )}
 
-        <p className="mt-8 text-center text-xs uppercase tracking-[0.25em] text-clay">
+        <p className="mt-8 text-center text-xs uppercase tracking-[0.25em] text-text-muted">
           {poweredBy}
         </p>
       </div>

@@ -4,18 +4,14 @@ import { readFile } from "node:fs/promises";
 
 const source = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("the real estate block ('Find a Home') sits directly after the Hero, ahead of Categories and Featured Professionals", async () => {
-  // V3 refactor: homes must never rank below contractors on the homepage — the block
-  // moved from after Featured Professionals to immediately after the Hero.
+test("the real estate entry block leads the homes and rentals marketplace sequence", async () => {
   const page = await source("../app/page.tsx");
   const heroIdx = page.indexOf("<Hero");
   const blockIdx = page.indexOf("<RealEstateEntryBlock");
-  const categoriesIdx = page.indexOf("<CategoriesGrid");
-  const featuredIdx = page.indexOf("<FeaturedProfessionals");
-  assert.ok(heroIdx > -1 && blockIdx > -1 && categoriesIdx > -1 && featuredIdx > -1, "all sections must render");
-  assert.ok(heroIdx < blockIdx, "real estate block must come after the Hero");
-  assert.ok(blockIdx < categoriesIdx, "real estate block must come before Browse Categories");
-  assert.ok(blockIdx < featuredIdx, "real estate block must come before Featured Professionals");
+  const homesIdx = page.indexOf("<FeaturedHomes");
+  const rentalsIdx = page.indexOf("<FeaturedRentals");
+  assert.ok(heroIdx > -1 && blockIdx > -1 && homesIdx > -1 && rentalsIdx > -1, "all sections must render");
+  assert.ok(heroIdx < blockIdx && blockIdx < homesIdx && homesIdx < rentalsIdx, "real estate entry leads homes and rentals after the Hero");
 });
 
 test("primary CTAs route to real pages, never a dead \"#\"", async () => {
@@ -24,7 +20,7 @@ test("primary CTAs route to real pages, never a dead \"#\"", async () => {
   assert.match(text, /href="\/homes/);
   assert.match(text, /href="\/agents/);
   assert.match(text, /href=\{`\/homes\/\$\{property\.slug\}`\}/);
-  assert.match(text, /href=\{`\/agents\/\$\{agent\.slug\}`\}/);
+  assert.match(text, /href=\{agent\.demo \? "\/agents" : `\/agents\/\$\{agent\.slug\}`\}/);
 });
 
 test("the entry block renders only real, already-fetched data — no fabricated reviews, production numbers, or emojis", async () => {

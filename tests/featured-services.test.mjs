@@ -5,13 +5,15 @@ import { execSync } from "node:child_process";
 
 const source = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("Featured Services Marketplace sits directly below the Homes section on the homepage", async () => {
+test("Featured Services Marketplace follows Homes and Rentals on the homepage", async () => {
   const page = await source("../app/page.tsx");
   const featuredHomesIdx = page.indexOf("<FeaturedHomes");
   const servicesIdx = page.indexOf("<FeaturedServicesEntryBlock");
+  const rentalsIdx = page.indexOf("<FeaturedRentals");
   const professionalsIdx = page.indexOf("<FeaturedProfessionals");
   assert.ok(featuredHomesIdx > -1 && servicesIdx > -1 && professionalsIdx > -1, "all three sections must render");
   assert.ok(featuredHomesIdx < servicesIdx, "Featured Services must come after Featured Homes");
+  assert.ok(featuredHomesIdx < rentalsIdx && rentalsIdx < servicesIdx, "Rentals must bridge Homes and Services");
   assert.ok(servicesIdx < professionalsIdx, "Featured Services must come before the professionals grid");
 });
 
@@ -58,7 +60,7 @@ test("the category strip is sourced from the shared taxonomy and every chip link
 
 test("Lucio Financial Copilot (tax/payment) code is untouched by this pass", () => {
   const diff = execSync(
-    "git diff --name-only e407245 -- app/api/contractor/expenses app/api/contractor/forms-1099 app/api/contractor/quarterly app/api/contractor/setasides app/api/contractor/tax-profile app/api/contractor/payees app/api/contractor/year-end-csv app/api/contractor/year-end-pdf lib/store-money-pg.ts lib/store-money-json.ts lib/payments.ts",
+    "git diff --name-only HEAD -- app/api/contractor/expenses app/api/contractor/forms-1099 app/api/contractor/quarterly app/api/contractor/setasides app/api/contractor/tax-profile app/api/contractor/payees app/api/contractor/year-end-csv app/api/contractor/year-end-pdf lib/store-money-pg.ts lib/store-money-json.ts lib/payments.ts",
     { encoding: "utf8" }
   ).trim();
   assert.equal(diff, "", "LFC tax/payment routes and stores must not change for a homepage marketing section");

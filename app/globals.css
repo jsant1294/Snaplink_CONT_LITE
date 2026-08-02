@@ -7,28 +7,77 @@
 :root {
   color-scheme: dark;
 
-  /* Southline Living design tokens — the consumer sub-brand's light palette,
-     mapped onto colors already in tailwind.config.ts (cream/walnut/clay/gold/
-     obsidian/sand/paper/success). Not new colors, not a redesign — a named,
-     reusable reference for the light forms living inside a dark-default app. */
-  --southline-bg: #f1eadf;              /* cream */
-  --southline-surface: #f1eadf;         /* cream */
-  --southline-surface-raised: #e7ddcf;  /* paper — cards atop cream */
-  --southline-text: #5d4635;            /* walnut */
-  --southline-text-muted: #9a614d;      /* clay */
-  --southline-border: rgba(93, 70, 53, 0.2);        /* walnut/20 */
-  --southline-border-strong: rgba(93, 70, 53, 0.4); /* walnut/40 */
-  --southline-accent: #c9a24b;          /* gold */
-  --southline-accent-foreground: #0b0b0d; /* obsidian */
-  --southline-input-bg: #f1eadf;        /* cream */
-  --southline-input-text: #5d4635;      /* walnut */
-  --southline-input-placeholder: rgba(154, 97, 77, 0.7); /* clay/70 */
-  --southline-focus-ring: #0b0b0d;      /* obsidian — real WCAG-compliant focus indicator; gold alone is ~2:1 on cream, under the 3:1 minimum */
-  --southline-focus-accent: #c9a24b;    /* gold — decorative companion border, not the sole indicator */
-  --southline-error: #a93f38;           /* darkened from the app-wide danger red for ~5.1:1 text contrast on cream */
-  --southline-success: #3e9b6e;
-  --southline-disabled-bg: #ddd1c0;     /* sand */
-  --southline-disabled-text: rgba(154, 97, 77, 0.5); /* clay/50 */
+  /* Southline Living semantic color system */
+  --sl-page: #d8d6d0;
+  --sl-section: #d8d6d0;
+  --sl-surface: #f6f3ed;
+  --sl-surface-soft: #e7e4de;
+  --sl-gold: #b88a2e;
+  --sl-gold-strong: #9e7423;
+  --sl-divider: rgba(158, 116, 35, 0.72);
+  --sl-eyebrow: #9e7423;
+  --sl-muted: #59615a;
+  --sl-card-border: rgba(89, 97, 90, 0.52);
+  --color-bg-page: var(--sl-page);
+  --color-bg-section: var(--sl-section);
+  --color-bg-surface: var(--sl-surface);
+  --color-bg-surface-soft: var(--sl-surface-soft);
+  --color-bg-surface-raised: var(--sl-surface);
+  --color-border-default: #aaa79f;
+  --color-text-primary: #202020;
+  --color-text-secondary: #3f5c4a;
+  --color-text-muted: var(--sl-muted);
+  --color-text-on-dark: #fffdf9;
+  --color-text-on-dark-muted: #e8e1d7;
+  --color-accent-gold: var(--sl-gold);
+  --color-accent-gold-text: var(--sl-gold-strong);
+  --color-eyebrow: var(--sl-eyebrow);
+  --color-accent-green: #758a72;
+  --color-accent-dark: #2f4738;
+  --color-image-overlay: #20251f;
+  --color-state-error: #a24e45;
+  --color-state-success: #55725c;
+  --color-bg-page-rgb: 216 214 208;
+  --color-bg-section-rgb: 216 214 208;
+  --color-bg-surface-rgb: 246 243 237;
+  --color-bg-surface-soft-rgb: 231 228 222;
+  --color-bg-surface-raised-rgb: 246 243 237;
+  --color-border-default-rgb: 170 167 159;
+  --color-text-primary-rgb: 32 32 32;
+  --color-text-secondary-rgb: 63 92 74;
+  --color-text-muted-rgb: 89 97 90;
+  --color-text-on-dark-rgb: 255 253 249;
+  --color-text-on-dark-muted-rgb: 232 225 215;
+  --color-accent-gold-rgb: 184 138 46;
+  --color-accent-gold-text-rgb: 158 116 35;
+  --color-eyebrow-rgb: 158 116 35;
+  --color-accent-green-rgb: 117 138 114;
+  --color-accent-dark-rgb: 47 71 56;
+  --color-image-overlay-rgb: 32 37 31;
+  --color-state-error-rgb: 162 78 69;
+  --color-state-success-rgb: 85 114 92;
+
+  /* Form aliases keep native-control behavior centralized. */
+  --southline-bg: var(--color-bg-page);
+  --southline-section: var(--color-bg-section);
+  --southline-surface: var(--color-bg-surface);
+  --southline-surface-soft: var(--color-bg-surface-soft);
+  --southline-surface-raised: var(--color-bg-surface-raised);
+  --southline-text: var(--color-text-primary);
+  --southline-text-muted: var(--color-text-muted);
+  --southline-border: var(--color-border-default);
+  --southline-border-strong: var(--color-text-secondary);
+  --southline-accent: var(--color-accent-gold);
+  --southline-accent-foreground: var(--color-text-primary);
+  --southline-input-bg: var(--color-bg-surface-raised);
+  --southline-input-text: var(--color-text-primary);
+  --southline-input-placeholder: var(--color-text-muted);
+  --southline-focus-ring: var(--color-text-primary);
+  --southline-focus-accent: var(--color-accent-gold);
+  --southline-error: var(--color-state-error);
+  --southline-success: var(--color-state-success);
+  --southline-disabled-bg: var(--color-bg-surface);
+  --southline-disabled-text: var(--color-text-muted);
 }
 
 body {
@@ -85,6 +134,61 @@ body {
     @apply block text-sm font-medium mb-1.5;
     color: var(--southline-text);
   }
+  .southline-btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-accent-gold px-5 py-3 text-sm font-semibold text-primary transition-colors
+      hover:bg-accent-gold/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page;
+  }
+  .southline-btn-secondary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-accent-dark px-5 py-3 text-sm font-semibold text-on-dark transition-colors
+      hover:bg-accent-dark/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-page;
+  }
+  .southline-btn-outline {
+    @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-secondary bg-surface-raised px-5 py-3 text-sm font-semibold text-secondary transition-colors
+      hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-page;
+  }
+  .southline-btn-ghost {
+    @apply inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-secondary transition-colors
+      hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-page;
+  }
+  .marketplace-card {
+    @apply overflow-hidden rounded-2xl border bg-surface-raised shadow-southline-card;
+    border-color: var(--sl-card-border);
+  }
+  .marketplace-card-media {
+    @apply relative aspect-[4/3] w-full overflow-hidden bg-surface;
+  }
+  .marketplace-card-body {
+    @apply p-5 sm:p-6;
+  }
+  .marketplace-card-title {
+    @apply font-display text-xl leading-tight text-primary;
+  }
+  .marketplace-card-copy {
+    @apply mt-2 text-sm leading-relaxed text-text-muted;
+  }
+  .marketplace-chip {
+    @apply inline-flex items-center rounded-md border border-border-default bg-surface-raised px-2.5 py-1 text-xs font-medium text-secondary;
+  }
+  .marketplace-image-portrait {
+    @apply h-full w-full object-cover;
+    object-position: center 20%;
+  }
+  .marketplace-image-project {
+    @apply h-full w-full object-cover;
+    object-position: center bottom;
+  }
+  .southline-section-header {
+    @apply mb-10;
+  }
+  .southline-section-eyebrow {
+    @apply mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-eyebrow;
+  }
+  .southline-section-title {
+    @apply font-display text-3xl leading-tight text-primary sm:text-4xl;
+  }
+  .southline-section-description {
+    @apply mt-3 text-sm leading-relaxed text-secondary sm:text-base;
+  }
   .southline-help {
     @apply text-xs;
     color: var(--southline-text-muted);
@@ -106,6 +210,14 @@ body {
      /southline/admin (none of which render it) keep the correct dark default. */
   body:has(> header[data-southline-header]) {
     color-scheme: light;
+    background-color: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  body:has(> header[data-southline-header]) button,
+  body:has(> header[data-southline-header]) input:not([type="checkbox"]):not([type="radio"]),
+  body:has(> header[data-southline-header]) select {
+    min-height: 44px;
   }
 
   .southline-input:-webkit-autofill,

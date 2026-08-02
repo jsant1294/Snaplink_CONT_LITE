@@ -6,14 +6,14 @@ import { FAQ_CATEGORIES, FAQ_ENTRIES, faqEntriesByCategory, searchFaq } from "..
 
 const source = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
-test("Powered by SnapLink sits after Featured Professionals and before DIY Learning on the homepage", async () => {
+test("Powered by SnapLink sits near the end after DIY Learning and Featured Professionals", async () => {
   const page = await source("../app/page.tsx");
   const proIdx = page.indexOf("<FeaturedProfessionals");
   const snaplinkIdx = page.indexOf("<PoweredBySnapLink");
   const diyIdx = page.indexOf("<DIYLearningTeaser");
   assert.ok(proIdx > -1 && snaplinkIdx > -1 && diyIdx > -1, "all three sections must render");
   assert.ok(proIdx < snaplinkIdx, "Powered by SnapLink must come after Featured Professionals");
-  assert.ok(snaplinkIdx < diyIdx, "Powered by SnapLink must come before DIY Learning");
+  assert.ok(diyIdx < snaplinkIdx, "Powered by SnapLink must follow supporting homeowner content");
 });
 
 test("every FAQ category has at least one published, bilingual entry", () => {

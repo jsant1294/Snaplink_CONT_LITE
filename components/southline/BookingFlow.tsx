@@ -113,20 +113,20 @@ export default function BookingFlow({
     return (
       <div className="text-center py-16 max-w-lg mx-auto">
         <div className="text-5xl mb-4">🎉</div>
-        <h2 className="font-display text-2xl text-obsidian mb-2">
+        <h2 className="font-display text-2xl text-primary mb-2">
           {lang === "es" ? "¡Solicitud enviada!" : "Request sent!"}
         </h2>
-        <p className="text-clay mb-2">
+        <p className="text-text-muted mb-2">
           {lang === "es"
             ? `${selectedContractor?.businessName ?? "El profesional"} recibió los detalles de tu proyecto y te contactará pronto.`
             : `${selectedContractor?.businessName ?? "The professional"} received your project details and will reach out soon.`}
         </p>
-        <p className="text-xs text-clay/60 mb-6">
+        <p className="text-xs text-text-muted/60 mb-6">
           {lang === "es" ? "ID de referencia:" : "Reference ID:"} {leadId}
         </p>
         <button
           onClick={reset}
-          className="bg-gold text-obsidian font-semibold px-6 py-3 rounded-xl hover:bg-goldlight active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+          className="bg-accent-gold text-primary font-semibold px-6 py-3 rounded-xl hover:bg-accent-gold/90 active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2"
         >
           {lang === "es" ? "Enviar otra solicitud" : "Send another request"}
         </button>
@@ -153,15 +153,15 @@ export default function BookingFlow({
             <div key={s} className="flex items-center gap-1">
               <span
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                  thisIdx <= currentIdx ? "bg-gold text-obsidian" : "bg-sand/50 text-clay"
+                  thisIdx <= currentIdx ? "bg-accent-gold text-primary" : "bg-surface/50 text-text-muted"
                 }`}
               >
                 {i + 1}
               </span>
-              <span className={`hidden sm:inline ${thisIdx <= currentIdx ? "text-obsidian" : "text-clay/60"}`}>
+              <span className={`hidden sm:inline ${thisIdx <= currentIdx ? "text-primary" : "text-text-muted/60"}`}>
                 {labels[i]}
               </span>
-              {i < 4 && <span className="w-4 h-px bg-sand/60 hidden sm:block" />}
+              {i < 4 && <span className="w-4 h-px bg-surface/60 hidden sm:block" />}
             </div>
           );
         })}
@@ -170,10 +170,10 @@ export default function BookingFlow({
       {/* Step: Select contractor */}
       {step === "contractor" && (
         <div>
-          <h2 className="font-display text-2xl text-obsidian text-center mb-2">
+          <h2 className="font-display text-2xl text-primary text-center mb-2">
             {lang === "es" ? "Selecciona un profesional" : "Select a professional"}
           </h2>
-          <p className="text-clay text-center mb-6 text-sm">
+          <p className="text-text-muted text-center mb-6 text-sm">
             {lang === "es"
               ? "Elige el contratista con quien deseas conectarte."
               : "Choose the contractor you'd like to connect with."}
@@ -186,10 +186,10 @@ export default function BookingFlow({
                   setSelectedContractor(c);
                   setStep("service");
                 }}
-                className="w-full p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+                className="w-full p-4 rounded-2xl border border-border-default bg-surface hover:border-accent-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <p className="font-semibold text-obsidian">{c.businessName}</p>
-                <p className="text-xs text-clay">{c.serviceArea}</p>
+                <p className="font-semibold text-primary">{c.businessName}</p>
+                <p className="text-xs text-text-muted">{c.serviceArea}</p>
               </button>
             ))}
           </div>
@@ -199,13 +199,13 @@ export default function BookingFlow({
       {/* Step: Select service */}
       {step === "service" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("contractor")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
+          <button onClick={() => setStep("contractor")} className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-xl text-obsidian mb-2">
+          <h2 className="font-display text-xl text-primary mb-2">
             {lang === "es" ? "¿Qué servicio necesitas?" : "What service do you need?"}
           </h2>
-          <p className="text-clay text-sm mb-4">
+          <p className="text-text-muted text-sm mb-4">
             {lang === "es" ? "Selecciona el servicio que mejor describa tu proyecto." : "Pick the service that best describes your project."}
           </p>
           <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -216,9 +216,9 @@ export default function BookingFlow({
                   setSelectedService(svc.name);
                   setStep("details");
                 }}
-                className="w-full p-3 rounded-xl border border-sand/40 bg-paper hover:border-gold/50 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+                className="w-full p-3 rounded-xl border border-border-default bg-surface hover:border-accent-gold/50 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <span className="text-sm font-medium text-obsidian">{serviceLabel(svc.name, lang)}</span>
+                <span className="text-sm font-medium text-primary">{serviceLabel(svc.name, lang)}</span>
               </button>
             ))}
           </div>
@@ -228,15 +228,15 @@ export default function BookingFlow({
       {/* Step: Project details */}
       {step === "details" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("service")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
+          <button onClick={() => setStep("service")} className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-xl text-obsidian mb-4">
+          <h2 className="font-display text-xl text-primary mb-4">
             {lang === "es" ? "Detalles del proyecto" : "Project details"}
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Dirección del proyecto" : "Project address"}
               </label>
               <input
@@ -244,17 +244,17 @@ export default function BookingFlow({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder={lang === "es" ? "Calle, ciudad" : "Street, city"}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               />
             </div>
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "¿Cuándo te gustaría comenzar?" : "When would you like to start?"}
               </label>
               <select
                 value={timeline}
                 onChange={(e) => setTimeline(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               >
                 <option value="">{lang === "es" ? "Selecciona una opción" : "Select an option"}</option>
                 {TIMELINE_OPTIONS.map((to) => (
@@ -263,13 +263,13 @@ export default function BookingFlow({
               </select>
             </div>
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Rango de presupuesto" : "Budget range"}
               </label>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               >
                 <option value="">{lang === "es" ? "Selecciona una opción" : "Select an option"}</option>
                 {BUDGET_OPTIONS.map((bo) => (
@@ -278,14 +278,14 @@ export default function BookingFlow({
               </select>
             </div>
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Notas adicionales" : "Additional notes"}
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="input bg-white border-sand/60 text-obsidian !resize-y"
+                className="input bg-surface-raised border-border-default text-primary !resize-y"
               />
             </div>
             <button onClick={() => setStep("contact")} className="btn-gold w-full">
@@ -298,45 +298,45 @@ export default function BookingFlow({
       {/* Step: Contact info */}
       {step === "contact" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("details")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
+          <button onClick={() => setStep("details")} className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-xl text-obsidian mb-2">
+          <h2 className="font-display text-xl text-primary mb-2">
             {lang === "es" ? "Tu información" : "Your information"}
           </h2>
-          <p className="text-sm text-clay mb-4">
+          <p className="text-sm text-text-muted mb-4">
             {lang === "es"
               ? "El profesional usará estos datos para contactarte."
               : "The professional will use this info to contact you."}
           </p>
           <div className="space-y-4">
             <div>
-              <label className="label text-clay">{lang === "es" ? "Nombre *" : "Name *"}</label>
+              <label className="label text-text-muted">{lang === "es" ? "Nombre *" : "Name *"}</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
                 required
               />
             </div>
             <div>
-              <label className="label text-clay">{lang === "es" ? "Teléfono *" : "Phone *"}</label>
+              <label className="label text-text-muted">{lang === "es" ? "Teléfono *" : "Phone *"}</label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
                 required
               />
             </div>
             <div>
-              <label className="label text-clay">{lang === "es" ? "Correo electrónico" : "Email"}</label>
+              <label className="label text-text-muted">{lang === "es" ? "Correo electrónico" : "Email"}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               />
             </div>
             <button
@@ -353,32 +353,32 @@ export default function BookingFlow({
       {/* Step: Confirm */}
       {step === "confirm" && (
         <div className="max-w-md mx-auto">
-          <button onClick={() => setStep("contact")} className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2">
+          <button onClick={() => setStep("contact")} className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-xl text-obsidian mb-4">
+          <h2 className="font-display text-xl text-primary mb-4">
             {lang === "es" ? "Confirmar solicitud" : "Confirm request"}
           </h2>
-          <div className="bg-paper rounded-2xl border border-sand/40 p-5 space-y-3 mb-6">
+          <div className="bg-surface rounded-2xl border border-border-default p-5 space-y-3 mb-6">
             <div className="flex justify-between text-sm">
-              <span className="text-clay">{lang === "es" ? "Profesional" : "Professional"}</span>
-              <span className="text-obsidian font-medium">{selectedContractor?.businessName}</span>
+              <span className="text-text-muted">{lang === "es" ? "Profesional" : "Professional"}</span>
+              <span className="text-primary font-medium">{selectedContractor?.businessName}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-clay">{lang === "es" ? "Servicio" : "Service"}</span>
-              <span className="text-obsidian font-medium">{serviceLabel(selectedService, lang)}</span>
+              <span className="text-text-muted">{lang === "es" ? "Servicio" : "Service"}</span>
+              <span className="text-primary font-medium">{serviceLabel(selectedService, lang)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-clay">{lang === "es" ? "Nombre" : "Name"}</span>
-              <span className="text-obsidian font-medium">{name}</span>
+              <span className="text-text-muted">{lang === "es" ? "Nombre" : "Name"}</span>
+              <span className="text-primary font-medium">{name}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-clay">{lang === "es" ? "Teléfono" : "Phone"}</span>
-              <span className="text-obsidian font-medium">{phone}</span>
+              <span className="text-text-muted">{lang === "es" ? "Teléfono" : "Phone"}</span>
+              <span className="text-primary font-medium">{phone}</span>
             </div>
           </div>
           {error && (
-            <p className="text-sm text-danger mb-4">{error}</p>
+            <p className="text-sm text-state-error mb-4">{error}</p>
           )}
           <button
             onClick={submit}

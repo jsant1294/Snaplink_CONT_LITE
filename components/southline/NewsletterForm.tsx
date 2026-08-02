@@ -29,7 +29,7 @@ export default function NewsletterForm({ lang }: { lang: Lang }) {
   return (
     <form onSubmit={submit} className="flex gap-2">
       {done ? (
-        <p className="text-sm text-gold w-full text-center py-2.5">
+        <p className="text-sm text-accent-gold w-full text-center py-2.5">
           {lang === "es" ? "¡Gracias por suscribirte!" : "Thanks for subscribing!"}
         </p>
       ) : (
@@ -39,13 +39,13 @@ export default function NewsletterForm({ lang }: { lang: Lang }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t("newsletterPlaceholder", lang)}
-            className="flex-1 bg-charcoal border border-white/10 rounded-xl px-4 py-2.5 text-sm text-bone placeholder:text-bone/30 focus:outline-none focus:border-gold/60"
+            className="flex-1 bg-charcoal border border-white/10 rounded-xl px-4 py-2.5 text-sm text-on-dark placeholder:text-on-dark/30 focus:outline-none focus:border-accent-gold/60"
             required
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-gold text-obsidian font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-goldlight transition-colors shrink-0 disabled:opacity-40"
+            className="bg-accent-gold text-primary font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-accent-gold/90 transition-colors shrink-0 disabled:opacity-40"
           >
             {loading ? "…" : t("newsletterSubmit", lang)}
           </button>

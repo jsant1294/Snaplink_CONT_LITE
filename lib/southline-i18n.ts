@@ -433,17 +433,17 @@ export const UI_DEFS = {
   },
   exploreDiyProjects: { es: "Explorar proyectos DIY", en: "Explore DIY projects" },
 
-  // Homepage: Seasonal Ideas
-  seasonalIdeasEyebrow: { es: "De temporada", en: "Seasonal" },
+  // Homepage: Seasonal DIY
+  seasonalIdeasEyebrow: { es: "Diario DIY de temporada", en: "Seasonal DIY Journal" },
   seasonalIdeasHeadline: {
-    es: "Ideas de temporada para tu hogar",
-    en: "Seasonal ideas for your home",
+    es: "¿Qué vamos a crear esta temporada?",
+    en: "What are we making this season?",
   },
   seasonalIdeasBody: {
-    es: "Desde preparar tu jardín hasta acondicionar tu hogar para el próximo cambio de clima — encuentra inspiración a tiempo.",
-    en: "From getting your garden ready to prepping your home for the next season — find inspiration right on time.",
+    es: "Un poco de tierra, una tarde libre y un proyecto bien pensado pueden transformar cómo se siente tu hogar. Comienza con una renovación sencilla del jardín para la próxima temporada.",
+    en: "A little soil, a free afternoon, and one thoughtful project can change how home feels. Start with a simple garden refresh made for the season ahead.",
   },
-  seasonalIdeasCta: { es: "Ver ideas de temporada", en: "See seasonal ideas" },
+  seasonalIdeasCta: { es: "Probar este proyecto de temporada", en: "Try this seasonal project" },
 
   // Homepage: Cost Estimator
   costEstimatorEyebrow: { es: "Planifica", en: "Plan" },

@@ -54,25 +54,25 @@ export default async function ResultsPage({
   return (
     <>
       <Header lang={lang} />
-      <main className="min-h-screen bg-[#EEE7DA] text-[#2F2923]">
-        <section className="border-b border-walnut/15 px-4 py-14 sm:py-16">
+      <main className="min-h-screen bg-page text-primary">
+        <section className="border-b border-border-default px-4 py-14 sm:py-16">
           <div className="mx-auto max-w-7xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#6F552A]">
+            <p className="text-xs uppercase tracking-[0.3em] text-secondary">
               Southline Living · {t("navPros", lang)}
             </p>
             <h1 className="mt-4 max-w-3xl font-display text-4xl leading-tight sm:text-5xl">
               {t("resultsTitle", lang)}
             </h1>
-            <p className="mt-4 max-w-2xl leading-relaxed text-[#62584F]">{t("resultsSubtitle", lang)}</p>
+            <p className="mt-4 max-w-2xl leading-relaxed text-secondary">{t("resultsSubtitle", lang)}</p>
             <form className="mt-7 flex max-w-xl gap-2">
               <input
                 name="q"
                 defaultValue={q}
                 placeholder={t("searchPlaceholder", lang)}
-                className="min-w-0 flex-1 rounded-xl border border-walnut/20 bg-[#F5EFE4]/70 px-4 py-3 text-base text-[#2F2923] placeholder:text-[#6F552A]/60 outline-none focus:border-[#B99552] focus-visible:ring-2 focus-visible:ring-[#2F2923] focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]"
+                className="min-w-0 flex-1 rounded-xl border border-border-default bg-surface-raised/70 px-4 py-3 text-base text-primary placeholder:text-secondary/60 outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page"
               />
               {category && <input type="hidden" name="category" value={category} />}
-              <button className="rounded-xl bg-[#2F2923] px-5 py-3 text-sm font-semibold text-[#F5EFE4]">
+              <button className="southline-btn-secondary">
                 {t("heroSearch", lang)}
               </button>
             </form>
@@ -81,15 +81,15 @@ export default async function ResultsPage({
 
         <section className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-wider text-[#6F552A]">
+            <span className="text-xs font-medium uppercase tracking-wider text-secondary">
               {t("resultsFilterLabel", lang)}
             </span>
             <Link
               href="/results"
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+              className={`inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                 !category
-                  ? "bg-[#2F2923] text-[#F5EFE4]"
-                  : "bg-[#E4DACB] text-[#62584F] hover:bg-[#D8CBBA]"
+                  ? "bg-accent-dark text-on-dark"
+                  : "bg-surface text-secondary hover:bg-border-default"
               }`}
             >
               {t("resultsAll", lang)}
@@ -101,10 +101,10 @@ export default async function ResultsPage({
                 <Link
                   key={c.id}
                   href={href}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                  className={`inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                     active
-                      ? "bg-[#2F2923] text-[#F5EFE4]"
-                      : "bg-[#E4DACB] text-[#62584F] hover:bg-[#D8CBBA]"
+                      ? "bg-accent-dark text-on-dark"
+                      : "bg-surface text-secondary hover:bg-border-default"
                   }`}
                 >
                   {c.label}
@@ -115,17 +115,17 @@ export default async function ResultsPage({
 
           <div className="mt-8">
             {professionals.length === 0 ? (
-              <div className="rounded-[18px] border border-walnut/15 bg-[#E4DACB] p-10 text-center">
+              <div className="rounded-[18px] border border-border-default bg-surface p-10 text-center">
                 <h2 className="font-display text-2xl">
                   {category ? t("catalogEmptyTitle", lang) : t("searchNoResults", lang)}
                 </h2>
-                <p className="mt-2 text-sm text-[#6A5F55]">
+                <p className="mt-2 text-sm text-text-muted">
                   {category ? t("catalogEmptyBody", lang) : t("resultsEmpty", lang)}
                 </p>
                 {category && (
                   <Link
                     href="/results"
-                    className="mt-6 inline-block rounded-xl bg-[#2F2923] px-6 py-3 text-sm font-semibold text-[#F5EFE4]"
+                    className="southline-btn-secondary mt-6"
                   >
                     {t("catalogEmptyExplore", lang)}
                   </Link>

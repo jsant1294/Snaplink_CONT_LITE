@@ -115,12 +115,14 @@ test("SnapLinkLocalPromo reuses the safe URL builder, fires non-blocking analyti
   assert.doesNotMatch(section, /localSearch|LOCAL_SEARCH_EVENT/);
 });
 
-test("the homepage wires SnapLinkLocalPromo directly after Local Discovery, gated on sections.localPromo", async () => {
+test("the homepage wires SnapLinkLocalPromo as the final content block, gated on sections.localPromo", async () => {
   const page = await source("../app/page.tsx");
-  const localDiscovery = page.indexOf("LocalDiscovery");
-  const promo = page.indexOf("SnapLinkLocalPromo");
+  const localDiscovery = page.indexOf("<LocalDiscovery");
+  const promo = page.indexOf("<SnapLinkLocalPromo");
   assert.ok(promo > -1 && localDiscovery > -1);
   assert.ok(promo > localDiscovery, "promo must render after the Local Discovery block");
+  assert.ok(promo > page.indexOf("<PoweredBySnapLink"), "promo must follow platform attribution");
+  assert.ok(promo < page.indexOf("</main>"), "promo must be the final block inside main");
   assert.match(page, /import SnapLinkLocalPromo from "@\/components\/southline\/SnapLinkLocalPromo";/);
   assert.match(page, /sections\.localPromo !== false/);
   assert.match(page, /<SnapLinkLocalPromo lang=\{lang\} content=\{settings\?\.snapLinkPromo\} \/>/);
@@ -146,7 +148,9 @@ test("both settings stores merge sections against defaults so legacy rows show t
 // --- Image-driven redesign: settings shape ------------------------------------
 
 test("DEFAULT_SNAPLINK_PROMO ships a verified image, safe defaults, and no guessed content", () => {
-  assert.equal(DEFAULT_SNAPLINK_PROMO.layout, "image-left");
+  assert.equal(DEFAULT_SNAPLINK_PROMO.layout, "full-background");
+  assert.equal(DEFAULT_SNAPLINK_PROMO.contentAlignment, "left");
+  assert.equal(DEFAULT_SNAPLINK_PROMO.overlayStrength, "strong");
   assert.ok(DEFAULT_SNAPLINK_PROMO.desktopImageUrl.startsWith("https://images.unsplash.com/"));
   assert.ok(DEFAULT_SNAPLINK_PROMO.mobileImageUrl.startsWith("https://images.unsplash.com/"));
   assert.ok(DEFAULT_SNAPLINK_PROMO.imageAltEn.length > 0);

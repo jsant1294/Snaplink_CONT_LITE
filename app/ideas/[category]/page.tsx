@@ -80,21 +80,21 @@ export default async function CategoryPage({
       <Header lang={lang} />
       <main>
         {/* Breadcrumb */}
-        <div className="bg-cream border-b border-sand/20">
-          <div className="max-w-5xl mx-auto px-4 py-3 text-xs text-clay/60">
-            <Link href="/" className="hover:text-gold transition-colors">{t("navHome", lang)}</Link>
+        <div className="bg-page border-b border-border-default">
+          <div className="max-w-5xl mx-auto px-4 py-3 text-xs text-text-muted/60">
+            <Link href="/" className="hover:text-accent-gold transition-colors">{t("navHome", lang)}</Link>
             <span className="mx-2">/</span>
-            <span className="text-obsidian">{label[lang]}</span>
+            <span className="text-primary">{label[lang]}</span>
           </div>
         </div>
 
         {/* Hero */}
-        <section className="bg-gradient-to-b from-cream to-sand/30 py-16 text-center">
+        <section className="bg-page py-16 text-center">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
-            <h1 className="font-display text-4xl sm:text-5xl text-obsidian leading-tight mb-4">
+            <h1 className="font-display text-4xl sm:text-5xl text-primary leading-tight mb-4">
               {label[lang]}
             </h1>
-            <p className="text-clay max-w-lg mx-auto">
+            <p className="text-text-muted max-w-lg mx-auto">
               {lang === "es"
                 ? `Explora proyectos e ideas para ${label.es.toLowerCase()}. Encuentra inspiración y profesionales locales.`
                 : `Explore projects and ideas for ${label.en.toLowerCase()}. Find inspiration and local professionals.`}
@@ -104,25 +104,25 @@ export default async function CategoryPage({
 
         {/* DIY Projects */}
         {projects.length > 0 && (
-          <section className="bg-cream pb-12">
+          <section className="bg-page pb-12">
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
-              <h2 className="font-display text-xl text-obsidian mb-6">{t("diyTitle", lang)}</h2>
+              <h2 className="font-display text-xl text-primary mb-6">{t("diyTitle", lang)}</h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((p) => (
                   <Link
                     key={p.id}
                     href={`/diy/${p.slug}`}
-                    className="bg-paper rounded-2xl border border-sand/40 p-4 hover:shadow-lg transition-all"
+                    className="marketplace-card marketplace-card-body hover:shadow-lg transition-all"
                   >
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                      p.difficulty === "easy" ? "bg-sage/15 text-sage" : p.difficulty === "medium" ? "bg-amber-900/15 text-amber" : "bg-danger/15 text-danger"
+                      p.difficulty === "easy" ? "bg-accent-green/15 text-secondary" : p.difficulty === "medium" ? "bg-accent-gold/15 text-accent-gold-text" : "bg-state-error/15 text-state-error"
                     }`}>
                       {t(p.difficulty === "easy" ? "diyEasy" : p.difficulty === "medium" ? "diyMedium" : "diyHard", lang)}
                     </span>
-                    <h3 className="font-display text-base text-obsidian mt-2 mb-1">
+                    <h3 className="font-display text-base text-primary mt-2 mb-1">
                       {lang === "es" ? p.titleEs : p.titleEn}
                     </h3>
-                    <p className="text-xs text-clay line-clamp-2">{lang === "es" ? p.descEs : p.descEn}</p>
+                    <p className="text-xs text-text-muted line-clamp-2">{lang === "es" ? p.descEs : p.descEn}</p>
                   </Link>
                 ))}
               </div>
@@ -131,43 +131,43 @@ export default async function CategoryPage({
         )}
 
         {/* Contractors */}
-        <section className="bg-sand/20 pb-16">
+        <section className="bg-page pb-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <h2 className="font-display text-xl text-obsidian mb-6 pt-12">{t("featuredTitle", lang)}</h2>
+            <h2 className="font-display text-xl text-primary mb-6 pt-12">{t("featuredTitle", lang)}</h2>
             {contractors.length > 0 ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {contractors.map((c) => (
                   <Link
                     key={c.id}
                     href={`/contractor/${c.username}`}
-                    className="bg-paper rounded-2xl border border-sand/40 overflow-hidden hover:shadow-lg transition-all flex flex-col"
+                    className="marketplace-card hover:shadow-lg transition-all flex flex-col"
                   >
-                    <div className="relative h-36 overflow-hidden">
+                    <div className="marketplace-card-media">
                       <img
                         src={c.avatarUrl || c.logoUrl || professionPlaceholderPhotoFor(c.id, c.professionType)}
                         alt=""
                         loading="lazy"
-                        className="h-full w-full object-cover"
+                        className="marketplace-image-project"
                       />
-                      <span className="absolute left-3 top-3 rounded-full bg-obsidian/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-cream">
+                      <span className="absolute left-3 top-3 rounded-full bg-accent-dark/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-on-dark">
                         {professionTypeLabel(c.professionType, lang)}
                       </span>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-display text-base text-obsidian mb-1">{c.businessName}</h3>
-                      {c.tagline && <p className="text-xs text-clay line-clamp-2">{c.tagline}</p>}
-                      <span className="text-xs text-gold mt-2 block">{t("viewProfile", lang)} →</span>
+                    <div className="marketplace-card-body">
+                      <h3 className="font-display text-base text-primary mb-1">{c.businessName}</h3>
+                      {c.tagline && <p className="text-xs text-text-muted line-clamp-2">{c.tagline}</p>}
+                      <span className="text-xs text-accent-gold mt-2 block">{t("viewProfile", lang)} →</span>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-sand/40 bg-paper px-6 py-10 text-center">
-                <p className="text-sm text-clay">{t("noProfessionalsYet", lang)}</p>
+              <div className="rounded-2xl border border-border-default bg-surface px-6 py-10 text-center">
+                <p className="text-sm text-text-muted">{t("noProfessionalsYet", lang)}</p>
               </div>
             )}
             <div className="mt-8 text-center">
-              <Link href="/results" className="text-sm font-medium text-gold hover:underline">
+              <Link href="/results" className="text-sm font-medium text-accent-gold hover:underline">
                 {t("browseAllServices", lang)} →
               </Link>
             </div>

@@ -13,7 +13,7 @@ export default function LangToggle({ lang }: { lang: Lang }) {
   return (
     <button
       onClick={toggle}
-      className="text-sm font-medium text-clay hover:text-obsidian transition-colors px-3 py-1.5 rounded-lg hover:bg-sand/50"
+      className="text-sm font-medium text-text-muted hover:text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-surface/50"
       aria-label={t("langLabel", lang)}
     >
       {t("langSwitch", lang)}

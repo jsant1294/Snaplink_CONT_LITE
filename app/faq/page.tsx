@@ -33,14 +33,14 @@ export default async function FaqPage() {
   return (
     <>
       <Header lang={lang} />
-      <main className="bg-ivory">
-        <section className="border-b border-walnut/15 px-4 py-14 sm:py-20">
+      <main className="bg-page">
+        <section className="border-b border-border-default px-4 py-14 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs uppercase tracking-[0.35em] text-gold">{eyebrow ?? "Southline Living"}</p>
-            <h1 className="mt-4 font-display text-4xl leading-tight text-obsidian sm:text-5xl">
+            <p className="text-xs uppercase tracking-[0.35em] text-accent-gold">{eyebrow ?? "Southline Living"}</p>
+            <h1 className="mt-4 font-display text-4xl leading-tight text-primary sm:text-5xl">
               {title ?? (lang === "es" ? "Preguntas frecuentes" : "Frequently Asked Questions")}
             </h1>
-            <p className="mt-4 text-clay">
+            <p className="mt-4 text-text-muted">
               {subtitle ??
                 (lang === "es"
                   ? "Respuestas sobre Southline Living, SnapLink, casas, profesionales, cotizaciones, reservas y más."
@@ -53,11 +53,11 @@ export default async function FaqPage() {
           {cmsItems.length > 0 ? (
             <div className="space-y-4">
               {cmsItems.map((item) => (
-                <details key={item.id} className="group rounded-2xl border border-walnut/15 bg-cream p-5 open:shadow-sm">
-                  <summary className="cursor-pointer list-none font-display text-lg text-obsidian marker:content-none">
+                <details key={item.id} className="group rounded-2xl border border-border-default bg-page p-5 open:shadow-sm">
+                  <summary className="cursor-pointer list-none font-display text-lg text-primary marker:content-none">
                     {lang === "es" ? item.questionEs : item.questionEn}
                   </summary>
-                  <p className="mt-3 text-sm leading-relaxed text-clay">
+                  <p className="mt-3 text-sm leading-relaxed text-text-muted">
                     {lang === "es" ? item.answerEs : item.answerEn}
                   </p>
                 </details>
@@ -69,16 +69,16 @@ export default async function FaqPage() {
               if (entries.length === 0) return null;
               return (
                 <div key={category.id} className="mb-12">
-                  <h2 className="font-display text-2xl text-obsidian mb-5 border-l-2 border-gold pl-3">
+                  <h2 className="font-display text-2xl text-primary mb-5 border-l-2 border-accent-gold pl-3">
                     {lang === "es" ? category.es : category.en}
                   </h2>
                   <div className="space-y-4">
                     {entries.map((entry) => (
-                      <details key={entry.id} className="group rounded-2xl border border-walnut/15 bg-cream p-5 open:shadow-sm">
-                        <summary className="cursor-pointer list-none font-display text-lg text-obsidian marker:content-none">
+                      <details key={entry.id} className="group rounded-2xl border border-border-default bg-page p-5 open:shadow-sm">
+                        <summary className="cursor-pointer list-none font-display text-lg text-primary marker:content-none">
                           {lang === "es" ? entry.questionEs : entry.questionEn}
                         </summary>
-                        <p className="mt-3 text-sm leading-relaxed text-clay">
+                        <p className="mt-3 text-sm leading-relaxed text-text-muted">
                           {lang === "es" ? entry.answerEs : entry.answerEn}
                         </p>
                       </details>

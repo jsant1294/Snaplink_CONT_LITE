@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type {
   CmsImage,
+  FeaturedRentalsContent,
   HomeServicesContent,
   HeroContent,
   SeasonalContent,
@@ -39,7 +40,7 @@ function localInputToIso(value: string): string | undefined {
   return d.toISOString();
 }
 
-type Tab = "hero" | "sections" | "services" | "trending" | "seasonal" | "categories" | "snapLinkPromo" | "taxonomy";
+type Tab = "hero" | "sections" | "services" | "rentals" | "trending" | "seasonal" | "categories" | "snapLinkPromo" | "taxonomy";
 
 export default function HomepageEditor({ pin }: { pin: string }) {
   const [settings, setSettings] = useState<SouthlineSettings | null>(null);
@@ -104,8 +105,9 @@ export default function HomepageEditor({ pin }: { pin: string }) {
   const tabs: { key: Tab; label: string }[] = [
     { key: "hero", label: "Hero & Copy" },
     { key: "services", label: "Home Services" },
+    { key: "rentals", label: "Rentals & Getaways" },
     { key: "trending", label: "Trending" },
-    { key: "seasonal", label: "Seasonal" },
+    { key: "seasonal", label: "Seasonal DIY" },
     { key: "categories", label: "Categories" },
     { key: "snapLinkPromo", label: "SnapLink Local Promo" },
     { key: "sections", label: "Sections" },
@@ -139,6 +141,9 @@ export default function HomepageEditor({ pin }: { pin: string }) {
       )}
       {activeTab === "services" && (
         <HomeServicesTab content={settings.homeServices} busy={busy} pin={pin} onSave={save} />
+      )}
+      {activeTab === "rentals" && (
+        <FeaturedRentalsTab content={settings.featuredRentals} busy={busy} onSave={save} />
       )}
       {activeTab === "trending" && (
         <TrendingTab items={settings.trendingProjects} busy={busy} pin={pin} onSave={save} />
@@ -639,10 +644,10 @@ function SeasonalTab({
   return (
     <div className="space-y-4">
       <p className="text-xs text-muted">
-        Edit the Seasonal Ideas banner. Disabling it hides the banner even when the section is on.
+        Edit the Seasonal DIY journal introduction. The project cards below provide its calls to action. Disabling it hides the banner even when the section is on.
       </p>
       <label className="flex items-center justify-between py-3 border-b border-white/5">
-        <span className="text-sm">Seasonal banner enabled</span>
+        <span className="text-sm">Seasonal DIY banner enabled</span>
         <Toggle on={local.enabled !== false} onToggle={() => setLocal({ ...local, enabled: local.enabled === false })} />
       </label>
       <div className={`rounded-xl border px-4 py-3 text-sm ${activeNow ? "border-gold/40 bg-gold/10 text-gold" : "border-white/10 bg-obsidian text-muted"}`}>
@@ -749,30 +754,6 @@ function SeasonalTab({
             className="input"
             value={local.imageAltEn ?? ""}
             onChange={(e) => setLocal({ ...local, imageAltEn: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="label">CTA label (ES)</label>
-          <input
-            className="input"
-            value={local.ctaLabelEs ?? ""}
-            onChange={(e) => setLocal({ ...local, ctaLabelEs: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="label">CTA label (EN)</label>
-          <input
-            className="input"
-            value={local.ctaLabelEn ?? ""}
-            onChange={(e) => setLocal({ ...local, ctaLabelEn: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="label">CTA URL</label>
-          <input
-            className="input"
-            value={local.ctaUrl ?? ""}
-            onChange={(e) => setLocal({ ...local, ctaUrl: e.target.value })}
           />
         </div>
       </div>
@@ -1116,6 +1097,7 @@ function SnapLinkPromoTab({
           >
             <option value="left">Left</option>
             <option value="right">Right</option>
+            <option value="bottom">Center bottom</option>
           </select>
         </div>
         <div>
@@ -1181,6 +1163,72 @@ function SnapLinkPromoTab({
   );
 }
 
+function FeaturedRentalsTab({
+  content,
+  busy,
+  onSave,
+}: {
+  content: FeaturedRentalsContent;
+  busy: boolean;
+  onSave: (p: Partial<SouthlineSettings>) => void;
+}) {
+  const [local, setLocal] = useState(content);
+  useEffect(() => setLocal(content), [content]);
+
+  const fields: { key: keyof FeaturedRentalsContent; label: string }[] = [
+    { key: "eyebrowEn", label: "Eyebrow (English)" },
+    { key: "eyebrowEs", label: "Eyebrow (Spanish)" },
+    { key: "headlineEn", label: "Headline (English)" },
+    { key: "headlineEs", label: "Headline (Spanish)" },
+    { key: "descriptionEn", label: "Description (English)" },
+    { key: "descriptionEs", label: "Description (Spanish)" },
+    { key: "ctaEn", label: "CTA (English)" },
+    { key: "ctaEs", label: "CTA (Spanish)" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-muted">Homepage presentation only. Rental inventory continues to come from the existing published rental source.</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {fields.map((field) => (
+          <label key={field.key} className="label">
+            {field.label}
+            <input
+              className="input mt-1"
+              value={String(local[field.key])}
+              onChange={(event) => setLocal({ ...local, [field.key]: event.target.value })}
+            />
+          </label>
+        ))}
+      </div>
+      <label className="label max-w-xs">
+        Maximum cards
+        <select
+          className="input mt-1"
+          value={local.maxCards}
+          onChange={(event) => setLocal({ ...local, maxCards: Number(event.target.value) })}
+        >
+          {[1, 2, 3, 4].map((count) => <option key={count} value={count}>{count}</option>)}
+        </select>
+      </label>
+      <label className="label">
+        Selected rental IDs (optional, comma-separated)
+        <input
+          className="input mt-1"
+          value={local.selectedRentalIds.join(", ")}
+          onChange={(event) => setLocal({
+            ...local,
+            selectedRentalIds: event.target.value.split(",").map((id) => id.trim()).filter(Boolean),
+          })}
+        />
+      </label>
+      <button disabled={busy} onClick={() => onSave({ featuredRentals: local })} className="btn-gold disabled:opacity-50">
+        Save Rentals & Getaways
+      </button>
+    </div>
+  );
+}
+
 function SectionsTab({
   sections,
   busy,
@@ -1200,14 +1248,17 @@ function SectionsTab({
     { key: "featuredPros", label: "Featured professionals" },
     { key: "featuredAgents", label: "Real estate discovery block" },
     { key: "featuredHomes", label: "Featured homes" },
+    { key: "featuredRentals", label: "Rentals & Getaways" },
     { key: "featuredServices", label: "Featured services marketplace" },
     { key: "poweredBySnaplink", label: "Powered by SnapLink" },
     { key: "localPromo", label: "SnapLink Local cross-promo" },
     { key: "diyLearning", label: "DIY learning" },
     { key: "trending", label: "Trending & editorial" },
-    { key: "seasonalIdeas", label: "Seasonal ideas banner" },
-    { key: "costEstimator", label: "Cost estimator CTA" },
-    { key: "bookConsultation", label: "Book consultation CTA" },
+    { key: "seasonalIdeas", label: "Seasonal DIY banner" },
+    { key: "estimatorBooking", label: "Estimator / Booking section (hidden by default)" },
+    { key: "costEstimator", label: "Cost estimator CTA (within the section above)" },
+    { key: "bookConsultation", label: "Book consultation CTA (within the section above)" },
+    { key: "testimonials", label: "Testimonials" },
     { key: "recruitment", label: "Become a SnapLink Professional CTA" },
   ];
 

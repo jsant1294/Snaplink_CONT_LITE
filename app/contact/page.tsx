@@ -75,18 +75,18 @@ export default async function ContactPage() {
   return (
     <>
       <Header lang={lang} />
-      <main className="bg-ivory">
-        <section className="border-b border-walnut/15 px-4 py-14 sm:py-20">
+      <main className="bg-page">
+        <section className="border-b border-border-default px-4 py-14 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs uppercase tracking-[0.35em] text-gold">{t("contactEyebrow", lang)}</p>
-            <h1 className="mt-4 font-display text-4xl leading-tight text-obsidian sm:text-5xl">{heading}</h1>
-            <p className="mt-4 text-clay">{body}</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-accent-gold">{t("contactEyebrow", lang)}</p>
+            <h1 className="mt-4 font-display text-4xl leading-tight text-primary sm:text-5xl">{heading}</h1>
+            <p className="mt-4 text-text-muted">{body}</p>
             {ctaHrefValue && (
               <a
                 href={ctaHrefValue}
                 target={contact?.primaryCtaType === "external_link" || contact?.primaryCtaType === "directions" ? "_blank" : undefined}
                 rel={contact?.primaryCtaType === "external_link" || contact?.primaryCtaType === "directions" ? "noopener noreferrer" : undefined}
-                className="mt-8 inline-block rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian hover:bg-gold/90"
+                className="mt-8 inline-block rounded-xl bg-accent-gold px-6 py-3 text-sm font-semibold text-primary hover:bg-accent-gold/90"
               >
                 {ctaLabel}
               </a>
@@ -96,17 +96,17 @@ export default async function ContactPage() {
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl border border-walnut/15 bg-cream p-6">
-              <h2 className="text-xs uppercase tracking-[0.2em] text-gold font-medium mb-4">
+            <div className="rounded-2xl border border-border-default bg-surface p-6 shadow-sm">
+              <h2 className="text-xs uppercase tracking-[0.2em] text-accent-gold font-medium mb-4">
                 {t("contactBusinessLabel", lang)}
               </h2>
-              <p className="font-display text-xl text-obsidian">{businessName}</p>
-              <p className="mt-2 text-sm leading-relaxed text-clay">{businessDescription}</p>
+              <p className="font-display text-xl text-primary">{businessName}</p>
+              <p className="mt-2 text-sm leading-relaxed text-text-muted">{businessDescription}</p>
             </div>
 
             {methods.length > 0 && (
-              <div className="rounded-2xl border border-walnut/15 bg-cream p-6">
-                <h2 className="text-xs uppercase tracking-[0.2em] text-gold font-medium mb-4">
+              <div className="rounded-2xl border border-border-default bg-surface p-6 shadow-sm">
+                <h2 className="text-xs uppercase tracking-[0.2em] text-accent-gold font-medium mb-4">
                   {t("contactMethodsLabel", lang)}
                 </h2>
                 <ul className="space-y-3">
@@ -116,9 +116,9 @@ export default async function ContactPage() {
                         href={method.href}
                         target={method.key === "whatsapp" ? "_blank" : undefined}
                         rel={method.key === "whatsapp" ? "noopener noreferrer" : undefined}
-                        className="text-sm text-obsidian hover:text-gold transition-colors"
+                        className="text-sm text-primary hover:text-accent-gold transition-colors"
                       >
-                        <span className="text-xs uppercase tracking-wider text-clay block">{method.label}</span>
+                        <span className="text-xs uppercase tracking-wider text-text-muted block">{method.label}</span>
                         <span className="font-medium">{method.value}</span>
                       </a>
                     </li>
@@ -128,17 +128,17 @@ export default async function ContactPage() {
             )}
 
             {address && (
-              <div className="rounded-2xl border border-walnut/15 bg-cream p-6">
-                <h2 className="text-xs uppercase tracking-[0.2em] text-gold font-medium mb-4">
+              <div className="rounded-2xl border border-border-default bg-surface p-6 shadow-sm">
+                <h2 className="text-xs uppercase tracking-[0.2em] text-accent-gold font-medium mb-4">
                   {t("contactAddressLabel", lang)}
                 </h2>
-                <p className="text-sm leading-relaxed text-obsidian">{address}</p>
+                <p className="text-sm leading-relaxed text-primary">{address}</p>
                 {contact?.directionsUrl && (
                   <a
                     href={contact.directionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 inline-block rounded-lg border border-gold px-4 py-2 text-xs font-semibold text-obsidian hover:bg-gold/10"
+                    className="mt-4 inline-block rounded-lg border border-accent-gold px-4 py-2 text-xs font-semibold text-primary hover:bg-accent-gold/10"
                   >
                     {t("contactDirectionsLabel", lang)}
                   </a>
@@ -147,15 +147,15 @@ export default async function ContactPage() {
             )}
 
             {hours && hours.length > 0 && (
-              <div className="rounded-2xl border border-walnut/15 bg-cream p-6">
-                <h2 className="text-xs uppercase tracking-[0.2em] text-gold font-medium mb-4">
+              <div className="rounded-2xl border border-border-default bg-surface p-6 shadow-sm">
+                <h2 className="text-xs uppercase tracking-[0.2em] text-accent-gold font-medium mb-4">
                   {t("contactHoursLabel", lang)}
                 </h2>
                 <ul className="space-y-2">
                   {hours.map((entry) => (
                     <li key={entry.id} className="flex items-baseline justify-between gap-4 text-sm">
-                      <span className="text-obsidian">{entry.dayLabel}</span>
-                      <span className="text-clay text-right">{entry.hoursLabel}</span>
+                      <span className="text-primary">{entry.dayLabel}</span>
+                      <span className="text-text-muted text-right">{entry.hoursLabel}</span>
                     </li>
                   ))}
                 </ul>

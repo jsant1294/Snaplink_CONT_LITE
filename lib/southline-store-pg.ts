@@ -63,6 +63,11 @@ function mergeWithDefaults(stored: Partial<SouthlineSettings>): SouthlineSetting
     categories: [...categoriesOrdered, ...categoriesExtras],
     sections: { ...defaults.sections, ...stored.sections },
     realEstateBlock: { ...defaults.realEstateBlock, ...stored.realEstateBlock },
+    featuredRentals: {
+      ...defaults.featuredRentals,
+      ...stored.featuredRentals,
+      selectedRentalIds: stored.featuredRentals?.selectedRentalIds ?? defaults.featuredRentals.selectedRentalIds,
+    },
     featureFlags: { ...defaults.featureFlags, ...stored.featureFlags },
     faq: { ...defaults.faq, ...stored.faq, items: stored.faq?.items ?? defaults.faq.items },
     footer: { ...defaults.footer, ...stored.footer, columns: stored.footer?.columns ?? defaults.footer.columns },

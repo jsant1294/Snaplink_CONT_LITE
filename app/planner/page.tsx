@@ -18,14 +18,14 @@ export default async function PlannerPage() {
     <>
       <Header lang={lang} />
       <main>
-        <div className="bg-gradient-to-b from-cream to-sand/30 py-8 sm:py-12 text-center">
-          <p className="text-xs tracking-[0.35em] uppercase text-gold font-medium mb-3">
+        <div className="bg-page py-8 sm:py-12 text-center">
+          <p className="text-xs tracking-[0.35em] uppercase text-accent-gold font-medium mb-3">
             Southline Living
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl text-obsidian leading-tight mb-2">
+          <h1 className="font-display text-3xl sm:text-4xl text-primary leading-tight mb-2">
             {lang === "es" ? "Planifica tu proyecto" : "Plan Your Project"}
           </h1>
-          <p className="text-clay max-w-xl mx-auto px-4">
+          <p className="text-text-muted max-w-xl mx-auto px-4">
             {lang === "es"
               ? "Cuéntanos sobre tu proyecto y te daremos un presupuesto estimado, tiempos y recomendaciones de profesionales."
               : "Tell us about your project and we'll give you an estimated budget, timeline, and professional recommendations."}

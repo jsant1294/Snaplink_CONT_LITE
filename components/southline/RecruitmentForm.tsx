@@ -63,10 +63,10 @@ export default function RecruitmentForm({
     return (
       <div className="text-center py-12">
         <div className="text-4xl mb-3">🎉</div>
-        <h3 className="font-display text-xl text-obsidian mb-2">
+        <h3 className="font-display text-xl text-primary mb-2">
           {lang === "es" ? "¡Recibimos tu información!" : "We received your info!"}
         </h3>
-        <p className="text-clay text-sm">
+        <p className="text-text-muted text-sm">
           {lang === "es"
             ? "El equipo de Southline Living te contactará pronto."
             : "The Southline Living team will reach out soon."}
@@ -78,11 +78,11 @@ export default function RecruitmentForm({
   return (
     <div className="max-w-lg mx-auto">
       {/* Mode toggle */}
-      <div className="flex rounded-xl border border-sand/40 overflow-hidden mb-6">
+      <div className="flex rounded-xl border border-border-default overflow-hidden mb-6">
         <button
           onClick={() => setMode("join")}
           className={`flex-1 py-3 text-sm font-medium transition ${
-            mode === "join" ? "bg-obsidian text-cream" : "bg-paper text-clay"
+            mode === "join" ? "bg-accent-dark text-on-dark" : "bg-surface text-text-muted"
           }\`}
         >
           {lang === "es" ? "Únete a Snaplink" : "Join Snaplink"}
@@ -90,7 +90,7 @@ export default function RecruitmentForm({
         <button
           onClick={() => setMode("claim")}
           className={\`flex-1 py-3 text-sm font-medium transition \${
-            mode === "claim" ? "bg-obsidian text-cream" : "bg-paper text-clay"
+            mode === "claim" ? "bg-accent-dark text-on-dark" : "bg-surface text-text-muted"
           }`}
         >
           {lang === "es" ? "Reclama tu negocio" : "Claim Your Business"}
@@ -101,7 +101,7 @@ export default function RecruitmentForm({
         {/* Claim: search existing business */}
         {mode === "claim" && !selectedBusiness && (
           <div>
-            <label className="label text-clay">
+            <label className="label text-text-muted">
               {lang === "es" ? "Busca tu negocio" : "Search for your business"}
             </label>
             <input
@@ -109,7 +109,7 @@ export default function RecruitmentForm({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === "es" ? "Nombre de tu negocio" : "Your business name"}
-              className="input bg-white border-sand/60 text-obsidian mb-2"
+              className="input bg-surface-raised border-border-default text-primary mb-2"
             />
             {matchingBusinesses.length > 0 && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -117,16 +117,16 @@ export default function RecruitmentForm({
                   <button
                     key={c.id}
                     onClick={() => setSelectedBusiness(c)}
-                    className="w-full p-3 rounded-xl border border-sand/40 bg-paper hover:border-gold/50 text-left"
+                    className="w-full p-3 rounded-xl border border-border-default bg-surface hover:border-accent-gold/50 text-left"
                   >
-                    <p className="font-medium text-sm text-obsidian">{c.businessName}</p>
-                    <p className="text-xs text-clay">{c.serviceArea}</p>
+                    <p className="font-medium text-sm text-primary">{c.businessName}</p>
+                    <p className="text-xs text-text-muted">{c.serviceArea}</p>
                   </button>
                 ))}
               </div>
             )}
             {searchQuery && matchingBusinesses.length === 0 && (
-              <p className="text-xs text-clay/60">
+              <p className="text-xs text-text-muted/60">
                 {lang === "es"
                   ? "No encontramos este negocio. ¿Quieres agregarlo?"
                   : "We didn't find this business. Want to add it?"}
@@ -137,14 +137,14 @@ export default function RecruitmentForm({
 
         {/* Selected business info */}
         {selectedBusiness && (
-          <div className="bg-sand/20 rounded-xl p-4 flex items-center justify-between">
+          <div className="bg-surface/20 rounded-xl p-4 flex items-center justify-between">
             <div>
-              <p className="font-medium text-sm text-obsidian">{selectedBusiness.businessName}</p>
-              <p className="text-xs text-clay">{selectedBusiness.serviceArea}</p>
+              <p className="font-medium text-sm text-primary">{selectedBusiness.businessName}</p>
+              <p className="text-xs text-text-muted">{selectedBusiness.serviceArea}</p>
             </div>
             <button
               onClick={() => setSelectedBusiness(null)}
-              className="text-xs text-clay hover:text-obsidian"
+              className="text-xs text-text-muted hover:text-primary"
             >
               {lang === "es" ? "Cambiar" : "Change"}
             </button>
@@ -153,51 +153,51 @@ export default function RecruitmentForm({
 
         {/* Form fields */}
         <div>
-          <label className="label text-clay">
+          <label className="label text-text-muted">
             {lang === "es" ? "Nombre completo *" : "Full name *"}
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="input bg-white border-sand/60 text-obsidian"
+            className="input bg-surface-raised border-border-default text-primary"
           />
         </div>
         <div>
-          <label className="label text-clay">
+          <label className="label text-text-muted">
             {lang === "es" ? "Nombre del negocio *" : "Business name *"}
           </label>
           <input
             type="text"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
-            className="input bg-white border-sand/60 text-obsidian"
+            className="input bg-surface-raised border-border-default text-primary"
           />
         </div>
         <div>
-          <label className="label text-clay">
+          <label className="label text-text-muted">
             {lang === "es" ? "Correo electrónico *" : "Email *"}
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="input bg-white border-sand/60 text-obsidian"
+            className="input bg-surface-raised border-border-default text-primary"
           />
         </div>
         <div>
-          <label className="label text-clay">
+          <label className="label text-text-muted">
             {lang === "es" ? "Teléfono *" : "Phone *"}
           </label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="input bg-white border-sand/60 text-obsidian"
+            className="input bg-surface-raised border-border-default text-primary"
           />
         </div>
         <div>
-          <label className="label text-clay">
+          <label className="label text-text-muted">
             {lang === "es" ? "Área de servicio" : "Service area"}
           </label>
           <input
@@ -205,11 +205,11 @@ export default function RecruitmentForm({
             value={serviceArea}
             onChange={(e) => setServiceArea(e.target.value)}
             placeholder={lang === "es" ? "Ciudades donde trabajas" : "Cities you serve"}
-            className="input bg-white border-sand/60 text-obsidian"
+            className="input bg-surface-raised border-border-default text-primary"
           />
         </div>
 
-        <label className="flex items-start gap-2 text-sm text-clay">
+        <label className="flex items-start gap-2 text-sm text-text-muted">
           <input
             type="checkbox"
             checked={agreed}
@@ -223,7 +223,7 @@ export default function RecruitmentForm({
           </span>
         </label>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p className="text-sm text-state-error">{error}</p>}
 
         <button
           onClick={submit}

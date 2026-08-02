@@ -53,23 +53,23 @@ export default function Hero({
           className="w-full h-full object-cover object-[62%_center] md:hidden"
           fetchPriority="high"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2a241e]/90 via-[#3c3229]/60 to-[#4a3d30]/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-cream via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-image-overlay/90 via-image-overlay/60 to-accent-dark/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-image-overlay/45 via-transparent to-transparent" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
           <div className="max-w-2xl">
-            <p className="text-xs tracking-[0.35em] uppercase text-gold mb-4 font-medium">
+            <p className="text-xs tracking-[0.35em] uppercase text-accent-gold mb-4 font-semibold">
               {tagline}
             </p>
 
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl text-cream leading-tight tracking-tight mb-6">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl text-on-dark leading-tight tracking-tight mb-6">
               {title}
             </h1>
 
-            <p className="text-lg sm:text-xl text-bone/80 max-w-xl mb-8 leading-relaxed">
+            <p className="text-lg sm:text-xl text-on-dark-muted max-w-xl mb-8 leading-relaxed">
               {subtitle}
             </p>
 
@@ -80,10 +80,10 @@ export default function Hero({
                   name="q"
                   placeholder={searchPrompt}
                   aria-label={searchPrompt}
-                  className="w-full bg-[#3c3229]/30 backdrop-blur-sm border border-cream/20 rounded-2xl px-5 py-4 pl-12 text-cream placeholder:text-cream/40 focus:outline-none focus:border-gold focus-visible:ring-2 focus-visible:ring-cream text-base shadow-lg"
+                  className="w-full bg-accent-dark/30 backdrop-blur-sm border border-on-dark/20 rounded-2xl px-5 py-4 pl-12 text-on-dark placeholder:text-on-dark/40 focus:outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-on-dark text-base shadow-lg"
                 />
                 <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-bone/40"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-dark-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -101,19 +101,19 @@ export default function Hero({
             <div className="flex flex-wrap items-stretch gap-3 sm:gap-4">
               <Link
                 href="#categories"
-                className="w-full sm:w-auto min-w-[12rem] bg-gold text-obsidian font-semibold px-8 py-3.5 rounded-xl text-center hover:bg-goldlight active:scale-[0.98] motion-reduce:active:scale-100 transition-colors shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+                className="w-full sm:w-auto min-w-[12rem] bg-accent-gold text-primary font-semibold px-8 py-3.5 rounded-xl text-center hover:bg-accent-gold/90 active:scale-[0.98] motion-reduce:active:scale-100 transition-colors shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark focus-visible:ring-offset-2 focus-visible:ring-offset-image-overlay"
               >
                 {exploreLabel}
               </Link>
               <Link
                 href="/planner"
-                className="w-full sm:w-auto min-w-[12rem] bg-[#3c3229]/60 backdrop-blur-sm border-2 border-cream/30 text-cream font-medium px-8 py-3.5 rounded-xl text-center hover:bg-[#3c3229]/80 hover:border-cream/50 active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+                className="w-full sm:w-auto min-w-[12rem] bg-accent-dark/60 backdrop-blur-sm border-2 border-on-dark/30 text-on-dark font-medium px-8 py-3.5 rounded-xl text-center hover:bg-accent-dark/80 hover:border-on-dark/50 active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark focus-visible:ring-offset-2 focus-visible:ring-offset-image-overlay"
               >
                 {planLabel}
               </Link>
               <Link
                 href="/book"
-                className="w-full sm:w-auto min-w-[12rem] bg-[#3c3229]/60 backdrop-blur-sm border-2 border-gold/70 text-gold font-medium px-8 py-3.5 rounded-xl text-center hover:bg-gold hover:text-[#2a241e] active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e]"
+                className="w-full sm:w-auto min-w-[12rem] bg-accent-dark/60 backdrop-blur-sm border-2 border-accent-gold/70 text-accent-gold font-medium px-8 py-3.5 rounded-xl text-center hover:bg-accent-gold hover:text-primary active:scale-[0.98] motion-reduce:active:scale-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark focus-visible:ring-offset-2 focus-visible:ring-offset-image-overlay"
               >
                 {findProLabel}
               </Link>
@@ -122,7 +122,7 @@ export default function Hero({
 
             <Link
               href="/homes"
-              className="mt-5 inline-flex items-center gap-1.5 text-sm text-cream/90 underline decoration-cream/50 underline-offset-4 hover:text-gold hover:decoration-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-[#2a241e] rounded-sm"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm text-on-dark/90 underline decoration-on-dark/50 underline-offset-4 hover:text-accent-gold hover:decoration-accent-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark focus-visible:ring-offset-2 focus-visible:ring-offset-image-overlay rounded-sm"
             >
               {t("heroRealEstateLink", lang)}
             </Link>

@@ -43,14 +43,14 @@ export default function Header({
   );
 
   return (
-    <header data-southline-header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-walnut/15">
+    <header data-southline-header className="sticky top-0 z-50 bg-surface-raised/95 backdrop-blur-sm border-b border-border-default shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="text-xl font-display font-bold text-obsidian tracking-tight">
+            <span className="text-xl font-display font-bold text-primary tracking-tight">
               Southline
             </span>
-            <span className="text-xl font-display font-light text-gold">
+            <span className="text-xl font-display font-light text-accent-gold-text">
               Living
             </span>
           </Link>
@@ -60,7 +60,7 @@ export default function Header({
               <Link
                 key={item.key}
                 href={item.href}
-                className="px-3 py-2 text-sm font-medium text-clay hover:text-obsidian transition-colors rounded-lg hover:bg-sand/30"
+                className="inline-flex min-h-11 items-center px-3 py-2 text-sm font-medium text-secondary hover:text-primary transition-colors rounded-lg hover:bg-surface"
               >
                 {item.labelEs && item.labelEn
                   ? lang === "es" ? item.labelEs : item.labelEn
@@ -72,19 +72,19 @@ export default function Header({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-lg hover:bg-sand/30 transition-colors"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
               aria-label="Search"
             >
-              <svg className="w-5 h-5 text-clay" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
             <LangToggle lang={lang} />
             <Link
               href="/contractor-admin"
-              className="hidden sm:flex flex-col items-end rounded-lg px-2 py-1 leading-none hover:bg-ivory transition-colors"
+              className="hidden sm:flex flex-col items-end rounded-lg px-2 py-1 leading-none hover:bg-surface transition-colors"
             >
-              <span className="text-[9px] uppercase tracking-[0.16em] text-taupe">
+              <span className="text-[9px] uppercase tracking-[0.16em] text-text-muted">
                 Powered by <span className="text-snaplink-gold-dark font-semibold">Snaplink</span>
               </span>
               <span className="mt-1 text-xs font-semibold text-snaplink-charcoal">
@@ -93,10 +93,10 @@ export default function Header({
             </Link>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-sand/30 transition-colors"
+              className="md:hidden flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-surface transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
             >
-              <svg className="w-6 h-6 text-obsidian" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {menuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -111,14 +111,14 @@ export default function Header({
       {searchOpen && <SearchOverlay lang={lang} onClose={() => setSearchOpen(false)} />}
 
       {menuOpen && (
-        <div className="md:hidden border-t border-sand/50 bg-cream">
+        <div className="md:hidden border-t border-border-default bg-surface-raised">
           <nav className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {items.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className="block px-3 py-3 text-base font-medium text-clay hover:text-obsidian hover:bg-sand/30 rounded-lg transition-colors"
+                className="block px-3 py-3 text-base font-medium text-text-muted hover:text-primary hover:bg-surface/30 rounded-lg transition-colors"
               >
                 {item.labelEs && item.labelEn
                   ? lang === "es" ? item.labelEs : item.labelEn
@@ -128,11 +128,11 @@ export default function Header({
             <Link
               href="/contractor-admin"
               onClick={() => setMenuOpen(false)}
-              className="block px-3 py-3 mt-2 text-base font-medium text-cream bg-obsidian rounded-xl text-center"
+              className="block px-3 py-3 mt-2 text-base font-medium text-on-dark bg-accent-dark rounded-xl text-center"
             >
               {t("contractorLogin", lang)}
             </Link>
-            <p className="text-center text-[10px] uppercase tracking-[0.16em] text-taupe pt-1">
+            <p className="text-center text-[10px] uppercase tracking-[0.16em] text-text-muted pt-1">
               Powered by <span className="text-snaplink-gold-dark">Snaplink</span>
             </p>
           </nav>

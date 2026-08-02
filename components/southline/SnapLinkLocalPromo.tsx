@@ -19,6 +19,7 @@ const FOCAL_CLASS: Record<SnapLinkPromoContent["focalPoint"], string> = {
   left: "object-left",
   center: "object-center",
   right: "object-right",
+  bottom: "object-bottom",
 };
 
 const MOBILE_FOCAL_CLASS: Record<SnapLinkPromoContent["mobileFocalPoint"], string> = {
@@ -33,7 +34,7 @@ function ImageFallback({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={`bg-gradient-to-br from-walnut/25 via-gold/15 to-cream ${className ?? ""}`}
+      className={`bg-gradient-to-br from-accent-dark/25 via-accent-gold/15 to-page ${className ?? ""}`}
     />
   );
 }
@@ -61,13 +62,13 @@ function Badge({ lang, tone, label }: { lang: Lang; tone: "onLight" | "onDark"; 
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 ${
-        tone === "onLight" ? "border-walnut/15 bg-ivory" : "border-cream/25 bg-obsidian/30 backdrop-blur-sm"
+        tone === "onLight" ? "border-border-default bg-surface" : "border-on-dark/25 bg-accent-dark/30 backdrop-blur-sm"
       }`}
     >
-      <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-md bg-gold text-[10px] font-bold text-obsidian">
+      <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-md bg-accent-gold text-[10px] font-bold text-primary">
         S
       </span>
-      <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-[0.35em] text-eyebrow">{label}</span>
     </span>
   );
 }
@@ -90,8 +91,8 @@ function ChipRow({
   if (categories.length === 0) return null;
   const chipClass =
     tone === "onLight"
-      ? "border-walnut/15 bg-ivory text-obsidian hover:border-gold/60 hover:bg-cream focus-visible:ring-gold"
-      : "border-cream/25 bg-obsidian/30 text-cream backdrop-blur-sm hover:border-gold/70 hover:bg-obsidian/45 focus-visible:ring-cream";
+      ? "border-border-default bg-surface text-primary hover:border-accent-gold/60 hover:bg-page focus-visible:ring-accent-gold"
+      : "border-on-dark/25 bg-accent-dark/30 text-on-dark backdrop-blur-sm hover:border-accent-gold/70 hover:bg-accent-dark/45 focus-visible:ring-on-dark";
   return (
     <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible">
       {categories.slice(0, 6).map((chip) => (
@@ -112,16 +113,16 @@ function ChipRow({
 const OVERLAY_CLASS: Record<SnapLinkPromoContent["overlayStrength"], Record<SnapLinkPromoContent["contentAlignment"], string>> = {
   none: { left: "", right: "" },
   light: {
-    left: "bg-gradient-to-t from-obsidian/45 via-obsidian/10 to-transparent md:bg-gradient-to-r md:from-obsidian/50 md:via-obsidian/10 md:to-transparent",
-    right: "bg-gradient-to-t from-obsidian/45 via-obsidian/10 to-transparent md:bg-gradient-to-l md:from-obsidian/50 md:via-obsidian/10 md:to-transparent",
+    left: "bg-gradient-to-t from-image-overlay/45 via-image-overlay/10 to-transparent md:bg-gradient-to-r md:from-image-overlay/50 md:via-image-overlay/10 md:to-transparent",
+    right: "bg-gradient-to-t from-image-overlay/45 via-image-overlay/10 to-transparent md:bg-gradient-to-l md:from-image-overlay/50 md:via-image-overlay/10 md:to-transparent",
   },
   medium: {
-    left: "bg-gradient-to-t from-obsidian/65 via-obsidian/20 to-transparent md:bg-gradient-to-r md:from-obsidian/70 md:via-obsidian/25 md:to-transparent",
-    right: "bg-gradient-to-t from-obsidian/65 via-obsidian/20 to-transparent md:bg-gradient-to-l md:from-obsidian/70 md:via-obsidian/25 md:to-transparent",
+    left: "bg-gradient-to-t from-image-overlay/65 via-image-overlay/20 to-transparent md:bg-gradient-to-r md:from-image-overlay/70 md:via-image-overlay/25 md:to-transparent",
+    right: "bg-gradient-to-t from-image-overlay/65 via-image-overlay/20 to-transparent md:bg-gradient-to-l md:from-image-overlay/70 md:via-image-overlay/25 md:to-transparent",
   },
   strong: {
-    left: "bg-gradient-to-t from-obsidian/80 via-obsidian/35 to-transparent md:bg-gradient-to-r md:from-obsidian/85 md:via-obsidian/35 md:to-transparent",
-    right: "bg-gradient-to-t from-obsidian/80 via-obsidian/35 to-transparent md:bg-gradient-to-l md:from-obsidian/85 md:via-obsidian/35 md:to-transparent",
+    left: "bg-gradient-to-t from-image-overlay/80 via-image-overlay/35 to-transparent md:bg-gradient-to-r md:from-image-overlay/85 md:via-image-overlay/35 md:to-transparent",
+    right: "bg-gradient-to-t from-image-overlay/80 via-image-overlay/35 to-transparent md:bg-gradient-to-l md:from-image-overlay/85 md:via-image-overlay/35 md:to-transparent",
   },
 };
 
@@ -188,13 +189,13 @@ export default function SnapLinkLocalPromo({
   const titleNode = (
     <h2
       id="snaplink-local-promo-title"
-      className={`mt-4 font-display text-3xl leading-tight sm:text-4xl ${isFullBackground ? "text-cream" : "text-obsidian"}`}
+      className={`southline-section-title mt-4 ${isFullBackground ? "!text-on-dark" : "text-primary"}`}
     >
       {titleText}
     </h2>
   );
   const bodyNode = (
-    <p className={`mt-3 ${isFullBackground ? "text-cream/85" : "text-clay"}`}>{bodyText}</p>
+    <p className={`southline-section-description ${isFullBackground ? "!text-on-dark/85" : "text-secondary"}`}>{bodyText}</p>
   );
   const chipsNode = promo.showChips && (
     <ChipRow lang={lang} categories={categories} inbound={inbound} track={track} handOffProps={handOffProps} tone={tone} />
@@ -204,14 +205,14 @@ export default function SnapLinkLocalPromo({
       href={buildCrossPromoUrl(lang, inbound)}
       {...handOffProps}
       onClick={() => track(null, null)}
-      className="inline-flex items-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-obsidian transition-colors hover:bg-gold/90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2 focus-visible:ring-offset-cream motion-reduce:transition-none motion-reduce:active:scale-100"
+      className="inline-flex items-center gap-2 rounded-xl bg-accent-gold px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-accent-gold/90 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page motion-reduce:transition-none motion-reduce:active:scale-100"
     >
       {ctaLabelText}
       <span aria-hidden="true">→</span>
     </a>
   );
   const secondaryLineNode = promo.showSecondaryLine && (
-    <p className={`mt-6 text-xs uppercase tracking-[0.25em] ${isFullBackground ? "text-cream/70" : "text-clay"}`}>
+    <p className={`mt-6 text-xs uppercase tracking-[0.25em] ${isFullBackground ? "text-on-dark/70" : "text-text-muted"}`}>
       {secondaryLineText}
     </p>
   );
@@ -219,7 +220,7 @@ export default function SnapLinkLocalPromo({
   if (isFullBackground) {
     const overlayClass = OVERLAY_CLASS[promo.overlayStrength][promo.contentAlignment];
     return (
-      <section aria-labelledby="snaplink-local-promo-title" className="relative overflow-hidden border-b border-walnut/15 bg-obsidian">
+      <section aria-labelledby="snaplink-local-promo-title" className="relative overflow-hidden border-b border-border-default bg-accent-dark">
         <div className="absolute inset-0">
           {showDesktopImage ? (
             <img
@@ -263,9 +264,9 @@ export default function SnapLinkLocalPromo({
 
   const imageIsRight = promo.layout === "image-right";
   return (
-    <section aria-labelledby="snaplink-local-promo-title" className="border-b border-walnut/15 bg-cream">
+    <section aria-labelledby="snaplink-local-promo-title" className="border-b border-border-default bg-page">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-        <div className="overflow-hidden rounded-3xl border border-walnut/15 bg-ivory shadow-sm md:grid md:grid-cols-5 md:items-stretch">
+        <div className="overflow-hidden rounded-3xl border border-border-default bg-surface shadow-sm md:grid md:grid-cols-5 md:items-stretch">
           <div className={`relative h-64 sm:h-80 md:col-span-3 md:h-auto ${imageIsRight ? "md:order-2" : "md:order-1"}`}>
             {showDesktopImage ? (
               <img

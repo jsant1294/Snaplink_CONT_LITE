@@ -36,13 +36,13 @@ export default function TrendingSection({
   const cards = cmsCards ?? TRENDING_CARDS;
 
   return (
-    <section className="bg-paper py-14 sm:py-20">
+    <section className="bg-page py-14 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-xs tracking-[0.35em] uppercase text-gold font-medium mb-3">
+        <div className="southline-section-header text-center">
+          <p className="southline-section-eyebrow">
             {t("trendingTitle", lang)}
           </p>
-          <h2 className="font-display text-3xl sm:text-4xl text-obsidian leading-tight">
+          <h2 className="southline-section-title">
             {t("trendingSubtitle", lang)}
           </h2>
         </div>
@@ -60,20 +60,20 @@ export default function TrendingSection({
               <Link
                 key={"titleKey" in card ? card.titleKey : card.id}
                 href={"titleKey" in card ? card.href : card.linkUrl}
-                className="group overflow-hidden rounded-2xl border border-walnut/15 bg-cream shadow-sm transition-shadow hover:shadow-md"
+                className="marketplace-card group transition-shadow hover:shadow-md"
               >
-                <div className="relative h-48 overflow-hidden">
+                <div className="marketplace-card-media">
                   <img
                     src={"titleKey" in card ? card.image : card.imageUrl}
                     alt=""
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    className="marketplace-image-project transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
                 </div>
-                <div className="p-5">
-                  <h3 className="font-display text-lg text-obsidian">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-clay">{desc}</p>
-                  <span className="mt-4 inline-flex text-sm font-medium text-olive group-hover:text-obsidian transition-colors">
+                <div className="marketplace-card-body">
+                  <h3 className="marketplace-card-title">{title}</h3>
+                  <p className="marketplace-card-copy">{desc}</p>
+                  <span className="mt-4 inline-flex text-sm font-medium text-secondary group-hover:text-primary transition-colors">
                     {t("viewProjects", lang)} →
                   </span>
                 </div>

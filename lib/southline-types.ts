@@ -22,6 +22,7 @@ export interface SectionVisibility {
   recruitment: boolean;
   featuredAgents: boolean;
   featuredHomes: boolean;
+  featuredRentals: boolean;
   featuredServices: boolean;
   poweredBySnaplink: boolean;
   localPromo: boolean;
@@ -29,6 +30,22 @@ export interface SectionVisibility {
   seasonalIdeas: boolean;
   costEstimator: boolean;
   bookConsultation: boolean;
+  testimonials: boolean;
+  /** Outer gate for the whole Estimator/Booking homepage block. Defaults to false (hidden) — unlike every other section here, absence of this key (older stored settings) must also resolve to hidden, so callers check `=== true`, not `!== false`. */
+  estimatorBooking: boolean;
+}
+
+export interface FeaturedRentalsContent {
+  eyebrowEn: string;
+  eyebrowEs: string;
+  headlineEn: string;
+  headlineEs: string;
+  descriptionEn: string;
+  descriptionEs: string;
+  ctaEn: string;
+  ctaEs: string;
+  maxCards: number;
+  selectedRentalIds: string[];
 }
 
 export interface SpotlightItem {
@@ -71,7 +88,7 @@ export interface CmsImage {
 
 export type SnapLinkPromoLayout = "image-left" | "image-right" | "full-background";
 export type SnapLinkPromoOverlay = "none" | "light" | "medium" | "strong";
-export type SnapLinkPromoFocalPoint = "left" | "center" | "right";
+export type SnapLinkPromoFocalPoint = "left" | "center" | "right" | "bottom";
 export type SnapLinkPromoMobileFocalPoint = "top" | "center" | "bottom";
 
 // CMS content for the image-driven SnapLink Local cross-promo section
@@ -501,6 +518,7 @@ export interface SouthlineSettings {
   featuredContractorIds: string[];
   featuredAgentProfileIds: string[];
   realEstateBlock: RealEstateBlockSettings;
+  featuredRentals: FeaturedRentalsContent;
   featureFlags: Record<string, boolean>;
   faq: SouthlineFaqContent;
   footer: SouthlineFooterContent;
@@ -540,6 +558,7 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   recruitment: true,
   featuredAgents: true,
   featuredHomes: true,
+  featuredRentals: true,
   featuredServices: true,
   poweredBySnaplink: true,
   localPromo: true,
@@ -547,6 +566,21 @@ export const DEFAULT_SECTIONS: SectionVisibility = {
   seasonalIdeas: true,
   costEstimator: true,
   bookConsultation: true,
+  testimonials: true,
+  estimatorBooking: false,
+};
+
+export const DEFAULT_FEATURED_RENTALS: FeaturedRentalsContent = {
+  eyebrowEn: "RENTALS & GETAWAYS",
+  eyebrowEs: "ALQUILERES Y ESCAPADAS",
+  headlineEn: "Find a place to stay, settle in, or get away",
+  headlineEs: "Encuentra un lugar para quedarte, instalarte o escapar",
+  descriptionEn: "Explore local rentals, furnished stays, cabins, cottages, and memorable getaways.",
+  descriptionEs: "Explora alquileres locales, estancias amuebladas, cabañas, casas de campo y escapadas memorables.",
+  ctaEn: "Explore Rentals & Getaways",
+  ctaEs: "Explorar Alquileres y Escapadas",
+  maxCards: 3,
+  selectedRentalIds: [],
 };
 
 export const DEFAULT_REAL_ESTATE_BLOCK: RealEstateBlockSettings = {
@@ -572,17 +606,17 @@ export const DEFAULT_HERO_IMAGE: CmsImage = {
 // foliage negative space at the top, works for both the split-card and
 // full-background layouts. See docs/snaplink-local-cross-promo/02-image-source.md.
 export const DEFAULT_SNAPLINK_PROMO: SnapLinkPromoContent = {
-  layout: "image-left",
-  contentAlignment: "right",
+  layout: "full-background",
+  contentAlignment: "left",
   desktopImageUrl:
     "https://images.unsplash.com/photo-1672177789763-18c8d0a3ab7f?auto=format&fit=crop&w=1800&q=80",
   mobileImageUrl:
     "https://images.unsplash.com/photo-1672177789763-18c8d0a3ab7f?auto=format&fit=crop&w=1200&h=1000&q=80",
   imageAltEn: "A warm neighborhood alley strung with lights, lined with restaurants and people dining outdoors",
   imageAltEs: "Un cálido callejón de vecindario con luces, restaurantes y personas cenando al aire libre",
-  focalPoint: "center",
-  mobileFocalPoint: "center",
-  overlayStrength: "none",
+  focalPoint: "bottom",
+  mobileFocalPoint: "bottom",
+  overlayStrength: "strong",
   showBadge: true,
   showChips: true,
   showSecondaryLine: true,
@@ -648,15 +682,15 @@ export const DEFAULT_TRENDING_PROJECTS: TrendingProjectItem[] = [
 ];
 
 export const DEFAULT_SEASONAL: SeasonalContent = {
-  eyebrowEn: "Seasonal",
-  eyebrowEs: "De temporada",
-  titleEn: "Seasonal ideas for your home",
-  titleEs: "Ideas de temporada para tu hogar",
-  descriptionEn: "From getting your garden ready to prepping your home for the next season — find inspiration right on time.",
-  descriptionEs: "Desde preparar tu jardín hasta acondicionar tu hogar para el próximo cambio de clima — encuentra inspiración a tiempo.",
+  eyebrowEn: "Seasonal DIY Journal",
+  eyebrowEs: "Diario DIY de temporada",
+  titleEn: "What are we making this season?",
+  titleEs: "¿Qué vamos a crear esta temporada?",
+  descriptionEn: "A little soil, a free afternoon, and one thoughtful project can change how home feels. Start with a simple garden refresh made for the season ahead.",
+  descriptionEs: "Un poco de tierra, una tarde libre y un proyecto bien pensado pueden transformar cómo se siente tu hogar. Comienza con una renovación sencilla del jardín para la próxima temporada.",
   imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1600&q=85",
-  ctaLabelEn: "See seasonal ideas",
-  ctaLabelEs: "Ver ideas de temporada",
+  ctaLabelEn: "Try this seasonal project",
+  ctaLabelEs: "Probar este proyecto de temporada",
   ctaUrl: "/diy",
   enabled: true,
 };
@@ -973,6 +1007,7 @@ export function defaultSouthlineSettings(): SouthlineSettings {
     featuredContractorIds: [],
     featuredAgentProfileIds: [],
     realEstateBlock: { ...DEFAULT_REAL_ESTATE_BLOCK },
+    featuredRentals: { ...DEFAULT_FEATURED_RENTALS, selectedRentalIds: [] },
     featureFlags: { ...DEFAULT_FEATURE_FLAGS },
     faq: { ...DEFAULT_FAQ, items: [] },
     footer: { ...DEFAULT_FOOTER, columns: [] },

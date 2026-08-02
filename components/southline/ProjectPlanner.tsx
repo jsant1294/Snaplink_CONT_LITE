@@ -169,17 +169,17 @@ export default function ProjectPlanner({
     return (
       <div className="text-center py-16 max-w-lg mx-auto">
         <div className="text-4xl mb-4">✅</div>
-        <h2 className="font-display text-2xl text-obsidian mb-2">
+        <h2 className="font-display text-2xl text-primary mb-2">
           {lang === "es" ? "¡Plan guardado!" : "Plan saved!"}
         </h2>
-        <p className="text-clay mb-6">
+        <p className="text-text-muted mb-6">
           {lang === "es"
             ? "Hemos guardado tu plan. Revisa los resultados abajo o empieza uno nuevo."
             : "Your plan has been saved. Check the results below or start a new one."}
         </p>
         <button
           onClick={reset}
-          className="bg-gold text-obsidian font-semibold px-6 py-3 rounded-xl"
+          className="bg-accent-gold text-primary font-semibold px-6 py-3 rounded-xl"
         >
           {lang === "es" ? "Planificar otro proyecto" : "Plan another project"}
         </button>
@@ -205,20 +205,20 @@ export default function ProjectPlanner({
               <span
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
                   thisIdx <= currentIdx
-                    ? "bg-gold text-obsidian"
-                    : "bg-sand/50 text-clay"
+                    ? "bg-accent-gold text-primary"
+                    : "bg-surface/50 text-text-muted"
                 }`}
               >
                 {i + 1}
               </span>
               <span
                 className={`text-xs hidden sm:inline ${
-                  thisIdx <= currentIdx ? "text-obsidian font-medium" : "text-clay/60"
+                  thisIdx <= currentIdx ? "text-primary font-medium" : "text-text-muted/60"
                 }`}
               >
                 {labels[i]}
               </span>
-              {i < 3 && <span className="w-6 h-px bg-sand/60 hidden sm:block" />}
+              {i < 3 && <span className="w-6 h-px bg-surface/60 hidden sm:block" />}
             </div>
           );
         })}
@@ -227,10 +227,10 @@ export default function ProjectPlanner({
       {/* Category step */}
       {step === "category" && (
         <div>
-          <h2 className="font-display text-2xl sm:text-3xl text-obsidian text-center mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl text-primary text-center mb-2">
             {lang === "es" ? "¿Qué tipo de proyecto?" : "What type of project?"}
           </h2>
-          <p className="text-clay text-center mb-8">
+          <p className="text-text-muted text-center mb-8">
             {lang === "es"
               ? "Selecciona la categoría que mejor describa tu proyecto."
               : "Pick the category that best describes your project."}
@@ -244,9 +244,9 @@ export default function ProjectPlanner({
                   setSelectedService(null);
                   setStep("service");
                 }}
-                className="p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+                className="p-4 rounded-2xl border border-border-default bg-surface hover:border-accent-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <span className="font-medium text-obsidian">
+                <span className="font-medium text-primary">
                   {lang === "es" ? cat.es : cat.en}
                 </span>
               </button>
@@ -260,14 +260,14 @@ export default function ProjectPlanner({
         <div>
           <button
             onClick={() => setStep("category")}
-            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+            className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-2xl sm:text-3xl text-obsidian text-center mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl text-primary text-center mb-2">
             {lang === "es" ? "¿Cuál es el servicio?" : "Which service?"}
           </h2>
-          <p className="text-clay text-center mb-8">
+          <p className="text-text-muted text-center mb-8">
             {lang === "es"
               ? "Selecciona el servicio específico para tu proyecto."
               : "Select the specific service for your project."}
@@ -280,9 +280,9 @@ export default function ProjectPlanner({
                   setSelectedService(svc);
                   setStep("details");
                 }}
-                className="p-4 rounded-2xl border border-sand/40 bg-paper hover:border-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+                className="p-4 rounded-2xl border border-border-default bg-surface hover:border-accent-gold/50 hover:shadow-sm transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <span className="font-medium text-obsidian">
+                <span className="font-medium text-primary">
                   {serviceLabel(svc.name, lang)}
                 </span>
               </button>
@@ -296,23 +296,23 @@ export default function ProjectPlanner({
         <div className="max-w-lg mx-auto">
           <button
             onClick={() => setStep("service")}
-            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+            className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-2xl text-obsidian text-center mb-6">
+          <h2 className="font-display text-2xl text-primary text-center mb-6">
             {lang === "es" ? "Detalles del proyecto" : "Project details"}
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Tipo de propiedad" : "Property type"}
               </label>
               <select
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               >
                 {PROPERTY_TYPES.map((pt) => (
                   <option key={pt.value} value={pt.value}>
@@ -323,7 +323,7 @@ export default function ProjectPlanner({
             </div>
 
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es"
                   ? "¿Quieres hacerlo tú mismo o contratar a un profesional?"
                   : "DIY or hire a professional?"}
@@ -334,8 +334,8 @@ export default function ProjectPlanner({
                     key={dc.value}
                     className={`block p-3 rounded-xl border cursor-pointer transition ${
                       diyChoice === dc.value
-                        ? "border-gold bg-gold/5"
-                        : "border-sand/40 bg-paper"
+                        ? "border-accent-gold bg-accent-gold/5"
+                        : "border-border-default bg-surface"
                     }`}
                   >
                     <input
@@ -346,7 +346,7 @@ export default function ProjectPlanner({
                       onChange={(e) => setDiyChoice(e.target.value)}
                       className="sr-only"
                     />
-                    <span className="text-sm text-obsidian">
+                    <span className="text-sm text-primary">
                       {lang === "es" ? dc.es : dc.en}
                     </span>
                   </label>
@@ -355,13 +355,13 @@ export default function ProjectPlanner({
             </div>
 
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Presupuesto estimado" : "Estimated budget"}
               </label>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               >
                 {BUDGET_RANGES.map((br) => (
                   <option key={br.value} value={br.value}>
@@ -372,13 +372,13 @@ export default function ProjectPlanner({
             </div>
 
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "¿Cuándo te gustaría comenzar?" : "When would you like to start?"}
               </label>
               <select
                 value={timeline}
                 onChange={(e) => setTimeline(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               >
                 {TIMELINE_OPTIONS.map((to) => (
                   <option key={to.value} value={to.value}>
@@ -389,7 +389,7 @@ export default function ProjectPlanner({
             </div>
 
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Ubicación del proyecto" : "Project location"}
               </label>
               <input
@@ -397,12 +397,12 @@ export default function ProjectPlanner({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder={lang === "es" ? "Ciudad, estado" : "City, state"}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               />
             </div>
 
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Notas adicionales" : "Additional notes"}
               </label>
               <textarea
@@ -410,7 +410,7 @@ export default function ProjectPlanner({
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder={lang === "es" ? "Describe tu proyecto con más detalle…" : "Describe your project in more detail…"}
-                className="input bg-white border-sand/60 text-obsidian !resize-y"
+                className="input bg-surface-raised border-border-default text-primary !resize-y"
               />
             </div>
 
@@ -429,52 +429,52 @@ export default function ProjectPlanner({
         <div className="max-w-lg mx-auto">
           <button
             onClick={() => setStep("details")}
-            className="text-sm text-clay hover:text-obsidian mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+            className="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Volver" : "Back"}
           </button>
-          <h2 className="font-display text-2xl text-obsidian text-center mb-2">
+          <h2 className="font-display text-2xl text-primary text-center mb-2">
             {lang === "es" ? "¿Cómo te contactamos?" : "How do we reach you?"}
           </h2>
-          <p className="text-clay text-center text-sm mb-6">
+          <p className="text-text-muted text-center text-sm mb-6">
             {lang === "es"
               ? "Deja tu información para que podamos enviarte los resultados y conectarte con profesionales."
               : "Leave your info so we can send you results and connect you with professionals."}
           </p>
           <div className="space-y-4">
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Nombre completo *" : "Full name *"}
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
                 required
               />
             </div>
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Teléfono *" : "Phone *"}
               </label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
                 required
               />
             </div>
             <div>
-              <label className="label text-clay">
+              <label className="label text-text-muted">
                 {lang === "es" ? "Correo electrónico" : "Email"}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input bg-white border-sand/60 text-obsidian"
+                className="input bg-surface-raised border-border-default text-primary"
               />
             </div>
             <button
@@ -495,43 +495,43 @@ export default function ProjectPlanner({
         <div className="space-y-8">
           <button
             onClick={reset}
-            className="text-sm text-clay hover:text-obsidian inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+            className="text-sm text-text-muted hover:text-primary inline-flex items-center gap-1 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             ← {lang === "es" ? "Nuevo plan" : "New plan"}
           </button>
 
           {/* Budget estimate */}
-            <div className="bg-paper rounded-2xl border border-sand/40 p-6 sm:p-8">
-              <h2 className="font-display text-2xl text-obsidian mb-2">
+            <div className="bg-surface rounded-2xl border border-border-default p-6 sm:p-8">
+              <h2 className="font-display text-2xl text-primary mb-2">
                 {lang === "es" ? "Tu plan de proyecto" : "Your Project Plan"}
               </h2>
-            <p className="text-sm text-clay mb-6">
+            <p className="text-sm text-text-muted mb-6">
               {serviceLabel(selectedService.name, lang)} ·{" "}
               {lang === "es" ? "Plan de presupuesto" : "Budget plan"}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-4">
-              <div className="bg-sand/20 rounded-xl p-4">
-                <p className="text-xs text-clay mb-1">
+              <div className="bg-surface/20 rounded-xl p-4">
+                <p className="text-xs text-text-muted mb-1">
                   {lang === "es" ? "Rango de presupuesto estimado" : "Estimated budget range"}
                 </p>
-                <p className="font-display text-2xl text-gold">
+                <p className="font-display text-2xl text-accent-gold">
                   {estimateBudgetRange(selectedService.category, lang).label}
                 </p>
-                <p className="text-xs text-clay/60 mt-1">
+                <p className="text-xs text-text-muted/60 mt-1">
                   {lang === "es"
                     ? "Este es un rango estimado. Los presupuestos reales varían según el contractor y materiales."
                     : "This is an estimated range. Actual quotes vary by contractor and materials."}
                 </p>
               </div>
-              <div className="bg-sand/20 rounded-xl p-4">
-                <p className="text-xs text-clay mb-1">
+              <div className="bg-surface/20 rounded-xl p-4">
+                <p className="text-xs text-text-muted mb-1">
                   {lang === "es" ? "Tiempo estimado" : "Estimated timeline"}
                 </p>
-                <p className="font-display text-2xl text-obsidian">
+                <p className="font-display text-2xl text-primary">
                   {estimateTimeline(selectedService.category, lang)}
                 </p>
-                <p className="text-xs text-clay/60 mt-1">
+                <p className="text-xs text-text-muted/60 mt-1">
                   {lang === "es"
                     ? "El tiempo real depende del alcance y disponibilidad del contractor."
                     : "Actual timeline depends on scope and contractor availability."}
@@ -539,7 +539,7 @@ export default function ProjectPlanner({
               </div>
             </div>
 
-            <div className="bg-warn/5 border border-warn/20 rounded-xl p-4 text-xs text-clay">
+            <div className="bg-accent-gold/10 border border-accent-gold/30 rounded-xl p-4 text-xs text-text-muted">
               ⚠️{" "}
               {lang === "es"
                 ? "Estos son rangos de planificación, no cotizaciones vinculantes. Los precios varían según materiales, mano de obra, ubicación y alcance específico del proyecto. Siempre solicita presupuestos detallados a los profesionales."
@@ -550,7 +550,7 @@ export default function ProjectPlanner({
           {/* Recommended contractors */}
           {matchedContractors.length > 0 && (
             <div>
-              <h3 className="font-display text-xl text-obsidian mb-4">
+              <h3 className="font-display text-xl text-primary mb-4">
                 {lang === "es"
                   ? "Profesionales recomendados"
                   : "Recommended professionals"}
@@ -559,20 +559,20 @@ export default function ProjectPlanner({
                 {matchedContractors.slice(0, 4).map((c) => (
                   <div
                     key={c.id}
-                    className="bg-paper rounded-xl border border-sand/40 p-4"
+                    className="bg-surface rounded-xl border border-border-default p-4"
                   >
-                    <p className="font-semibold text-obsidian">{c.businessName}</p>
-                    <p className="text-xs text-clay mb-3">{c.serviceArea}</p>
+                    <p className="font-semibold text-primary">{c.businessName}</p>
+                    <p className="text-xs text-text-muted mb-3">{c.serviceArea}</p>
                     <div className="flex gap-2">
                       <a
                         href={`/contractor/${c.username}`}
-                        className="text-xs flex-1 text-center border border-sand/60 text-clay rounded-lg py-2 hover:bg-sand/20 transition-colors"
+                        className="text-xs flex-1 text-center border border-border-default text-text-muted rounded-lg py-2 hover:bg-surface/20 transition-colors"
                       >
                         {lang === "es" ? "Ver perfil" : "View profile"}
                       </a>
                       <a
                         href={`/book?contractor=${c.id}`}
-                        className="text-xs flex-1 text-center bg-obsidian text-cream rounded-lg py-2 hover:bg-obsidian/90 transition-colors"
+                        className="text-xs flex-1 text-center bg-accent-dark text-on-dark rounded-lg py-2 hover:bg-accent-dark/90 transition-colors"
                       >
                         {lang === "es" ? "Reservar ahora" : "Book now"}
                       </a>
@@ -584,8 +584,8 @@ export default function ProjectPlanner({
           )}
 
           {/* Next steps */}
-          <div className="bg-paper rounded-2xl border border-sand/40 p-6">
-            <h3 className="font-display text-lg text-obsidian mb-4">
+          <div className="bg-surface rounded-2xl border border-border-default p-6">
+            <h3 className="font-display text-lg text-primary mb-4">
               {lang === "es" ? "Próximos pasos" : "Next steps"}
             </h3>
             <div className="space-y-3">
@@ -593,7 +593,7 @@ export default function ProjectPlanner({
                 <>
                   <a
                     href="/book"
-                    className="block w-full bg-gold text-obsidian font-semibold text-center py-3 rounded-xl"
+                    className="block w-full bg-accent-gold text-primary font-semibold text-center py-3 rounded-xl"
                   >
                     {lang === "es"
                       ? "Reservar consulta ahora"
@@ -601,7 +601,7 @@ export default function ProjectPlanner({
                   </a>
                   <a
                     href="/book"
-                    className="block w-full border-2 border-obsidian/20 text-obsidian text-center py-3 rounded-xl hover:bg-obsidian hover:text-cream transition-colors"
+                    className="block w-full border-2 border-primary/20 text-primary text-center py-3 rounded-xl hover:bg-accent-dark hover:text-on-dark transition-colors"
                   >
                     {lang === "es"
                       ? "Explorar más profesionales"
@@ -609,7 +609,7 @@ export default function ProjectPlanner({
                   </a>
                 </>
               ) : (
-                <p className="text-sm text-clay text-center">
+                <p className="text-sm text-text-muted text-center">
                   {lang === "es"
                     ? "¡Genial! Si decides que necesitas ayuda profesional, estamos aquí para conectarte."
                     : "Great! If you decide you need professional help, we're here to connect you."}
@@ -617,7 +617,7 @@ export default function ProjectPlanner({
               )}
               <button
                 onClick={reset}
-                className="block w-full text-sm text-clay hover:text-obsidian text-center py-2 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-obsidian focus-visible:ring-offset-2"
+                className="block w-full text-sm text-text-muted hover:text-primary text-center py-2 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {lang === "es"
                   ? "Planificar otro proyecto"

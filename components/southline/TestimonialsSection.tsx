@@ -21,16 +21,16 @@ export default function TestimonialsSection({
     : content?.reviewCtaLabel;
 
   return (
-    <section className="bg-ivory py-14 sm:py-20">
+    <section className="bg-page py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.35em] text-gold">
+          <p className="text-xs uppercase tracking-[0.35em] text-accent-gold">
             {t("testimonialsEyebrow", lang)}
           </p>
-          <h2 className="mt-4 font-display text-3xl text-obsidian sm:text-4xl">
+          <h2 className="mt-4 font-display text-3xl text-primary sm:text-4xl">
             {heading ?? t("testimonialsHeading", lang)}
           </h2>
-          <p className="mt-3 text-clay">{body ?? t("testimonialsBody", lang)}</p>
+          <p className="mt-3 text-text-muted">{body ?? t("testimonialsBody", lang)}</p>
         </div>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -47,41 +47,41 @@ export default function TestimonialsSection({
             return (
               <figure
                 key={item.id}
-                className={`flex flex-col rounded-2xl border bg-cream p-6 ${
-                  item.featured ? "border-gold" : "border-walnut/15"
+                className={`flex flex-col rounded-2xl border bg-surface p-6 shadow-sm ${
+                  item.featured ? "border-accent-gold" : "border-border-default"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3 mb-4">
                   {rating !== null ? (
-                    <span className="inline-flex rounded-full border border-gold/40 px-3 py-1 text-xs font-semibold text-obsidian">
+                    <span className="inline-flex rounded-full border border-accent-gold/40 px-3 py-1 text-xs font-semibold text-primary">
                       {rating} / 5
                     </span>
                   ) : (
                     <span />
                   )}
                   {item.featured && (
-                    <span className="text-xs uppercase tracking-wider text-gold">
+                    <span className="text-xs uppercase tracking-wider text-accent-gold">
                       {t("testimonialsFeaturedBadge", lang)}
                     </span>
                   )}
                 </div>
 
-                <blockquote className="flex-1 text-sm leading-relaxed text-obsidian">
+                <blockquote className="flex-1 text-sm leading-relaxed text-primary">
                   “{quote}”
                 </blockquote>
 
-                <figcaption className="mt-5 flex items-center gap-3 border-t border-walnut/10 pt-4">
+                <figcaption className="mt-5 flex items-center gap-3 border-t border-border-default pt-4">
                   {item.imageUrl && (
                     <img
                       src={item.imageUrl}
                       alt={authorName}
-                      className="h-10 w-10 rounded-full object-cover"
+                      className="h-10 w-10 rounded-full object-cover object-[center_20%]"
                     />
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-obsidian">{authorName}</p>
+                    <p className="text-sm font-semibold text-primary">{authorName}</p>
                     {[authorTitle, companyName].filter(Boolean).length > 0 && (
-                      <p className="truncate text-xs text-clay">
+                      <p className="truncate text-xs text-text-muted">
                         {[authorTitle, companyName].filter(Boolean).join(" · ")}
                       </p>
                     )}
@@ -93,7 +93,7 @@ export default function TestimonialsSection({
                     href={item.sourceUrl ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 text-xs text-clay hover:text-gold transition-colors"
+                    className="mt-4 text-xs text-text-muted hover:text-accent-gold transition-colors"
                   >
                     {lang === "es" ? "Vía" : "Via"} {item.sourceLabel}
                   </a>
@@ -109,7 +109,7 @@ export default function TestimonialsSection({
               href={content.reviewCtaUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-xl border border-gold px-6 py-3 text-sm font-semibold text-obsidian hover:bg-gold/10 transition-colors"
+              className="inline-block rounded-xl border border-accent-gold px-6 py-3 text-sm font-semibold text-primary hover:bg-accent-gold/10 transition-colors"
             >
               {reviewCtaLabel ?? t("testimonialsReviewCta", lang)}
             </a>

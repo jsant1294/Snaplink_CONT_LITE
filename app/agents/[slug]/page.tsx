@@ -19,7 +19,7 @@ export default async function AgentProfileRoute({ params }: { params: Promise<{ 
   return (
     <>
       <Header lang={lang} />
-      <div className="bg-[#EEE7DA] py-6">
+      <div className="bg-page py-6">
         <AgentProfilePublicPage profile={publicAgentProfile(profile)} lang={lang} variant="southline" />
       </div>
       <Footer lang={lang} />

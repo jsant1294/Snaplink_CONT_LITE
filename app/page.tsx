@@ -4,10 +4,10 @@ import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { publicAgentProfile } from "@/lib/agent-profiles/auth";
 import { southlineStore } from "@/lib/southline-store";
 import { demoTenant } from "@/lib/real-estate/fixtures";
-import { listPublishedPropertiesWithFallback, resolveFeaturedPropertyWithFallback } from "@/lib/real-estate/homes-fallback";
+import { listPublishedPropertiesWithFallback, listPublishedRentalsWithFallback, resolveFeaturedPropertyWithFallback } from "@/lib/real-estate/homes-fallback";
 import { listProjects } from "@/lib/southline-diy";
 import type { Lang } from "@/lib/southline-i18n";
-import { DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
+import { DEFAULT_FEATURED_RENTALS, DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
 
 import Header from "@/components/southline/Header";
 import Hero from "@/components/southline/Hero";
@@ -20,6 +20,7 @@ import FeaturedProfessionals from "@/components/southline/FeaturedProfessionals"
 import CommunitySpotlight from "@/components/southline/CommunitySpotlight";
 import RealEstateEntryBlock from "@/components/southline/RealEstateEntryBlock";
 import FeaturedHomes from "@/components/southline/FeaturedHomes";
+import FeaturedRentals from "@/components/southline/FeaturedRentals";
 import FeaturedServicesEntryBlock from "@/components/southline/FeaturedServicesEntryBlock";
 import PoweredBySnapLink from "@/components/southline/PoweredBySnapLink";
 import DIYLearningTeaser from "@/components/southline/DIYLearningTeaser";
@@ -27,7 +28,9 @@ import SeasonalIdeasBanner from "@/components/southline/SeasonalIdeasBanner";
 import TestimonialsSection from "@/components/southline/TestimonialsSection";
 import EstimatorBookingSection from "@/components/southline/EstimatorBookingSection";
 import BecomeAProfessionalSection from "@/components/southline/BecomeAProfessionalSection";
+import SectionDivider from "@/components/southline/SectionDivider";
 import LucioMount from "@/components/lucio/LucioMount";
+import { isSeasonalActive } from "@/lib/seasonal-schedule";
 
 export const dynamic = "force-dynamic";
 
@@ -70,9 +73,28 @@ export default async function HomePage() {
   const featuredHomesResult = showFeaturedHomes
     ? await listPublishedPropertiesWithFallback(demoTenant.id, { pageSize: 4 })
     : null;
-  const featuredHomes = (featuredHomesResult?.properties ?? [])
-    .filter((p) => p.id !== featuredProperty?.id)
-    .slice(0, 3);
+  const homepageHomes = featuredHomesResult?.properties ?? [];
+  const featuredHomes = [
+    ...homepageHomes.filter((property) => property.id !== featuredProperty?.id),
+    ...(featuredProperty && homepageHomes.some((property) => property.id === featuredProperty.id)
+      ? [featuredProperty]
+      : []),
+  ].slice(0, 3);
+
+  const rentalsContent = settings?.featuredRentals ?? DEFAULT_FEATURED_RENTALS;
+  const showFeaturedRentals = !sections || sections.featuredRentals !== false;
+  const featuredRentalsResult = showFeaturedRentals
+    ? await listPublishedRentalsWithFallback(demoTenant.id, { pageSize: 4 })
+    : null;
+  const availableRentals = featuredRentalsResult?.properties ?? [];
+  const selectedRentalIds = rentalsContent.selectedRentalIds;
+  const orderedRentals = selectedRentalIds.length > 0
+    ? [
+        ...selectedRentalIds.map((id) => availableRentals.find((property) => property.id === id)).filter((property): property is NonNullable<typeof property> => Boolean(property)),
+        ...availableRentals.filter((property) => !selectedRentalIds.includes(property.id)),
+      ]
+    : availableRentals;
+  const featuredRentals = orderedRentals.slice(0, Math.min(4, Math.max(1, rentalsContent.maxCards)));
 
   const diyTeaserProjects = diyProjects.slice(0, 3);
 
@@ -84,47 +106,49 @@ export default async function HomePage() {
       <Header lang={lang} navItems={navItems} />
       <main>
         {(!sections || sections.hero) && <Hero lang={lang} hero={hero} heroImage={settings?.heroImage} />}
-
-        {settings?.localDiscovery?.showOnHomepage !== false && (
-          <LocalDiscovery lang={lang} content={settings?.localDiscovery} />
-        )}
-
-        {(!sections || sections.localPromo !== false) && (
-          <SnapLinkLocalPromo lang={lang} content={settings?.snapLinkPromo} />
-        )}
-
+        {(!sections || sections.seasonalIdeas) && isSeasonalActive(settings?.seasonal) && <SeasonalIdeasBanner lang={lang} content={settings?.seasonal} />}
+        {(!sections || sections.trending) && <><SectionDivider /><TrendingSection lang={lang} items={settings?.trendingProjects} /></>}
         {showRealEstateBlock && (
-          <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />
+          <><SectionDivider /><RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} /></>
         )}
-        {showFeaturedHomes && <FeaturedHomes lang={lang} properties={featuredHomes} />}
-
+        {showFeaturedHomes && featuredHomes.length > 0 && <><SectionDivider /><FeaturedHomes lang={lang} properties={featuredHomes} /></>}
+        {showFeaturedRentals && <><SectionDivider /><FeaturedRentals lang={lang} properties={featuredRentals} content={rentalsContent} /></>}
         {(!sections || sections.featuredServices) && (
-          <FeaturedServicesEntryBlock lang={lang} content={settings?.homeServices} featuredContractor={featuredContractor} />
+          <><SectionDivider /><FeaturedServicesEntryBlock lang={lang} content={settings?.homeServices} featuredContractor={featuredContractor} /></>
+        )}
+        {settings?.localDiscovery?.showOnHomepage !== false && (
+          <><SectionDivider /><LocalDiscovery lang={lang} content={settings?.localDiscovery} /></>
         )}
         {(!sections || sections.featuredPros) && (
-          <FeaturedProfessionals
+          <><SectionDivider /><FeaturedProfessionals
             contractors={allContractors}
             agents={featuredSectionAgents}
             featuredContractorIds={settings?.featuredContractorIds ?? []}
             featuredAgentProfileIds={settings?.featuredAgentProfileIds ?? []}
             lang={lang}
-          />
+          /></>
         )}
-        {(!sections || sections.poweredBySnaplink) && <PoweredBySnapLink lang={lang} />}
-        {(!sections || sections.categories) && <CategoriesGrid lang={lang} categories={settings?.categories} />}
-
-        {(!sections || sections.diyLearning) && <DIYLearningTeaser lang={lang} projects={diyTeaserProjects} />}
-        {(!sections || sections.trending) && <TrendingSection lang={lang} items={settings?.trendingProjects} />}
-
-        <TestimonialsSection lang={lang} content={settings?.testimonials} />
-
+        {(!sections || sections.categories) && <><SectionDivider /><CategoriesGrid lang={lang} categories={settings?.categories} /></>}
+        {(!sections || sections.diyLearning) && <><SectionDivider /><DIYLearningTeaser lang={lang} projects={diyTeaserProjects} /></>}
+        {/* Hidden by default (feature-gated, not deleted) — see SectionVisibility.estimatorBooking. Explicit opt-in via `=== true` so older stored settings without this key also resolve to hidden. */}
+        {sections?.estimatorBooking === true && (
+          <>
+            <SectionDivider />
+            <EstimatorBookingSection lang={lang} showEstimator={Boolean(showEstimator)} showBooking={Boolean(showBooking)} />
+          </>
+        )}
         {settings?.spotlight && settings.spotlight.length > 0 && (
-          <CommunitySpotlight lang={lang} items={settings.spotlight} />
+          <><SectionDivider /><CommunitySpotlight lang={lang} items={settings.spotlight} /></>
         )}
-
-        {(!sections || sections.seasonalIdeas) && <SeasonalIdeasBanner lang={lang} content={settings?.seasonal} />}
-        <EstimatorBookingSection lang={lang} showEstimator={Boolean(showEstimator)} showBooking={Boolean(showBooking)} />
-        {(!sections || sections.recruitment) && <BecomeAProfessionalSection lang={lang} />}
+        {(!sections || sections.testimonials !== false) && (
+          <TestimonialsSection lang={lang} content={settings?.testimonials} />
+        )}
+        {(!sections || sections.recruitment) && <><SectionDivider /><BecomeAProfessionalSection lang={lang} /></>}
+        {(!sections || sections.poweredBySnaplink) && <PoweredBySnapLink lang={lang} />}
+        {(!sections || sections.localPromo !== false) && <SectionDivider monogram />}
+        {(!sections || sections.localPromo !== false) && (
+          <SnapLinkLocalPromo lang={lang} content={settings?.snapLinkPromo} />
+        )}
       </main>
       <Footer lang={lang} footer={settings?.footer} contact={settings?.contact} />
       <LucioMount lang={lang} pageContext={{ type: "home" }} />

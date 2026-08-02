@@ -14,13 +14,13 @@ export default function CategoriesGrid({
     .filter((category) => category.visible !== false)
     .sort((a, b) => a.sortOrder - b.sortOrder);
   return (
-    <section id="categories" className="bg-ivory py-14 sm:py-20">
+    <section id="categories" className="bg-page py-14 sm:py-20">
       <div className="max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 sm:mb-12">
-          <p className="text-xs tracking-[0.35em] uppercase text-gold font-medium mb-3">
+        <div className="southline-section-header text-center">
+          <p className="southline-section-eyebrow">
             {t("inspirationTitle", lang)}
           </p>
-          <h2 className="font-display text-3xl sm:text-4xl text-obsidian leading-tight">
+          <h2 className="southline-section-title">
             {t("inspirationSubtitle", lang)}
           </h2>
         </div>
@@ -36,7 +36,7 @@ export default function CategoriesGrid({
                 key={category.id}
                 href={category.linkUrl}
                 aria-label={`${cta ?? title}: ${title}`}
-                className="group relative isolate h-[230px] sm:h-[250px] overflow-hidden rounded-[18px] border border-cream/10 bg-snaplink-charcoal shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-[transform,box-shadow] duration-[225ms] ease-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(37,35,31,0.28)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-snaplink-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
+                className="group relative isolate h-[230px] sm:h-[250px] overflow-hidden rounded-[18px] border border-on-dark/10 bg-snaplink-charcoal shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-[transform,box-shadow] duration-[225ms] ease-out hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(37,35,31,0.28)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-snaplink-gold focus-visible:ring-offset-2 focus-visible:ring-offset-page"
               >
                 <img
                   src={category.imageUrl}

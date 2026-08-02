@@ -20,15 +20,15 @@ function Card({
   href: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-walnut/15 bg-cream shadow-sm">
-      <div className="relative h-40 overflow-hidden">
-        <img src={image} alt="" loading="lazy" className="h-full w-full object-cover" />
+    <div className="marketplace-card">
+      <div className="marketplace-card-media">
+        <img src={image} alt="" loading="lazy" className="marketplace-image-project" />
       </div>
-      <div className="flex flex-col items-start gap-3 p-6 sm:p-8">
-        <p className="text-xs font-medium uppercase tracking-[0.35em] text-gold">{eyebrow}</p>
-        <h2 className="font-display text-2xl leading-tight text-walnut">{title}</h2>
-        <p className="text-sm leading-relaxed text-walnut/80">{body}</p>
-        <Link href={href} className="mt-1 rounded-xl bg-obsidian px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-obsidian/90">
+      <div className="marketplace-card-body flex flex-col items-start gap-3">
+        <p className="southline-section-eyebrow !mb-0">{eyebrow}</p>
+        <h2 className="font-display text-2xl leading-tight text-primary">{title}</h2>
+        <p className="text-sm leading-relaxed text-primary/80">{body}</p>
+        <Link href={href} className="mt-1 rounded-xl bg-accent-dark px-6 py-3 text-sm font-semibold text-on-dark transition-colors hover:bg-accent-dark/90">
           {ctaLabel}
         </Link>
       </div>
@@ -48,7 +48,7 @@ export default function EstimatorBookingSection({
   if (!showEstimator && !showBooking) return null;
 
   return (
-    <section className="bg-mushroom/15 py-14 sm:py-20">
+    <section className="bg-page py-14 sm:py-20">
       <div className={`mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 lg:px-8 ${showEstimator && showBooking ? "sm:grid-cols-2" : "max-w-3xl"}`}>
         {showEstimator && (
           <Card
