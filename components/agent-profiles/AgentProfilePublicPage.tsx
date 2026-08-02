@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import type { AgentProfile } from "@/lib/agent-profiles/types";
+import { agentProfessionTypeLabel } from "@/lib/profession-types";
 import { t, type Lang } from "@/lib/southline-i18n";
 
 function track(id: string, eventType: string) {
@@ -56,7 +57,10 @@ export default function AgentProfilePublicPage({
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#6F552A]">{profile.serviceArea}</p>
         )}
         <h1 className="font-display text-4xl leading-tight text-[#2F2923]">{profile.name}</h1>
-        {profile.brokerageName && <p className="mt-1 text-sm text-[#62584F]">{profile.brokerageName}</p>}
+        <p className="mt-3 inline-block rounded-full border border-[#B99552]/40 bg-[#F5EFE4]/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#6F552A]">
+          {agentProfessionTypeLabel(profile.professionType, lang)}
+        </p>
+        {profile.brokerageName && <p className="mt-2 text-sm text-[#62584F]">{profile.brokerageName}</p>}
         {profile.tagline && <p className="mt-2 text-sm text-[#62584F]">{profile.tagline}</p>}
         {profile.licenseNumber && <p className="mt-1 text-xs text-[#6B6158]">{t("agentLicense", lang)} {profile.licenseNumber}</p>}
         <div className="gold-rule mx-auto mt-5 w-32" />
@@ -79,7 +83,7 @@ export default function AgentProfilePublicPage({
 
       {profile.bio && (
         <section className="mb-6">
-          <h2 className="mb-2 font-display text-lg text-[#2F2923]">{t("aboutAgent", lang)}</h2>
+          <h2 className="mb-2 font-display text-lg text-[#2F2923]">{t("aboutProfessional", lang)}</h2>
           <p className="text-sm leading-relaxed text-[#62584F]">{profile.bio}</p>
         </section>
       )}

@@ -11,6 +11,7 @@
     "test:real-estate:staging-load": "node scripts/real-estate-staging-load-test.mjs",
     "test:agent-profiles": "node --test tests/agent-profiles.test.mjs tests/real-estate-entry-block.test.mjs",
     "test:agent-management": "node --test tests/agent-management.test.mjs tests/agent-profiles.test.mjs",
+    "test:unified-professional": "node --test tests/unified-professional-profile.test.mjs tests/southline-search.test.mjs tests/agent-management.test.mjs tests/agent-profiles.test.mjs",
     "test:schema-drift": "node --test tests/schema-drift.test.mjs",
     "test:southline": "node --test tests/master-refactor-v2.test.mjs tests/master-refactor-v3.test.mjs tests/featured-services.test.mjs tests/snaplink-platform.test.mjs tests/lucio.test.mjs tests/southline-form-visibility.test.mjs tests/rentals-getaways.test.mjs",
     "test:southline-search": "node --test tests/southline-search.test.mjs",

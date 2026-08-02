@@ -10,14 +10,16 @@
 //    (both languages).
 //  - Agent profiles (realtors + licensed pros, /agents/{slug}): only profiles
 //    whose southlineStatus is published/featured; matched by name, brokerage,
-//    tagline, area(s), specialties, categories, license state.
+//    tagline, area(s), specialties, categories, license state, and the
+//    profession-type label in both languages (so "photographer" / "fotógrafo"
+//    finds a photographer on the unified professional model).
 //  - A category filter matches against SERVICE_CATEGORIES ids. Contractors map
 //    via their services' canonical category; agents map via any category/
 //    specialty equal to the category label, its id, or one of its services.
 // ---------------------------------------------------------------------------
 
 import { SERVICE_CATEGORIES, SERVICE_LIBRARY, getService } from "./services.ts";
-import { professionTypeLabel } from "./profession-types.ts";
+import { agentProfessionTypeLabel, professionTypeLabel } from "./profession-types.ts";
 import type { Contractor } from "./types.ts";
 import type { AgentProfile } from "./agent-profiles/types.ts";
 
@@ -132,7 +134,8 @@ export function searchProfessionals(
     const catIds = categoryIdsForAgent(a);
     if (category && !catIds.includes(category)) continue;
     const matches = matchesQuery(
-      [a.name, a.displayName, a.brokerageName, a.officeName, a.tagline, a.serviceArea, a.licenseState, ...a.serviceAreas, ...a.specialties, ...a.categories],
+      [a.name, a.displayName, a.brokerageName, a.officeName, a.tagline, a.serviceArea, a.licenseState, ...a.serviceAreas, ...a.specialties, ...a.categories,
+        agentProfessionTypeLabel(a.professionType, "en"), agentProfessionTypeLabel(a.professionType, "es")],
       q
     );
     if (!matches) continue;

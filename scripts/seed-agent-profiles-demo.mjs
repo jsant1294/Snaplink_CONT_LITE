@@ -7,6 +7,11 @@
 // "Listed by Elena Martinez" link both point at a real, coherent profile
 // (agent_profiles.status is "active" so it actually renders).
 //
+// Also seeds one non-real-estate professional (a photographer) on the SAME
+// unified agent_profiles model — profession_type "photographer", with the
+// shared brokerage_name field holding the studio name and no license — proving
+// the model serves every profession without a parallel profile system.
+//
 //   node scripts/seed-agent-profiles-demo.mjs
 //
 // ALL DATA IS FICTIONAL DEMO CONTENT, same convention as scripts/seed-demo-ridgeline.mjs.
@@ -41,5 +46,23 @@ await pool.query(
    ON CONFLICT (slug) DO NOTHING`
 );
 
-console.log("Seeded demo agent profile: elena-martinez (active).");
+await pool.query(
+  `INSERT INTO agent_profiles (
+     id, slug, status, name, profession_type, brokerage_name, phone, email,
+     service_area, bio, tagline, languages, specialties, service_areas, years_experience, photo_url,
+     southline_status
+   ) VALUES (
+     'apx_demo_camila_ruiz', 'camila-ruiz-photography', 'active', 'Camila Ruiz',
+     'photographer', 'Camila Ruiz Studio', '(470) 555-0177', 'camila@example.com',
+     'Decatur', 'Editorial and architectural photography for homes, listings, and interiors.',
+     'Homes that photograph as beautifully as they live.', '["English","Español"]'::jsonb,
+     '["Architecture","Interior","Real estate listing","Editorial"]'::jsonb,
+     '["Decatur","Oakhurst","Avondale Estates"]'::jsonb, 9,
+     'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&q=85',
+     'published'
+   )
+   ON CONFLICT (slug) DO NOTHING`
+);
+
+console.log("Seeded demo profiles: elena-martinez (realtor) + camila-ruiz-photography (photographer).");
 await pool.end();

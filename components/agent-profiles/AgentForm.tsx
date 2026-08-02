@@ -67,6 +67,11 @@ function fromCsv(value: string): string[] {
   return value.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
+// Brokerage-based professions keep real-estate wording ("Brokerage", license
+// prominent). Every other profession on the unified model gets profession-
+// neutral copy ("Company name") — the field model is identical either way.
+const BROKERAGE_PROFESSIONS = new Set(["realtor", "mortgage_broker"]);
+
 export function valuesFromProfile(profile?: AgentProfile): AgentFormValues {
   return {
     firstName: profile?.firstName ?? "",
@@ -230,6 +235,7 @@ export default function AgentForm({
   const snaplinkUrl = values.username ? `/p/${values.username}` : undefined;
   const southlineUrl = values.slug ? `/agents/${values.slug}` : values.username ? `/agents/${values.username}` : undefined;
   const workspaceUrl = mode === "edit" && excludeId ? `/southline/admin/agents/${excludeId}` : undefined;
+  const isBrokerageProfession = BROKERAGE_PROFESSIONS.has(values.professionType);
 
   return (
     <div className="space-y-8">
@@ -273,14 +279,14 @@ export default function AgentForm({
         </div>
       </section>
 
-      {/* --- Real Estate Details: the real-estate-specific extension of the shared identity. --- */}
+      {/* --- Professional Details: the profession-specific extension of the shared identity. --- */}
       <section id="real-estate-details">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gold">Real Estate Details</h3>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gold">Professional Details</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className={labelCls}>Profession type</label>
             <select className={inputCls} value={values.professionType} onChange={(e) => set("professionType", e.target.value)}>
-              <optgroup label="Licensed real estate">
+              <optgroup label="Licensed professionals">
                 {LICENSED_PROFESSION_TYPES.map((p) => (
                   <option key={p.id} value={p.id}>{p.en}</option>
                 ))}
@@ -292,12 +298,12 @@ export default function AgentForm({
               </optgroup>
             </select>
           </div>
-          <div><label className={labelCls}>Professional title / tagline</label><input className={inputCls} value={values.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="e.g. Senior Listing Agent" /></div>
-          <div><label className={labelCls}>Brokerage</label><input className={inputCls} value={values.brokerageName} onChange={(e) => set("brokerageName", e.target.value)} /></div>
+          <div><label className={labelCls}>Professional title / tagline</label><input className={inputCls} value={values.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="e.g. Senior listing agent, licensed contractor, studio owner" /></div>
+          <div><label className={labelCls}>{isBrokerageProfession ? "Brokerage" : "Company name"}</label><input className={inputCls} value={values.brokerageName} onChange={(e) => set("brokerageName", e.target.value)} placeholder={isBrokerageProfession ? "e.g. Southline Realty Group" : "e.g. Studio or company name"} /></div>
           <div><label className={labelCls}>Office</label><input className={inputCls} value={values.officeName} onChange={(e) => set("officeName", e.target.value)} /></div>
           <div><label className={labelCls}>Team</label><input className={inputCls} value={values.teamName} onChange={(e) => set("teamName", e.target.value)} /></div>
-          <div><label className={labelCls}>License number</label><input className={inputCls} value={values.licenseNumber} onChange={(e) => set("licenseNumber", e.target.value)} /></div>
-          <div><label className={labelCls}>License state</label><input className={inputCls} value={values.licenseState} onChange={(e) => set("licenseState", e.target.value)} /></div>
+          <div><label className={labelCls}>License number {isBrokerageProfession ? "" : "(optional for non-licensed)"}</label><input className={inputCls} value={values.licenseNumber} onChange={(e) => set("licenseNumber", e.target.value)} /></div>
+          <div><label className={labelCls}>License state {isBrokerageProfession ? "" : "(optional)"}</label><input className={inputCls} value={values.licenseState} onChange={(e) => set("licenseState", e.target.value)} /></div>
           <div><label className={labelCls}>Years of experience</label><input className={inputCls} type="number" value={values.yearsExperience} onChange={(e) => set("yearsExperience", e.target.value)} /></div>
           <div><label className={labelCls}>Primary service area</label><input className={inputCls} value={values.serviceArea} onChange={(e) => set("serviceArea", e.target.value)} /></div>
           <div><label className={labelCls}>Service areas (comma-separated)</label><input className={inputCls} value={values.serviceAreas} onChange={(e) => set("serviceAreas", e.target.value)} /></div>

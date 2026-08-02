@@ -177,6 +177,11 @@ which also re-runs `tests/agent-profiles.test.mjs`) statically asserts:
 - Scoped to the existing `lib/agent-profiles` module (real-estate agents)
   rather than building a new, fully unified cross-vertical "Professional"
   entity — the pragmatic, lower-risk scope for one implementation slice.
+  The follow-up **Unified Professional Profile** slice built on that same
+  model instead of forking it: the taxonomy now covers every home-service
+  profession (incl. `photographer`) and the public/directory/form/admin
+  surfaces render profession-agnostic copy — see
+  `docs/architecture/UNIFIED_PROFESSIONAL_PROFILE.md`.
 - "Agent receives invitation" is implemented as an operator-set 6-digit PIN
   plus copyable SnapLink/Southline URLs shown on the creation success screen
   — not an actual email send. No email-sending infrastructure exists

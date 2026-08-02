@@ -265,6 +265,16 @@ export const UI_DEFS = {
     en: "Powered by Snaplink Profile",
   },
 
+  // Unified professional profile — profession-neutral copy for the shared
+  // agent_profiles model, so one identity renders correctly for real estate
+  // agents AND trades/services (contractors, architects, photographers, ...).
+  professionalDirectoryEyebrow: { es: "Profesionales", en: "Professionals" },
+  professionalDirectoryTitle: {
+    es: "Directorio de profesionales",
+    en: "Professional directory",
+  },
+  aboutProfessional: { es: "Acerca de", en: "About" },
+
   // Agent recruitment
   agentRecruitmentHeadline: {
     es: "Convierte tu reputación local en una presencia digital profesional.",

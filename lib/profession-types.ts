@@ -39,6 +39,7 @@ export const PROFESSION_TYPES: ProfessionType[] = [
   { id: "window_company", en: "Windows", es: "Ventanas" },
   { id: "solar", en: "Solar", es: "Energía Solar" },
   { id: "pool_builder", en: "Pool Builder", es: "Constructor de Piscinas" },
+  { id: "photographer", en: "Photographer", es: "Fotógrafo" },
 ];
 
 const PROFESSION_IDS = new Set(PROFESSION_TYPES.map((p) => p.id));
@@ -171,6 +172,11 @@ export const PROFESSION_PLACEHOLDER_PHOTOS: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=900&q=85",
     "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=900&q=85",
     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=85",
+  ],
+  photographer: [
+    "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900&q=85",
+    "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=900&q=85",
+    "https://images.unsplash.com/photo-1552168324-d612d77725e3?w=900&q=85",
   ],
 };
 

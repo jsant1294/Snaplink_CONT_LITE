@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { AGENT_MODULE_KEYS, type AgentModuleKey } from "@/lib/agent-profiles/types";
+import { agentProfessionTypeLabel } from "@/lib/profession-types";
 
 interface AgentProfile {
   id: string;
@@ -14,6 +15,7 @@ interface AgentProfile {
   phone: string;
   serviceArea: string;
   brokerageName: string;
+  professionType?: string;
   officeName?: string;
   teamName?: string;
   photoUrl?: string;
@@ -183,8 +185,9 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
             <thead className="bg-white/5 text-muted">
               <tr>
                 <th className="px-3 py-2 font-medium">Photo</th>
-                <th className="px-3 py-2 font-medium">Agent</th>
-                <th className="px-3 py-2 font-medium">Brokerage</th>
+                <th className="px-3 py-2 font-medium">Professional</th>
+                <th className="px-3 py-2 font-medium">Profession</th>
+                <th className="px-3 py-2 font-medium">Company / Brokerage</th>
                 <th className="px-3 py-2 font-medium">Office / Team</th>
                 <th className="px-3 py-2 font-medium">Plan</th>
                 <th className="px-3 py-2 font-medium">Account</th>
@@ -212,6 +215,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                     <p className="font-medium text-bone">{p.name}</p>
                     <p className="text-muted">{p.username ? `@${p.username}` : "no username"}</p>
                   </td>
+                  <td className="px-3 py-2 text-muted">{p.professionType ? agentProfessionTypeLabel(p.professionType, "en") : "—"}</td>
                   <td className="px-3 py-2 text-muted">{p.brokerageName || "—"}</td>
                   <td className="px-3 py-2 text-muted">{[p.officeName, p.teamName].filter(Boolean).join(" / ") || "—"}</td>
                   <td className="px-3 py-2 text-muted">{p.tier ?? "—"}</td>
@@ -245,7 +249,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                 </tr>
                 {manageModulesId === p.id && (
                   <tr>
-                    <td colSpan={12} className="bg-white/5 px-3 py-3">
+                    <td colSpan={13} className="bg-white/5 px-3 py-3">
                       <ManageModulesPanel modules={p.modules} onCancel={() => setManageModulesId(null)} onSave={(modules) => saveModules(p.id, modules)} />
                     </td>
                   </tr>
