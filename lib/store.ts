@@ -24,6 +24,8 @@ import { pgEntitlementStore } from "./store-entitlements-pg";
 import { jsonEntitlementStore } from "./store-entitlements-json";
 import { pgLandingPageStore } from "./store-landingpage-pg";
 import { jsonLandingPageStore } from "./store-landingpage-json";
+import { pgIntakeSessionStore } from "./professional-intake/store-pg";
+import { jsonIntakeSessionStore } from "./professional-intake/store-json";
 
 import { usePg } from "./db-url";
 
@@ -54,6 +56,9 @@ export const entitlementStore = usePg ? pgEntitlementStore : jsonEntitlementStor
 
 // Landing page generator — marketing layer on top of the public contractor page
 export const landingPageStore = usePg ? pgLandingPageStore : jsonLandingPageStore;
+
+// Professional Intake — guided onboarding wizard + profile auto-fill
+export const intakeSessionStore = usePg ? pgIntakeSessionStore : jsonIntakeSessionStore;
 
 export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;

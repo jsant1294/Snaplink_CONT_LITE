@@ -266,6 +266,34 @@ export const campaigns = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// Southline Professional Intake — one row per intake session. ownerId is
+// indexed text with no real FK (same convention as campaigns.contractorId)
+// since it points at either a contractors.id or an agent_profiles.id
+// depending on ownerType. Answers are a single jsonb bag (matches
+// lucio_events.metadata) rather than a column-per-question table, so
+// adding/removing questions never requires a migration.
+// ---------------------------------------------------------------------------
+export const professionalIntakeSessions = pgTable(
+  "professional_intake_sessions",
+  {
+    id: text("id").primaryKey(),
+    ownerType: text("owner_type").notNull(),
+    ownerId: text("owner_id").notNull(),
+    status: text("status").notNull().default("not_started"),
+    locale: text("locale").notNull().default("en"),
+    currentStep: integer("current_step").notNull().default(1),
+    answers: jsonb("answers").$type<Record<string, unknown>>().notNull().default({}),
+    flaggedQuestionIds: jsonb("flagged_question_ids").$type<string[]>().notNull().default([]),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    appliedAt: timestamp("applied_at", { withTimezone: true, mode: "string" }),
+    archivedAt: timestamp("archived_at", { withTimezone: true, mode: "string" }),
+  },
+  (t) => [index("professional_intake_sessions_owner_idx").on(t.ownerType, t.ownerId)]
+);
+
+// ---------------------------------------------------------------------------
 // Contractor self-service: Invoices (Stripe Connect). Disabled app-side until
 // STRIPE_SECRET_KEY is set — see lib/stripe/config.ts. contractorId/leadId
 // indexed text, no real FK, same convention as leads/estimates/expenses.

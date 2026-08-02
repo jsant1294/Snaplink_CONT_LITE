@@ -351,6 +351,13 @@ export default function ProfessionalCatalogPanel({ pin }: { pin: string }) {
               <a href={row.openUrl} className="text-xs text-muted hover:text-gold shrink-0" title="Open source workspace">
                 Open →
               </a>
+              <a
+                href={`/southline/admin/intake/${row.source}/${row.id}`}
+                className="text-xs text-muted hover:text-gold shrink-0"
+                title="Start or resume the guided profile intake"
+              >
+                Intake
+              </a>
             </div>
           );
         })}

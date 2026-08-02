@@ -237,6 +237,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                     <div className="flex flex-wrap gap-1.5">
                       <Link href={`/southline/admin/agents/${p.id}`} className="rounded border border-white/10 px-2 py-1 text-gold">Edit</Link>
                       <Link href={`/southline/admin/agents/${p.id}#snaplink-workspace`} className="rounded border border-white/10 px-2 py-1 text-bone">Open Workspace</Link>
+                      <Link href={`/southline/admin/intake/agent/${p.id}`} className="rounded border border-white/10 px-2 py-1 text-bone">Start Intake</Link>
                       <button onClick={() => setManageModulesId(manageModulesId === p.id ? null : p.id)} className="rounded border border-white/10 px-2 py-1 text-bone">Manage Modules</button>
                       {p.username && <a href={`/p/${p.username}`} target="_blank" rel="noreferrer" className="rounded border border-white/10 px-2 py-1 text-bone">Preview SnapLink</a>}
                       <a href={`/agents/${p.slug}`} target="_blank" rel="noreferrer" className="rounded border border-white/10 px-2 py-1 text-bone">Preview Southline</a>
