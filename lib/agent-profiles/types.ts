@@ -102,6 +102,11 @@ export interface AgentProfile {
   billingTenantId?: string;
   billingOrganizationId?: string;
   billingSubscriptionId?: string;
+  /** Operator override for whether this profile's SnapLink/Southline plan is paid — see lib/professional-intake-payment/. Takes precedence over the derived subscription/invoice status when set. */
+  manualPaymentStatus?: string;
+  manualPaymentNote?: string;
+  manualPaymentSetAt?: string;
+  manualPaymentSetBy?: string;
   createdAt: string;
   updatedAt: string;
 }

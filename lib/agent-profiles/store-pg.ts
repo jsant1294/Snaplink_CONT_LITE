@@ -203,5 +203,23 @@ export const pgAgentProfileStore = {
     if (Object.keys(set).length > 1) await db().update(agentProfiles).set(set).where(eq(agentProfiles.id, id));
     return this.getById(id);
   },
+
+  /** Operator-only manual payment/comp override — see lib/professional-intake-payment/. A dedicated method (not update()) so clearing the status is unambiguous — update() skips `undefined` values, so it cannot express "clear this column." */
+  async setManualPayment(
+    id: string,
+    patch: { manualPaymentStatus: string | null; manualPaymentNote?: string; manualPaymentSetBy: string }
+  ): Promise<AgentProfile | undefined> {
+    await db()
+      .update(agentProfiles)
+      .set({
+        manualPaymentStatus: patch.manualPaymentStatus,
+        manualPaymentNote: patch.manualPaymentNote ?? null,
+        manualPaymentSetAt: new Date().toISOString(),
+        manualPaymentSetBy: patch.manualPaymentSetBy,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(agentProfiles.id, id));
+    return this.getById(id);
+  },
 };
 

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (moduleDenied) return NextResponse.json({ error: moduleDenied }, { status: 403 });
 
   const contractor = await contractorStore.getById(invoice.contractorId);
-  if (!contractor?.stripeAccountId || !contractor.stripeOnboardingComplete) {
+  if (!contractor?.stripeAccountId || contractor.stripeConnectStatus !== "ready" || !contractor.stripeDetailsSubmitted || !contractor.stripeChargesEnabled || !contractor.stripePayoutsEnabled) {
     return NextResponse.json({ error: "Connect Stripe and finish onboarding before sending invoices" }, { status: 400 });
   }
   if (invoice.providerInvoiceId) {

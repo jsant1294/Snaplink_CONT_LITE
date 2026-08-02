@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
-import { canAccessContractor } from "@/lib/auth";
 import { isModuleEnabled } from "@/lib/entitlements";
 import { getStripe, stripeEnabled } from "@/lib/stripe/config";
+import { createStripeConnectState, verifyStripeConnectState } from "@/lib/stripe/connect-state";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
 
 /** Stripe redirects here when the onboarding link itself has expired — mint a fresh one. */
 export async function GET(req: NextRequest) {
-  const contractorId = req.nextUrl.searchParams.get("contractorId") ?? "";
-  const pin = req.nextUrl.searchParams.get("pin") ?? "";
-  const contractor = await contractorStore.getById(contractorId);
-  const moduleEnabled = contractor ? await isModuleEnabled(contractorId, "invoices") : false;
-  if (!contractor || !canAccessContractor(pin, contractor) || !stripeEnabled() || !contractor.stripeAccountId || !moduleEnabled) {
-    return NextResponse.redirect(`${APP_URL}/contractor-admin/${contractor?.username ?? ""}/invoices`);
-  }
+  const currentState = verifyStripeConnectState(req.nextUrl.searchParams.get("state") ?? "");
+  if (!currentState || !stripeEnabled()) return NextResponse.redirect(`${APP_URL}/contractor-admin?stripe_status=invalid`);
+  const contractor = await contractorStore.getById(currentState.contractorId);
+  const moduleEnabled = contractor ? await isModuleEnabled(contractor.id, "invoices") : false;
+  if (!contractor || !contractor.stripeAccountId || !moduleEnabled) return NextResponse.redirect(`${APP_URL}/contractor-admin?stripe_status=invalid`);
   const stripe = await getStripe();
   const base = `${APP_URL}/api/contractor/invoices/connect`;
-  const qs = `contractorId=${encodeURIComponent(contractorId)}&pin=${encodeURIComponent(pin)}`;
+  const renewedState = createStripeConnectState(contractor.id, currentState.destination);
+  const qs = `state=${encodeURIComponent(renewedState)}`;
   const link = await stripe.accountLinks.create({
     account: contractor.stripeAccountId,
     type: "account_onboarding",

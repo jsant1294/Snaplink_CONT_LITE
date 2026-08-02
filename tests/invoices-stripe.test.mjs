@@ -16,7 +16,8 @@ test("invoices/stripe_customer_mappings/processed_webhook_events migration is ad
 
 test("lib/stripe/config.ts fails closed: disabled without STRIPE_SECRET_KEY, and requires Postgres", async () => {
   const text = await source("../lib/stripe/config.ts");
-  assert.match(text, /Boolean\(process\.env\.STRIPE_SECRET_KEY\?\.trim\(\)\) && usePg/);
+  assert.match(text, /return Boolean\(key\) && usePg/);
+  assert.match(text, /NODE_ENV === "test" && key\.startsWith\("sk_live_"\)/);
   assert.match(text, /getStripe\(\)/);
   assert.match(text, /throw new Error/);
 });
@@ -91,4 +92,45 @@ test("no real Stripe secret or webhook secret is committed anywhere in source", 
     assert.doesNotMatch(text, /sk_live_[a-zA-Z0-9]{10,}/);
     assert.doesNotMatch(text, /whsec_[a-zA-Z0-9]{10,}/);
   }
+});
+
+test("Stripe Connect readiness migration is additive and includes every readiness field", async () => {
+  const sql = await source("../drizzle/0026_stripe_connect_readiness.sql");
+  for (const column of ["stripe_details_submitted", "stripe_charges_enabled", "stripe_payouts_enabled", "stripe_requirements_currently_due", "stripe_disabled_reason", "stripe_last_synced_at", "stripe_connect_status"]) assert.match(sql, new RegExp(column));
+  assert.doesNotMatch(sql, /DROP|TRUNCATE|DELETE FROM/i);
+});
+
+test("account.updated uses server-side readiness and safe unknown-account diagnostics", async () => {
+  const webhook = await source("../app/api/webhooks/stripe/route.ts");
+  assert.match(webhook, /event\.type === "account\.updated"/);
+  assert.match(webhook, /getByStripeAccountId/);
+  assert.match(webhook, /readinessPatchFromAccount/);
+  assert.match(webhook, /account\.updated\.unknown_account/);
+  assert.ok(webhook.indexOf("already.length > 0") < webhook.indexOf('event.type === "account.updated"'));
+});
+
+test("Connect URLs use signed state and never include a PIN", async () => {
+  for (const route of ["../app/api/contractor/invoices/connect/route.ts", "../app/api/contractor/invoices/connect/refresh/route.ts", "../app/api/contractor/invoices/connect/return/route.ts"]) {
+    const text = await source(route);
+    assert.doesNotMatch(text, /pin=/);
+    assert.doesNotMatch(text, /pinFromRequest|canAccessContractor/);
+    assert.match(text, /state/);
+  }
+});
+
+test("dashboard login route requires authorization, entitlement, and connected account", async () => {
+  const route = await source("../app/api/contractor/invoices/connect/dashboard/route.ts");
+  assert.match(route, /authorizeContractorId/);
+  assert.match(route, /requireModuleEnabled/);
+  assert.match(route, /stripeAccountId/);
+  assert.match(route, /createLoginLink/);
+});
+
+test("Invoices UI renders all readiness states and dashboard access", async () => {
+  const ui = await source("../components/admin/InvoiceBoard.tsx");
+  for (const value of ["not_connected", "incomplete", "restricted", "ready"]) assert.match(ui, new RegExp(value));
+  assert.match(ui, /Continue Stripe setup/);
+  assert.match(ui, /Open Stripe Dashboard/);
+  assert.match(ui, /Charges enabled/);
+  assert.match(ui, /Payouts enabled/);
 });

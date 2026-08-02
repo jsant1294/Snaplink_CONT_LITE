@@ -7,6 +7,7 @@
 
 /** Canonical EN service name from lib/services.ts SERVICE_LIBRARY. */
 export type ProjectType = string;
+export type StripeConnectStatus = "not_connected" | "incomplete" | "restricted" | "ready";
 
 export type LeadStatus =
   | "New"
@@ -103,7 +104,19 @@ export interface Contractor {
   /** Stripe Connect Express account id, once onboarded — see lib/stripe/config.ts. */
   stripeAccountId?: string;
   stripeOnboardingComplete?: boolean;
+  stripeDetailsSubmitted?: boolean;
+  stripeChargesEnabled?: boolean;
+  stripePayoutsEnabled?: boolean;
+  stripeRequirementsCurrentlyDue?: string[];
+  stripeDisabledReason?: string;
+  stripeLastSyncedAt?: string;
+  stripeConnectStatus?: StripeConnectStatus;
   createdAt: string;
+  /** Operator override for whether this profile's SnapLink/Southline plan is paid — see lib/professional-intake-payment/. Distinct from Stripe Connect above (that's the contractor collecting money from their own customers). */
+  manualPaymentStatus?: string;
+  manualPaymentNote?: string;
+  manualPaymentSetAt?: string;
+  manualPaymentSetBy?: string;
 }
 
 export interface ClientContact {

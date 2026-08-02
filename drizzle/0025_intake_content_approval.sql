@@ -1,0 +1,2 @@
+ALTER TABLE "professional_intake_sessions" ADD COLUMN "content_approved_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "professional_intake_sessions" ADD COLUMN "content_approved_by" text;

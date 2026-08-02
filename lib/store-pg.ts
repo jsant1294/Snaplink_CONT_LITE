@@ -114,6 +114,13 @@ function rowToContractor(row: ContractorRow): Contractor {
     logoUrl: row.logoUrl ?? undefined,
     stripeAccountId: row.stripeAccountId ?? undefined,
     stripeOnboardingComplete: row.stripeOnboardingComplete,
+    stripeDetailsSubmitted: row.stripeDetailsSubmitted,
+    stripeChargesEnabled: row.stripeChargesEnabled,
+    stripePayoutsEnabled: row.stripePayoutsEnabled,
+    stripeRequirementsCurrentlyDue: row.stripeRequirementsCurrentlyDue ?? [],
+    stripeDisabledReason: row.stripeDisabledReason ?? undefined,
+    stripeLastSyncedAt: row.stripeLastSyncedAt ?? undefined,
+    stripeConnectStatus: row.stripeConnectStatus as Contractor["stripeConnectStatus"],
     createdAt: row.createdAt,
   };
 }
@@ -240,6 +247,10 @@ export const pgContractorStore = {
     const rows = await db().select().from(contractors).where(eq(contractors.id, id)).limit(1);
     return rows[0] ? rowToContractor(rows[0]) : undefined;
   },
+  async getByStripeAccountId(stripeAccountId: string): Promise<Contractor | undefined> {
+    const rows = await db().select().from(contractors).where(eq(contractors.stripeAccountId, stripeAccountId)).limit(1);
+    return rows[0] ? rowToContractor(rows[0]) : undefined;
+  },
   async create(c: Contractor): Promise<Contractor> {
     const existing = await this.getByUsername(c.username);
     if (existing) throw new Error(`Username "${c.username}" is already taken`);
@@ -272,7 +283,7 @@ export const pgContractorStore = {
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">> &
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete" | "stripeDetailsSubmitted" | "stripeChargesEnabled" | "stripePayoutsEnabled" | "stripeRequirementsCurrentlyDue" | "stripeDisabledReason" | "stripeLastSyncedAt" | "stripeConnectStatus">> &
       import("./types").ContractorProfilePatch
   ): Promise<Contractor | undefined> {
     const set: Record<string, unknown> = {};
@@ -281,6 +292,13 @@ export const pgContractorStore = {
     if (patch.payments !== undefined) set.payments = patch.payments;
     if (patch.stripeAccountId !== undefined) set.stripeAccountId = patch.stripeAccountId;
     if (patch.stripeOnboardingComplete !== undefined) set.stripeOnboardingComplete = patch.stripeOnboardingComplete;
+    if (patch.stripeDetailsSubmitted !== undefined) set.stripeDetailsSubmitted = patch.stripeDetailsSubmitted;
+    if (patch.stripeChargesEnabled !== undefined) set.stripeChargesEnabled = patch.stripeChargesEnabled;
+    if (patch.stripePayoutsEnabled !== undefined) set.stripePayoutsEnabled = patch.stripePayoutsEnabled;
+    if (patch.stripeRequirementsCurrentlyDue !== undefined) set.stripeRequirementsCurrentlyDue = patch.stripeRequirementsCurrentlyDue;
+    if (patch.stripeDisabledReason !== undefined) set.stripeDisabledReason = patch.stripeDisabledReason || null;
+    if (patch.stripeLastSyncedAt !== undefined) set.stripeLastSyncedAt = patch.stripeLastSyncedAt;
+    if (patch.stripeConnectStatus !== undefined) set.stripeConnectStatus = patch.stripeConnectStatus;
     if (patch.businessName !== undefined) set.businessName = patch.businessName;
     if (patch.ownerName !== undefined) set.ownerName = patch.ownerName;
     if (patch.tagline !== undefined) set.tagline = patch.tagline || null;
@@ -300,6 +318,23 @@ export const pgContractorStore = {
     if (Object.keys(set).length > 0) {
       await db().update(contractors).set(set).where(eq(contractors.id, id));
     }
+    return this.getById(id);
+  },
+
+  /** Operator-only manual payment/comp override — see lib/professional-intake-payment/. Deliberately a separate method from update() rather than a new optional patch field, so every write always stamps setAt/setBy. */
+  async setManualPayment(
+    id: string,
+    patch: { manualPaymentStatus: string | null; manualPaymentNote?: string; manualPaymentSetBy: string }
+  ): Promise<Contractor | undefined> {
+    await db()
+      .update(contractors)
+      .set({
+        manualPaymentStatus: patch.manualPaymentStatus,
+        manualPaymentNote: patch.manualPaymentNote ?? null,
+        manualPaymentSetAt: new Date().toISOString(),
+        manualPaymentSetBy: patch.manualPaymentSetBy,
+      })
+      .where(eq(contractors.id, id));
     return this.getById(id);
   },
 };

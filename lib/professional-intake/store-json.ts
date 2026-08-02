@@ -58,7 +58,7 @@ export const jsonIntakeSessionStore = {
 
   async update(
     id: string,
-    patch: Partial<Pick<IntakeSession, "answers" | "currentStep" | "status" | "flaggedQuestionIds" | "locale" | "submittedAt" | "appliedAt" | "archivedAt">>
+    patch: Partial<Pick<IntakeSession, "answers" | "currentStep" | "status" | "flaggedQuestionIds" | "locale" | "submittedAt" | "appliedAt" | "archivedAt" | "contentApprovedAt" | "contentApprovedBy">>
   ): Promise<IntakeSession | undefined> {
     const all = await readJson<IntakeSession[]>(SESSIONS_FILE, []);
     const row = all.find((s) => s.id === id);

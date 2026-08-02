@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
-import { authorizeContractorId, pinFromRequest } from "@/lib/auth";
+import { authorizeContractorId } from "@/lib/auth";
 import { requireModuleEnabled } from "@/lib/entitlements";
 import { getStripe, stripeEnabled } from "@/lib/stripe/config";
+import { contractorInvoicesDestination, createStripeConnectState } from "@/lib/stripe/connect-state";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
 
-function buildLinkUrls(contractorId: string, pin: string) {
+function buildLinkUrls(state: string) {
   const base = `${APP_URL}/api/contractor/invoices/connect`;
-  const qs = `contractorId=${encodeURIComponent(contractorId)}&pin=${encodeURIComponent(pin)}`;
+  const qs = `state=${encodeURIComponent(state)}`;
   return { refresh_url: `${base}/refresh?${qs}`, return_url: `${base}/return?${qs}` };
 }
 
@@ -43,8 +44,10 @@ export async function POST(req: NextRequest) {
     await contractorStore.update(contractorId, { stripeAccountId: accountId });
   }
 
-  const pin = pinFromRequest(req);
-  const { refresh_url, return_url } = buildLinkUrls(contractorId, pin);
+  let state: string;
+  try { state = createStripeConnectState(contractorId, contractorInvoicesDestination(contractor.username)); }
+  catch { return NextResponse.json({ error: "Stripe Connect state signing is not configured" }, { status: 503 }); }
+  const { refresh_url, return_url } = buildLinkUrls(state);
   const link = await stripe.accountLinks.create({
     account: accountId,
     type: "account_onboarding",

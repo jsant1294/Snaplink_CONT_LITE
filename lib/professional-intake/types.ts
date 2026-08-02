@@ -84,6 +84,9 @@ export interface IntakeSession {
   submittedAt?: string;
   appliedAt?: string;
   archivedAt?: string;
+  /** Content-approval step, distinct from appliedAt — see docs/professional-intake-payment/04-approve-save-publish.md. */
+  contentApprovedAt?: string | null;
+  contentApprovedBy?: string | null;
 }
 
 /** How applying a session's answers interacts with a profile's existing (possibly non-empty) fields. */

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getQuestionsFor, questionLabel, optionLabel } from "@/lib/professional-intake/questions";
 import type { IntakeOwnerType, IntakeQuestion, IntakeSession, ProfileApplyMode, ProfileFieldPreview } from "@/lib/professional-intake/types";
+import { PROFILE_PAYMENT_STATUSES, type ProfessionalBillingSummary, type PublicationEligibility, type ProfilePaymentStatus } from "@/lib/professional-intake-payment/types";
 
 type Lang = "en" | "es";
 
@@ -125,6 +126,10 @@ export default function IntakeConsole({
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ preview: ProfileFieldPreview[]; generatedCopy: Record<string, string> } | null>(null);
   const [applyMode, setApplyMode] = useState<ProfileApplyMode>("fill_empty");
+  const [gate, setGate] = useState<{ billing: ProfessionalBillingSummary; eligibility: PublicationEligibility } | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<ProfilePaymentStatus | "derived">("derived");
+  const [paymentNote, setPaymentNote] = useState("");
+  const [notice, setNotice] = useState<string | null>(null);
 
   const lang: Lang = session?.locale ?? "en";
 
@@ -224,14 +229,96 @@ export default function IntakeConsole({
     }
   }
 
+  async function loadGate() {
+    if (!session) return;
+    const data = await api(pin, `/api/professional-intake/sessions/${session.id}/status`);
+    setSession(data.session);
+    setGate({ billing: data.billing, eligibility: data.eligibility });
+    setPaymentStatus(data.billing.isManualOverride ? data.billing.paymentStatus : "derived");
+    setPaymentNote(data.billing.manualNote ?? "");
+  }
+
+  async function gateAction(action: "approval" | "payment" | "publish") {
+    if (!session) return;
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      if (action === "approval") {
+        const data = await api(pin, `/api/professional-intake/sessions/${session.id}/approval`, { method: "POST", body: JSON.stringify({ approvedBy: "operator" }) });
+        setSession(data.session);
+        setNotice("Content approved.");
+      } else if (action === "payment") {
+        await api(pin, `/api/professional-intake/sessions/${session.id}/payment`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: paymentStatus === "derived" ? null : paymentStatus, note: paymentNote, setBy: "operator" }),
+        });
+        setNotice(paymentStatus === "derived" ? "Manual override cleared." : "Payment status saved.");
+      } else {
+        await api(pin, `/api/professional-intake/sessions/${session.id}/publish`, { method: "POST" });
+        setNotice(ownerType === "agent" ? "Profile published to SnapLink and Southline." : "Contractor profile publication gate passed.");
+      }
+      await loadGate();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (error && !session) return <p className="text-sm text-red-400">{error}</p>;
   if (!session) return <p className="text-sm text-muted">Loading…</p>;
 
   if (session.status === "applied") {
     return (
-      <div className="space-y-3">
+      <div className="space-y-5">
         <p className="text-sm text-sage">This intake has been applied to the profile.</p>
         <p className="text-xs text-muted">Applied at {session.appliedAt}</p>
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        {notice && <p className="text-sm text-sage">{notice}</p>}
+        {isOperator && !gate && <button onClick={loadGate} disabled={busy} className="text-xs px-4 py-2 rounded-lg bg-white/10 text-bone">Load approval &amp; payment status</button>}
+        {isOperator && gate && (
+          <div className="space-y-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div>
+              <p className="text-sm font-semibold text-bone">Publication readiness</p>
+              <p className="mt-1 text-xs text-muted">Plan: {gate.billing.plan ?? "No paid plan"} · Payment: {gate.billing.paymentStatus.replaceAll("_", " ")}{gate.billing.isManualOverride ? " (manual override)" : ""}</p>
+              {typeof gate.billing.amountDueCents === "number" && (
+                <p className="mt-1 text-xs text-muted">
+                  Amount due: {(gate.billing.amountDueCents / 100).toFixed(2)} {gate.billing.currency?.toUpperCase() ?? ""}
+                </p>
+              )}
+              {gate.billing.lastPaymentAt && <p className="mt-1 text-xs text-muted">Last payment: {gate.billing.lastPaymentAt}</p>}
+              {gate.billing.nextBillingAt && <p className="mt-1 text-xs text-muted">Next billing: {gate.billing.nextBillingAt}</p>}
+              <p className="mt-1 text-xs text-muted">
+                Entitlements: {gate.billing.entitlementValid ? "match the selected plan" : `drift — added ${gate.billing.entitlementModulesAdded.join(", ") || "none"}, removed ${gate.billing.entitlementModulesRemoved.join(", ") || "none"}`}
+              </p>
+              {gate.eligibility.reasons.map((reason) => <p key={reason} className="mt-1 text-xs text-amber-300">{reason}</p>)}
+            </div>
+            <button onClick={() => gateAction("approval")} disabled={busy || Boolean(session.contentApprovedAt)} className="text-xs px-4 py-2 rounded-lg bg-white/10 text-bone disabled:opacity-40">
+              {session.contentApprovedAt ? "Content approved" : "Approve reviewed content"}
+            </button>
+            <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+              <select value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value as ProfilePaymentStatus | "derived")} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-bone">
+                <option value="derived">Use derived status</option>
+                {PROFILE_PAYMENT_STATUSES.map((status) => <option key={status} value={status}>{status.replaceAll("_", " ")}</option>)}
+              </select>
+              <input value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} maxLength={500} placeholder="Override note" className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-bone" />
+              <button
+                onClick={() => {
+                  const label = paymentStatus === "derived" ? "clear the manual payment override" : `set payment status to "${paymentStatus.replaceAll("_", " ")}"`;
+                  if (window.confirm(`Are you sure you want to ${label}? This is an internal administrative record only — it never charges or modifies Stripe.`)) {
+                    gateAction("payment");
+                  }
+                }}
+                disabled={busy}
+                className="text-xs px-4 py-2 rounded-lg bg-white/10 text-bone"
+              >
+                Save payment
+              </button>
+            </div>
+            <button onClick={() => gateAction("publish")} disabled={busy || !gate.eligibility.canPublish} className="text-xs px-4 py-2 rounded-lg bg-gold text-obsidian font-semibold disabled:opacity-40">Publish profile</button>
+          </div>
+        )}
       </div>
     );
   }

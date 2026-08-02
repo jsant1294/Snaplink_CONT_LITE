@@ -136,6 +136,10 @@ export const jsonContractorStore = {
     const list = await readContractors();
     return list.find((c) => c.id === id);
   },
+  async getByStripeAccountId(stripeAccountId: string): Promise<Contractor | undefined> {
+    const list = await readContractors();
+    return list.find((c) => c.stripeAccountId === stripeAccountId);
+  },
   async create(c: Contractor): Promise<Contractor> {
     const list = await readContractors();
     if (list.some((x) => x.username === c.username)) {
@@ -147,7 +151,7 @@ export const jsonContractorStore = {
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete">> &
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete" | "stripeDetailsSubmitted" | "stripeChargesEnabled" | "stripePayoutsEnabled" | "stripeRequirementsCurrentlyDue" | "stripeDisabledReason" | "stripeLastSyncedAt" | "stripeConnectStatus">> &
       import("./types").ContractorProfilePatch
   ): Promise<Contractor | undefined> {
     const list = await readContractors();
@@ -158,6 +162,13 @@ export const jsonContractorStore = {
     if (patch.payments !== undefined) c.payments = patch.payments;
     if (patch.stripeAccountId !== undefined) c.stripeAccountId = patch.stripeAccountId;
     if (patch.stripeOnboardingComplete !== undefined) c.stripeOnboardingComplete = patch.stripeOnboardingComplete;
+    if (patch.stripeDetailsSubmitted !== undefined) c.stripeDetailsSubmitted = patch.stripeDetailsSubmitted;
+    if (patch.stripeChargesEnabled !== undefined) c.stripeChargesEnabled = patch.stripeChargesEnabled;
+    if (patch.stripePayoutsEnabled !== undefined) c.stripePayoutsEnabled = patch.stripePayoutsEnabled;
+    if (patch.stripeRequirementsCurrentlyDue !== undefined) c.stripeRequirementsCurrentlyDue = patch.stripeRequirementsCurrentlyDue;
+    if (patch.stripeDisabledReason !== undefined) c.stripeDisabledReason = patch.stripeDisabledReason || undefined;
+    if (patch.stripeLastSyncedAt !== undefined) c.stripeLastSyncedAt = patch.stripeLastSyncedAt;
+    if (patch.stripeConnectStatus !== undefined) c.stripeConnectStatus = patch.stripeConnectStatus;
     if (patch.businessName !== undefined) c.businessName = patch.businessName;
     if (patch.ownerName !== undefined) c.ownerName = patch.ownerName;
     if (patch.tagline !== undefined) c.tagline = patch.tagline || undefined;
@@ -174,6 +185,22 @@ export const jsonContractorStore = {
     if (patch.professionType !== undefined) c.professionType = patch.professionType;
     if (patch.avatarUrl !== undefined) c.avatarUrl = patch.avatarUrl || undefined;
     if (patch.logoUrl !== undefined) c.logoUrl = patch.logoUrl || undefined;
+    await writeContractors(list);
+    return c;
+  },
+
+  /** Operator-only manual payment/comp override — see lib/professional-intake-payment/. Deliberately a separate method from update() rather than a new optional patch field, so every write always stamps setAt/setBy. */
+  async setManualPayment(
+    id: string,
+    patch: { manualPaymentStatus: string | null; manualPaymentNote?: string; manualPaymentSetBy: string }
+  ): Promise<Contractor | undefined> {
+    const list = await readContractors();
+    const c = list.find((x) => x.id === id);
+    if (!c) return undefined;
+    c.manualPaymentStatus = patch.manualPaymentStatus ?? undefined;
+    c.manualPaymentNote = patch.manualPaymentNote;
+    c.manualPaymentSetAt = new Date().toISOString();
+    c.manualPaymentSetBy = patch.manualPaymentSetBy;
     await writeContractors(list);
     return c;
   },
@@ -221,5 +248,4 @@ export const jsonEstimateStore = {
     return estimate;
   },
 };
-
 

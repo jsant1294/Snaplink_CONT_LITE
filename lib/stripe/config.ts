@@ -11,7 +11,26 @@
 import { usePg } from "@/lib/db-url";
 
 export function stripeEnabled(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY?.trim()) && usePg;
+  const key = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
+  if (process.env.NODE_ENV === "test" && key.startsWith("sk_live_")) return false;
+  return Boolean(key) && usePg;
+}
+
+export function stripeMode(): "test" | "live" | "unknown" {
+  const key = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
+  if (key.startsWith("sk_test_")) return "test";
+  if (key.startsWith("sk_live_")) return "live";
+  return "unknown";
+}
+
+export function stripeDiagnostics() {
+  return {
+    enabled: stripeEnabled(),
+    mode: stripeMode(),
+    databaseConfigured: usePg,
+    webhookConfigured: Boolean(stripeWebhookSecret()),
+    stateSigningConfigured: Boolean(process.env.STRIPE_CONNECT_STATE_SECRET?.trim()),
+  };
 }
 
 let _stripe: import("stripe").default | null = null;

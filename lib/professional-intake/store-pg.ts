@@ -39,6 +39,8 @@ function rowToSession(row: SessionRow): IntakeSession {
     submittedAt: row.submittedAt ?? undefined,
     appliedAt: row.appliedAt ?? undefined,
     archivedAt: row.archivedAt ?? undefined,
+    contentApprovedAt: row.contentApprovedAt ?? undefined,
+    contentApprovedBy: row.contentApprovedBy ?? undefined,
   };
 }
 
@@ -87,6 +89,8 @@ export const pgIntakeSessionStore = {
       submittedAt: session.submittedAt ?? null,
       appliedAt: session.appliedAt ?? null,
       archivedAt: session.archivedAt ?? null,
+      contentApprovedAt: session.contentApprovedAt ?? null,
+      contentApprovedBy: session.contentApprovedBy ?? null,
     });
     return session;
   },
@@ -94,7 +98,19 @@ export const pgIntakeSessionStore = {
   async update(
     id: string,
     patch: Partial<
-      Pick<IntakeSession, "answers" | "currentStep" | "status" | "flaggedQuestionIds" | "locale" | "submittedAt" | "appliedAt" | "archivedAt">
+      Pick<
+        IntakeSession,
+        | "answers"
+        | "currentStep"
+        | "status"
+        | "flaggedQuestionIds"
+        | "locale"
+        | "submittedAt"
+        | "appliedAt"
+        | "archivedAt"
+        | "contentApprovedAt"
+        | "contentApprovedBy"
+      >
     >
   ): Promise<IntakeSession | undefined> {
     const set: Record<string, unknown> = { updatedAt: new Date().toISOString() };
@@ -106,6 +122,8 @@ export const pgIntakeSessionStore = {
     if (patch.submittedAt !== undefined) set.submittedAt = patch.submittedAt ?? null;
     if (patch.appliedAt !== undefined) set.appliedAt = patch.appliedAt ?? null;
     if (patch.archivedAt !== undefined) set.archivedAt = patch.archivedAt ?? null;
+    if (patch.contentApprovedAt !== undefined) set.contentApprovedAt = patch.contentApprovedAt ?? null;
+    if (patch.contentApprovedBy !== undefined) set.contentApprovedBy = patch.contentApprovedBy ?? null;
     await db().update(professionalIntakeSessions).set(set).where(eq(professionalIntakeSessions.id, id));
     return this.get(id);
   },

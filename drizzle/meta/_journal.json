@@ -169,6 +169,27 @@
       "when": 1785649186505,
       "tag": "0023_professional_intake_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1785652289203,
+      "tag": "0024_manual_payment_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1785653236940,
+      "tag": "0025_intake_content_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1785655615225,
+      "tag": "0026_stripe_connect_readiness",
+      "breakpoints": true
     }
   ]
 }

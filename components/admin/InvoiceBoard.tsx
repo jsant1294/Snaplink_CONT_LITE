@@ -13,6 +13,12 @@ interface Status {
   stripeEnabled: boolean;
   connected: boolean;
   onboardingComplete: boolean;
+  status: "not_connected" | "incomplete" | "restricted" | "ready";
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  requirementsDueCount: number;
+  lastSyncedAt: string | null;
+  diagnostics?: { mode: "test" | "live" | "unknown"; webhookConfigured: boolean; stateSigningConfigured: boolean };
 }
 
 export default function InvoiceBoard({
@@ -81,6 +87,15 @@ export default function InvoiceBoard({
     else showToast(data.error ?? "Could not start Stripe onboarding");
   }
 
+  async function openDashboard() {
+    setBusy(true);
+    const res = await fetch("/api/contractor/invoices/connect/dashboard", { method: "POST", headers: headers(), body: JSON.stringify({ contractorId }) });
+    const data = await res.json();
+    setBusy(false);
+    if (data.url) window.open(data.url, "_blank", "noopener,noreferrer");
+    else showToast(data.error ?? "Stripe Dashboard is temporarily unavailable");
+  }
+
   async function createInvoice() {
     setBusy(true);
     const res = await fetch("/api/contractor/invoices", {
@@ -128,19 +143,35 @@ export default function InvoiceBoard({
     );
   }
 
-  if (!status.connected || !status.onboardingComplete) {
+  if (status.status !== "ready") {
+    const restricted = status.status === "restricted";
+    const incomplete = status.status === "incomplete";
     return (
       <div className="rounded-2xl border border-white/10 bg-charcoal p-6 text-center">
-        <p className="mb-4 text-sm text-muted">{nt("connectStripePrompt", lang)}</p>
+        <h2 className="font-display text-xl">
+          {restricted ? "Stripe needs more information" : incomplete ? "Stripe setup is incomplete" : "Connect Stripe"}
+        </h2>
+        <p className="mb-4 mt-2 text-sm text-muted">
+          {restricted && status.requirementsDueCount > 0 ? `${status.requirementsDueCount} setup item${status.requirementsDueCount === 1 ? "" : "s"} require attention.` : nt("connectStripePrompt", lang)}
+        </p>
         <button onClick={connect} disabled={busy} className="btn-gold !py-2 text-sm disabled:opacity-40">
-          {busy ? nt("redirecting", lang) : nt("connectStripe", lang)}
+          {busy ? nt("redirecting", lang) : status.connected ? "Continue Stripe setup" : nt("connectStripe", lang)}
         </button>
+        {status.connected && <button onClick={openDashboard} disabled={busy} className="btn-outline ml-2 !py-2 text-sm disabled:opacity-40">Open Stripe Dashboard</button>}
       </div>
     );
   }
 
   return (
     <div>
+      <div className="mb-5 rounded-2xl border border-white/10 bg-charcoal p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div><p className="font-medium text-success">Stripe connected and ready to accept payments</p><p className="mt-1 text-xs text-muted">Last synchronized: {status.lastSyncedAt ? new Date(status.lastSyncedAt).toLocaleString() : "Pending"}</p></div>
+          <button onClick={openDashboard} disabled={busy} className="btn-outline !py-2 text-sm disabled:opacity-40">Open Stripe Dashboard</button>
+        </div>
+        <div className="mt-3 flex gap-4 text-xs text-muted"><span>Charges enabled: {status.chargesEnabled ? "Yes" : "No"}</span><span>Payouts enabled: {status.payoutsEnabled ? "Yes" : "No"}</span></div>
+        {status.diagnostics && <p className="mt-2 text-[11px] uppercase tracking-wide text-muted">Stripe {status.diagnostics.mode} mode · Webhook {status.diagnostics.webhookConfigured ? "configured" : "missing"}</p>}
+      </div>
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-muted">
           {invoices.length} {nt("invoicesCount", lang)}

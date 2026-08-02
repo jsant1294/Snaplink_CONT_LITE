@@ -169,4 +169,21 @@ export const jsonAgentProfileStore = {
     await write(list);
     return profile;
   },
+
+  /** Operator-only manual payment/comp override — see lib/professional-intake-payment/. A dedicated method (not update()) so clearing the status is unambiguous in both JSON and Postgres modes, and every write always stamps setAt/setBy. */
+  async setManualPayment(
+    id: string,
+    patch: { manualPaymentStatus: string | null; manualPaymentNote?: string; manualPaymentSetBy: string }
+  ): Promise<AgentProfile | undefined> {
+    const list = await read();
+    const profile = list.find((p) => p.id === id);
+    if (!profile) return undefined;
+    profile.manualPaymentStatus = patch.manualPaymentStatus ?? undefined;
+    profile.manualPaymentNote = patch.manualPaymentNote;
+    profile.manualPaymentSetAt = new Date().toISOString();
+    profile.manualPaymentSetBy = patch.manualPaymentSetBy;
+    profile.updatedAt = new Date().toISOString();
+    await write(list);
+    return profile;
+  },
 };

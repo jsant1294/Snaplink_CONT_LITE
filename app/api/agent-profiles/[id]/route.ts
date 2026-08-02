@@ -5,6 +5,9 @@ import { applyAgentTier, subscribeAgentToTier, type TierAssignmentResult } from 
 import { isReservedIdentifier, isValidUsernameFormat, usernameify } from "@/lib/agent-profiles/identity";
 import { AGENT_MODULE_KEYS, SELF_EDITABLE_FIELDS, type AgentProfile } from "@/lib/agent-profiles/types";
 import { isValidAgentProfessionType } from "@/lib/profession-types";
+import { intakeSessionStore } from "@/lib/store";
+import { getProfessionalBillingSummary } from "@/lib/professional-intake-payment/adapters";
+import { evaluateProfilePublicationEligibility } from "@/lib/professional-intake-payment/eligibility";
 
 /** Operator (any status, for the edit page) or the profile's own PIN (active only). */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
@@ -51,6 +54,35 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     const onlySelfEditable = requestedKeys.every((k) => (SELF_EDITABLE_FIELDS as readonly string[]).includes(k));
     if (!canAccessAgentProfile(pin, target) || !onlySelfEditable) {
       return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
+    }
+  }
+
+  // Publication eligibility is enforced here too, not only on the dedicated
+  // /api/professional-intake/sessions/[id]/publish route — this is the
+  // generic PATCH every other agent-editing surface already goes through, so
+  // it must not be a second way to bypass the payment/approval gate.
+  const requestsPublication = body.snaplinkStatus === "published" || ["published", "featured"].includes(body.southlineStatus);
+  if (requestsPublication) {
+    if (body.tier !== undefined || body.modules !== undefined) {
+      return NextResponse.json({ error: "Save tier and entitlement changes before publishing" }, { status: 400 });
+    }
+    const sessions = await intakeSessionStore.list("agent", id);
+    const approved = sessions.find((session) => session.status === "applied" && Boolean(session.contentApprovedAt));
+    const billing = await getProfessionalBillingSummary({ ownerType: "agent", ownerId: id });
+    if (!approved || !billing) {
+      return NextResponse.json({ error: "An applied, operator-approved intake is required before publishing" }, { status: 409 });
+    }
+    const eligibility = evaluateProfilePublicationEligibility(
+      {
+        profileApproved: true,
+        paymentStatus: billing.paymentStatus,
+        planActive: billing.planActive,
+        entitlementValid: billing.entitlementValid,
+      },
+      approved.locale
+    );
+    if (!eligibility.canPublish) {
+      return NextResponse.json({ error: "Profile is not eligible to publish", eligibility, billing }, { status: 409 });
     }
   }
 
