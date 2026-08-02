@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isOperator, pinFromRequest } from "@/lib/agent-profiles/auth";
 import { agentInvoices, agentSubscriptions, cancelAgentSubscription, generateAgentInvoice, subscribeAgentToTier } from "@/lib/agent-profiles/billing";
-import type { AgentProfileTier } from "@/lib/agent-profiles/types";
+import { resolveAgentTier } from "@/lib/agent-profiles/tiers";
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   if (!isOperator(pinFromRequest(req))) return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
@@ -15,8 +15,9 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   const { id } = await ctx.params;
   const body = await req.json();
   try {
-    if (body.action === "subscribe" && ["basic", "professional", "featured"].includes(body.tier)) {
-      return NextResponse.json({ subscription: await subscribeAgentToTier(id, String(body.planId || ""), body.tier as AgentProfileTier) }, { status: 201 });
+    if (body.action === "subscribe" && resolveAgentTier(body.tier)) {
+      const result = await subscribeAgentToTier(id, String(body.planId || ""), String(body.tier));
+      return NextResponse.json({ subscription: result.subscription, tierResult: result.tierResult }, { status: 201 });
     }
     if (body.action === "cancel") {
       return NextResponse.json({ subscription: await cancelAgentSubscription(id, String(body.subscriptionId || "")) });

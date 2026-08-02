@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { canAccessAgentProfile, isOperator, pinFromRequest, publicAgentProfile } from "@/lib/agent-profiles/auth";
-import { subscribeAgentToTier } from "@/lib/agent-profiles/billing";
+import { applyAgentTier, subscribeAgentToTier, type TierAssignmentResult } from "@/lib/agent-profiles/billing";
 import { isReservedIdentifier, isValidUsernameFormat, usernameify } from "@/lib/agent-profiles/identity";
-import { AGENT_MODULE_KEYS, SELF_EDITABLE_FIELDS, type AgentProfile, type AgentProfileTier } from "@/lib/agent-profiles/types";
+import { AGENT_MODULE_KEYS, SELF_EDITABLE_FIELDS, type AgentProfile } from "@/lib/agent-profiles/types";
 import { isValidAgentProfessionType } from "@/lib/profession-types";
 
 /** Operator (any status, for the edit page) or the profile's own PIN (active only). */
@@ -125,15 +125,28 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const updated = patch && Object.keys(patch).length ? await agentProfileStore.update(id, patch) : target;
   if (!updated) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
-  if (operator && body.planId && body.tier && ["basic", "professional", "featured"].includes(body.tier)) {
+  // Tier assignment/change is handled separately from the generic field loop
+  // above because it drives the module bundle too (see lib/agent-profiles/
+  // billing.ts). `body.tier` + `body.planId` together create/record a
+  // subscription (the original activation path); `body.tier` alone just
+  // re-applies a tier's module bundle without touching billing — this is
+  // what makes the Edit page's Tier selector actually take effect, which it
+  // did not before (it silently required a planId it never sent).
+  let tierResult: TierAssignmentResult | null = null;
+  if (operator && body.tier !== undefined) {
     try {
-      await subscribeAgentToTier(id, String(body.planId), body.tier as AgentProfileTier);
+      if (body.planId) {
+        const result = await subscribeAgentToTier(id, String(body.planId), String(body.tier));
+        tierResult = result.tierResult;
+      } else {
+        tierResult = await applyAgentTier(id, body.tier ? String(body.tier) : null);
+      }
     } catch (e) {
-      return NextResponse.json({ error: e instanceof Error ? e.message : "Subscription failed" }, { status: 400 });
+      return NextResponse.json({ error: e instanceof Error ? e.message : "Tier update failed" }, { status: 400 });
     }
   }
 
   const final = await agentProfileStore.getById(id);
-  return NextResponse.json({ ok: true, profile: final ? publicAgentProfile(final) : null });
+  return NextResponse.json({ ok: true, profile: final ? publicAgentProfile(final) : null, tierResult });
 }
 

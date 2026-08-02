@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AGENT_MODULE_KEYS } from "@/lib/agent-profiles/types";
 import type { AgentModuleKey, AgentProfile } from "@/lib/agent-profiles/types";
+import { AGENT_TIER_LABELS, CANONICAL_AGENT_TIERS, TIER_MODULE_BUNDLES, computeTierModules, resolveAgentTier } from "@/lib/agent-profiles/tiers";
 import { LICENSED_PROFESSION_TYPES, PROFESSION_TYPES, DEFAULT_AGENT_PROFESSION_TYPE } from "@/lib/profession-types";
 
 export interface AgentFormValues {
@@ -116,7 +117,12 @@ export function valuesFromProfile(profile?: AgentProfile): AgentFormValues {
     seoDescription: profile?.seoDescription ?? "",
     marketplaceSummary: profile?.marketplaceSummary ?? "",
 
-    tier: profile?.tier ?? "",
+    // Resolves a legacy stored value ("basic"/"featured") to its canonical
+    // label for display; re-saving the form (even unchanged) then persists
+    // the canonical value — a natural, non-destructive upgrade path, never a
+    // background rewrite. See docs/commercial-architecture/
+    // 10-tier-entitlement-implementation.md "Existing-account compatibility."
+    tier: resolveAgentTier(profile?.tier) ?? "",
     modules: { ...emptyModules(), ...(profile?.modules ?? {}) },
 
     snaplinkStatus: profile?.snaplinkStatus ?? "draft",
@@ -352,12 +358,32 @@ export default function AgentForm({
           </div>
           <div>
             <label className={labelCls}>Tier</label>
-            <select className={inputCls} value={values.tier} onChange={(e) => set("tier", e.target.value)}>
+            <select
+              className={inputCls}
+              value={values.tier}
+              onChange={(e) => {
+                const nextTier = resolveAgentTier(e.target.value);
+                // Tier-authoritative: picking a tier immediately resets the
+                // module checkboxes below to exactly that tier's bundle. The
+                // operator can still hand-adjust before saving, but the next
+                // tier change resets again — see the implementation doc's
+                // "Manual overrides" section for why.
+                // computeTierModules always sets every AGENT_MODULE_KEYS entry
+                // explicitly, so this is a full Record despite AgentModules'
+                // Partial<> type — safe to cast at this one call site.
+                onChange({ ...values, tier: e.target.value, modules: nextTier ? (computeTierModules(nextTier) as Record<AgentModuleKey, boolean>) : values.modules });
+              }}
+            >
               <option value="">No tier</option>
-              <option value="basic">Basic</option>
-              <option value="professional">Professional</option>
-              <option value="featured">Featured</option>
+              {CANONICAL_AGENT_TIERS.map((t) => (
+                <option key={t} value={t}>{AGENT_TIER_LABELS[t]}</option>
+              ))}
             </select>
+            {values.tier && resolveAgentTier(values.tier) && (
+              <p className="mt-1 text-xs text-muted">
+                Plan includes: {TIER_MODULE_BUNDLES[resolveAgentTier(values.tier)!].join(", ")}
+              </p>
+            )}
           </div>
           {snaplinkUrl && (
             <p className="text-xs text-muted">Profile link: <span className="text-bone">{snaplinkUrl}</span></p>
@@ -378,7 +404,9 @@ export default function AgentForm({
           <div><label className={labelCls}>LinkedIn</label><input className={inputCls} value={values.linkedin} onChange={(e) => set("linkedin", e.target.value)} /></div>
         </div>
 
-        <p className={labelCls + " mt-6"}>Enabled modules</p>
+        <p className={labelCls + " mt-6"}>
+          Enabled modules <span className="text-muted/70">— manual override; the next tier change resets this to that tier&apos;s plan</span>
+        </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {AGENT_MODULE_KEYS.map((key) => (
             <label key={key} className="flex items-center gap-2 text-sm text-bone">

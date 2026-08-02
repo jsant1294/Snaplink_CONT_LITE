@@ -7,6 +7,7 @@ import { PinGate } from "@/components/admin/Dashboard";
 import AgentForm, { buildPayload, valuesFromProfile } from "@/components/agent-profiles/AgentForm";
 import type { AgentFormValues } from "@/components/agent-profiles/AgentForm";
 import type { AgentProfile } from "@/lib/agent-profiles/types";
+import { AGENT_TIER_LABELS, diffTierModules, resolveAgentTier } from "@/lib/agent-profiles/tiers";
 
 export default function EditAgentPage() {
   return (
@@ -41,7 +42,26 @@ function EditAgentForm({ pin }: { pin: string }) {
   }, [id, pin]);
 
   async function submit() {
-    if (!values) return;
+    if (!values || !profile) return;
+
+    // Confirm before a tier change removes module access — compares against
+    // the ORIGINAL loaded profile, not the in-progress form state, so the
+    // operator sees exactly what will actually change on save.
+    const newTier = resolveAgentTier(values.tier);
+    const priorTier = resolveAgentTier(profile.tier ?? null);
+    if (newTier !== priorTier || values.tier === "") {
+      const diff = diffTierModules(profile.modules, newTier);
+      if (diff.removed.length > 0) {
+        const tierLabel = newTier ? AGENT_TIER_LABELS[newTier] : "No tier";
+        const msg =
+          `Change tier to "${tierLabel}"?\n\n` +
+          `Modules being added: ${diff.added.join(", ") || "none"}\n` +
+          `Modules being removed: ${diff.removed.join(", ")}\n\n` +
+          `Removed modules are not deleted data — Flipbooks, campaigns, invoices, etc. stay stored, only access turns off. Continue?`;
+        if (!confirm(msg)) return;
+      }
+    }
+
     setError(null);
     setSaved(false);
     setSaving(true);

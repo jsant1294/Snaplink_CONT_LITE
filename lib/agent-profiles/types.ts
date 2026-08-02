@@ -10,7 +10,10 @@
 //    (/agents/{slug}) live, and is it featured.
 // ---------------------------------------------------------------------------
 export type AgentProfileStatus = "pending" | "active" | "suspended" | "archived";
-export type AgentProfileTier = "basic" | "professional" | "featured";
+// Canonical since the tier-entitlement automation pass (see lib/agent-profiles/tiers.ts).
+// Legacy stored values "basic"/"featured" are never rewritten automatically —
+// resolveAgentTier() maps them to "solo"/"growth" for interpretation only.
+export type AgentProfileTier = "solo" | "professional" | "business" | "growth" | "enterprise";
 export type SnaplinkStatus = "draft" | "published" | "unpublished";
 export type SouthlineStatus = "draft" | "published" | "featured" | "hidden";
 export type OnboardingStatus =

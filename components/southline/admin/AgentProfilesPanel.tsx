@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { AGENT_MODULE_KEYS, type AgentModuleKey } from "@/lib/agent-profiles/types";
+import { AGENT_TIER_LABELS, CANONICAL_AGENT_TIERS, resolveAgentTier } from "@/lib/agent-profiles/tiers";
 import { agentProfessionTypeLabel } from "@/lib/profession-types";
 
 interface AgentProfile {
@@ -35,6 +36,13 @@ function initials(name: string): string {
 function moduleCount(modules?: Partial<Record<AgentModuleKey, boolean>>): string {
   const enabled = AGENT_MODULE_KEYS.filter((k) => modules?.[k]).length;
   return `${enabled}/${AGENT_MODULE_KEYS.length}`;
+}
+
+/** Resolves a legacy tier value ("basic"/"featured") to its canonical label for display. */
+function tierLabel(tier?: string): string {
+  if (!tier) return "—";
+  const resolved = resolveAgentTier(tier);
+  return resolved ? AGENT_TIER_LABELS[resolved] : tier;
 }
 
 interface BillingPlan {
@@ -141,7 +149,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
             <div key={p.id} className="rounded-xl border border-white/10 bg-obsidian p-4">
               <p className="text-sm font-medium">{p.name} — {p.brokerageName || "No brokerage listed"}</p>
               <p className="mt-1 text-xs text-muted">{p.email} · {p.phone} · {p.serviceArea}</p>
-              {plans.length === 0 && <p className="mt-2 text-xs text-amber-300">No billing plans exist yet — create Basic/Professional/Featured plans under Real Estate Enterprise → Billing before activating.</p>}
+              {plans.length === 0 && <p className="mt-2 text-xs text-amber-300">No billing plans exist yet — create Solo/Professional/Business/Growth/Enterprise plans under Real Estate Enterprise → Billing before activating.</p>}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <input
                   placeholder="6-digit PIN"
@@ -167,9 +175,9 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                   className="rounded-lg border border-white/10 bg-charcoal px-2 py-1.5 text-xs text-bone focus:outline-none focus:ring-2 focus:ring-gold/40"
                 >
                   <option value="">Tier…</option>
-                  <option value="basic">Basic</option>
-                  <option value="professional">Professional</option>
-                  <option value="featured">Featured</option>
+                  {CANONICAL_AGENT_TIERS.map((t) => (
+                    <option key={t} value={t}>{AGENT_TIER_LABELS[t]}</option>
+                  ))}
                 </select>
                 <button onClick={() => activate(p.id)} className="rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-obsidian">Activate</button>
               </div>
@@ -218,7 +226,7 @@ export default function AgentProfilesPanel({ pin }: { pin: string }) {
                   <td className="px-3 py-2 text-muted">{p.professionType ? agentProfessionTypeLabel(p.professionType, "en") : "—"}</td>
                   <td className="px-3 py-2 text-muted">{p.brokerageName || "—"}</td>
                   <td className="px-3 py-2 text-muted">{[p.officeName, p.teamName].filter(Boolean).join(" / ") || "—"}</td>
-                  <td className="px-3 py-2 text-muted">{p.tier ?? "—"}</td>
+                  <td className="px-3 py-2 text-muted">{tierLabel(p.tier)}</td>
                   <td className="px-3 py-2 text-muted">{p.status}</td>
                   <td className="px-3 py-2 text-muted">{p.snaplinkStatus}</td>
                   <td className="px-3 py-2 text-muted">{p.southlineStatus}</td>
@@ -279,6 +287,7 @@ function ManageModulesPanel({
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gold">Manage modules</p>
+      <p className="mb-2 text-xs text-muted">Manual override — the next tier change resets these to that tier&apos;s plan.</p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {AGENT_MODULE_KEYS.map((key) => (
           <label key={key} className="flex items-center gap-2 text-xs text-bone">
@@ -295,11 +304,18 @@ function ManageModulesPanel({
   );
 }
 
+// Order matters: check the more specific/newer names first so a plan named
+// e.g. "Growth" isn't mis-matched by a broader legacy substring.
 function tierFromPlanName(name: string): string {
   const lower = name.toLowerCase();
-  if (lower.includes("featured")) return "featured";
+  if (lower.includes("enterprise")) return "enterprise";
+  if (lower.includes("growth")) return "growth";
+  if (lower.includes("business")) return "business";
   if (lower.includes("professional")) return "professional";
-  if (lower.includes("basic")) return "basic";
+  if (lower.includes("solo")) return "solo";
+  // Legacy plan names, still resolved to their canonical tier.
+  if (lower.includes("featured")) return "growth";
+  if (lower.includes("basic")) return "solo";
   return "";
 }
 

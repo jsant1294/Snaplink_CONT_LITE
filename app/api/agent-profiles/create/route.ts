@@ -3,6 +3,7 @@ import { agentProfileStore, newId } from "@/lib/agent-profiles/store";
 import { isOperator, pinFromRequest, publicAgentProfile } from "@/lib/agent-profiles/auth";
 import { firstAvailable, isValidUsernameFormat, suggestUsername, usernameify } from "@/lib/agent-profiles/identity";
 import { AGENT_MODULE_KEYS, type AgentOperatorCreateInput } from "@/lib/agent-profiles/types";
+import { computeTierModules, resolveAgentTier } from "@/lib/agent-profiles/tiers";
 import { isValidAgentProfessionType } from "@/lib/profession-types";
 
 /**
@@ -73,10 +74,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Duplicate slug — that slug is already taken or reserved" }, { status: 409 });
   }
 
-  const modules: AgentOperatorCreateInput["modules"] = {};
-  for (const key of AGENT_MODULE_KEYS) {
-    modules[key] = Boolean(body.modules?.[key]);
-  }
+  // A tier provided at creation applies its module bundle immediately (same
+  // rule as everywhere else this task touches); no tier means fall back to
+  // whatever modules were explicitly requested (both default to all-false).
+  const createTier = resolveAgentTier(body.tier);
+  const modules: AgentOperatorCreateInput["modules"] = createTier
+    ? computeTierModules(createTier)
+    : Object.fromEntries(AGENT_MODULE_KEYS.map((key) => [key, Boolean(body.modules?.[key])])) as AgentOperatorCreateInput["modules"];
 
   const input: AgentOperatorCreateInput = {
     firstName,
@@ -121,7 +125,7 @@ export async function POST(req: NextRequest) {
     seoDescription: body.seoDescription ? String(body.seoDescription) : undefined,
     marketplaceSummary: body.marketplaceSummary ? String(body.marketplaceSummary) : undefined,
 
-    tier: ["basic", "professional", "featured"].includes(body.tier) ? body.tier : undefined,
+    tier: createTier ?? undefined,
     modules,
 
     status: "active",
