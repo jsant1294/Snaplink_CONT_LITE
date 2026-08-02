@@ -1,11 +1,41 @@
 import { ImageResponse } from "next/og.js";
 import { readFile, writeFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 
-const heroBuffer = await readFile("public/images/southline-living-hero.png");
-const heroDataUrl = `data:image/png;base64,${heroBuffer.toString("base64")}`;
+// Single source of truth per locale — every visible text field on the card
+// comes from the SAME resolved locale object. No field may read from a
+// different locale, and none falls back to a hardcoded default independently
+// of the whole locale.
+export const OG_IMAGE_COPY = {
+  en: {
+    eyebrow: "SOUTHLINE LIVING",
+    headline: "Ideas for every home.",
+    supportingCopy: "Explore, plan, and connect with trusted home professionals.",
+    poweredLine: "Powered by SnapLink",
+    location: "Alpharetta, GA · Hablamos español",
+    urlText: "southlineliving.southlineone.com",
+  },
+  es: {
+    eyebrow: "SOUTHLINE LIVING",
+    headline: "Ideas para cada hogar.",
+    supportingCopy: "Explora, planifica y conecta con profesionales de confianza para tu hogar.",
+    poweredLine: "Impulsado por SnapLink",
+    location: "Alpharetta, GA · Hablamos español",
+    urlText: "southlineliving.southlineone.com",
+  },
+};
 
-const img = new ImageResponse(
-  {
+export const OG_IMAGE_OUTPUT_PATH = {
+  en: "public/og-image.png",
+  es: "public/og-image-es.png",
+};
+
+// Pure function: builds the ImageResponse element tree for one locale, using
+// only that locale's copy object. Exported so a test can assert its text
+// content directly (proving the Spanish tree never contains English strings)
+// without needing to decode the rendered PNG.
+export function buildOgImageTree(heroDataUrl, copy) {
+  return {
     type: "div",
     props: {
       style: {
@@ -73,7 +103,7 @@ const img = new ImageResponse(
                           fontWeight: 600,
                           marginBottom: 28,
                         },
-                        children: "SOUTHLINE LIVING",
+                        children: copy.eyebrow,
                       },
                     },
                     {
@@ -88,7 +118,7 @@ const img = new ImageResponse(
                           letterSpacing: -2,
                           maxWidth: 980,
                         },
-                        children: "Ideas for every home.",
+                        children: copy.headline,
                       },
                     },
                     {
@@ -103,7 +133,7 @@ const img = new ImageResponse(
                           maxWidth: 880,
                           lineHeight: 1.4,
                         },
-                        children: "Explore, plan, and connect with trusted home professionals.",
+                        children: copy.supportingCopy,
                       },
                     },
                   ],
@@ -129,14 +159,14 @@ const img = new ImageResponse(
                             type: "div",
                             props: {
                               style: { display: "flex", fontSize: 20, fontWeight: 600, color: "#F2EEE6" },
-                              children: "Powered by SnapLink",
+                              children: copy.poweredLine,
                             },
                           },
                           {
                             type: "div",
                             props: {
                               style: { display: "flex", fontSize: 16, color: "#F2EEE6", opacity: 0.75, marginTop: 4 },
-                              children: "Alpharetta, GA · Hablamos español",
+                              children: copy.location,
                             },
                           },
                         ],
@@ -151,7 +181,7 @@ const img = new ImageResponse(
                           color: "#F2EEE6",
                           fontWeight: 500,
                         },
-                        children: "southlineliving.southlineone.com",
+                        children: copy.urlText,
                       },
                     },
                   ],
@@ -162,13 +192,24 @@ const img = new ImageResponse(
         },
       ],
     },
-  },
-  { width: 1200, height: 630 }
-);
+  };
+}
 
-const buf = Buffer.from(await img.arrayBuffer());
-await writeFile(
-  "public/og-image.png",
-  buf
-);
-console.log("wrote", buf.length, "bytes");
+async function main() {
+  const heroBuffer = await readFile("public/images/southline-living-hero.png");
+  const heroDataUrl = `data:image/png;base64,${heroBuffer.toString("base64")}`;
+
+  for (const lang of ["en", "es"]) {
+    const img = new ImageResponse(buildOgImageTree(heroDataUrl, OG_IMAGE_COPY[lang]), { width: 1200, height: 630 });
+    const buf = Buffer.from(await img.arrayBuffer());
+    await writeFile(OG_IMAGE_OUTPUT_PATH[lang], buf);
+    console.log(`wrote ${OG_IMAGE_OUTPUT_PATH[lang]} (${lang}), ${buf.length} bytes`);
+  }
+}
+
+// Only run when invoked directly (`node scripts/gen-og-image.mjs`), not when
+// imported by a test for buildOgImageTree/OG_IMAGE_COPY. Compared as URLs
+// (not raw string concatenation) so paths containing spaces still match.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await main();
+}
