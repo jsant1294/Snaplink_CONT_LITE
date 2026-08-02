@@ -43,25 +43,30 @@ test("no desktop-only carousel; layout is a static asymmetric grid (image-domina
   assert.match(text, /grid gap-6 lg:grid-cols-\[1\.4fr_1fr\]/);
 });
 
-test("Real Estate is a primary nav item placed between Ideas and Projects, in both Header's default and the CMS default", async () => {
+test("Rentals & Getaways is a primary nav item placed after Homes and before Ideas, in both Header's default and the CMS default", async () => {
   const header = await source("../components/southline/Header.tsx");
+  const headerHomes = header.indexOf('key: "navHomes"');
+  const headerRentals = header.indexOf('key: "navRentals"');
   const headerIdeas = header.indexOf('key: "navIdeas"');
-  const headerRE = header.indexOf('key: "navRealEstate"');
-  const headerProjects = header.indexOf('key: "navProjects"');
-  assert.ok(headerIdeas < headerRE && headerRE < headerProjects, "Header.tsx DEFAULT_NAV order");
+  assert.ok(headerHomes < headerRentals && headerRentals < headerIdeas, "Header.tsx DEFAULT_NAV order");
+  assert.equal(header.includes('key: "navRealEstate"'), false, "retired navRealEstate key must be gone from Header");
 
   const types = await source("../lib/southline-types.ts");
+  const typesHomes = types.indexOf('key: "navHomes"');
+  const typesRentals = types.indexOf('key: "navRentals"');
   const typesIdeas = types.indexOf('key: "navIdeas"');
-  const typesRE = types.indexOf('key: "navRealEstate"');
-  const typesProjects = types.indexOf('key: "navProjects"');
-  assert.ok(typesIdeas < typesRE && typesRE < typesProjects, "defaultSouthlineSettings() nav order");
+  assert.ok(typesHomes < typesRentals && typesRentals < typesIdeas, "defaultSouthlineSettings() nav order");
+  assert.equal(types.includes('key: "navRealEstate"'), false, "retired navRealEstate key must be gone from CMS defaults");
+
+  const i18n = await source("../lib/southline-i18n.ts");
+  assert.match(i18n, /navRentals: \{ es: "Alquileres y Escapadas", en: "Rentals & Getaways" \}/);
 });
 
-test("the real estate section has a stable anchor id for direct nav links", async () => {
+test("the real estate section has a stable anchor id and Rentals & Getaways links to the /rentals landing", async () => {
   const text = await source("../components/southline/RealEstateEntryBlock.tsx");
   assert.match(text, /id="real-estate"/);
   const header = await source("../components/southline/Header.tsx");
-  assert.match(header, /href: "\/#real-estate"/);
+  assert.match(header, /href: "\/rentals"/);
 });
 
 test("the recruitment callout inside the block stays visually smaller than the consumer content and links to a real request page", async () => {

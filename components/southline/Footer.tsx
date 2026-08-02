@@ -106,7 +106,8 @@ export default function Footer({
                   {t("footerExplore", lang)}
                 </h4>
                 <ul className="space-y-2.5">
-                  <li><Link href="/homes" className="text-sm hover:text-gold transition-colors">{t("navRealEstate", lang)}</Link></li>
+                  <li><Link href="/homes" className="text-sm hover:text-gold transition-colors">{t("navHomes", lang)}</Link></li>
+                  <li><Link href="/rentals" className="text-sm hover:text-gold transition-colors">{t("navRentals", lang)}</Link></li>
                   <li><Link href="/diy" className="text-sm hover:text-gold transition-colors">{t("navIdeas", lang)}</Link></li>
                   <li><Link href="/planner" className="text-sm hover:text-gold transition-colors">{t("navProjects", lang)}</Link></li>
                   <li><Link href="/diy" className="text-sm hover:text-gold transition-colors">{t("navDIY", lang)}</Link></li>

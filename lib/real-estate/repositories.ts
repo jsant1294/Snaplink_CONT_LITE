@@ -295,6 +295,7 @@ export const propertyRepository: PropertyRepository = {
     const filters = [
       eq(realEstateProperties.tenantId, tenantId), eq(realEstateProperties.isPublished, true),
       isNull(realEstateProperties.deletedAt),
+      ...(options.status ? [eq(realEstateProperties.propertyStatus, options.status)] : []),
       ...(options.search ? [or(ilike(realEstateProperties.title, `%${options.search}%`), ilike(realEstateProperties.city, `%${options.search}%`))!] : []),
     ];
     const [rows, countRows] = await Promise.all([

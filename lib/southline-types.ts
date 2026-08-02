@@ -965,8 +965,8 @@ export function defaultSouthlineSettings(): SouthlineSettings {
       items: [
         { key: "navHome", href: "/", labelEs: "Inicio", labelEn: "Home", visible: true },
         { key: "navHomes", href: "/homes", labelEs: "Casas", labelEn: "Homes", visible: true },
+        { key: "navRentals", href: "/rentals", labelEs: "Alquileres y Escapadas", labelEn: "Rentals & Getaways", visible: true },
         { key: "navIdeas", href: "/#categories", labelEs: "Ideas", labelEn: "Ideas", visible: true },
-        { key: "navRealEstate", href: "/#real-estate", labelEs: "Bienes Raíces", labelEn: "Real Estate", visible: true },
         { key: "navProjects", href: "/planner", labelEs: "Proyectos", labelEn: "Projects", visible: true },
         { key: "navDIY", href: "/diy", labelEs: "DIY", labelEn: "DIY", visible: true },
         { key: "navPros", href: "/#professionals", labelEs: "Profesionales", labelEn: "Professionals", visible: true },

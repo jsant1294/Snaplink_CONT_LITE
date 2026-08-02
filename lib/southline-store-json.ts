@@ -28,9 +28,16 @@ async function ensureFile(): Promise<void> {
 // added via the CMS) is preserved.
 function mergeWithDefaults(stored: Partial<SouthlineSettings>): SouthlineSettings {
   const defaults = defaultSouthlineSettings();
-  const storedByKey = new Map((stored.navigation?.items ?? []).map((item) => [item.key, item]));
+  // Renamed nav keys from earlier slices are retired here so a stale stored item
+  // never survives the merge as an orphan customExtra (Rentals & Getaways slice:
+  // navRealEstate → navRentals). Keep in sync with any future renames.
+  const RETIRED_NAV_KEYS = ["navRealEstate"];
+  const storedNavItems = (stored.navigation?.items ?? []).filter(
+    (item) => !RETIRED_NAV_KEYS.includes(item.key)
+  );
+  const storedByKey = new Map(storedNavItems.map((item) => [item.key, item]));
   const orderedFromDefaults = defaults.navigation.items.map((item) => storedByKey.get(item.key) ?? item);
-  const customExtras = (stored.navigation?.items ?? []).filter(
+  const customExtras = storedNavItems.filter(
     (item) => !defaults.navigation.items.some((d) => d.key === item.key)
   );
   const trendingByKey = new Map((stored.trendingProjects ?? []).map((item) => [item.id, item]));

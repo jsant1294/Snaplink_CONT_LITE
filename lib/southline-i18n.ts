@@ -17,9 +17,11 @@ export const UI_DEFS = {
 
   // Navigation
   navHome: { es: "Inicio", en: "Home" },
+  navHomes: { es: "Casas", en: "Homes" },
+  navRentals: { es: "Alquileres y Escapadas", en: "Rentals & Getaways" },
   navIdeas: { es: "Ideas", en: "Ideas" },
   navProjects: { es: "Proyectos", en: "Projects" },
-  navDIY: { es: "DIY", en: "DIY" },
+  navDIY: { es: "Hazlo Tú Mismo", en: "DIY" },
   navPros: { es: "Profesionales", en: "Professionals" },
   navBook: { es: "Reservar", en: "Book" },
   navForContractors: { es: "Para contratistas", en: "For contractors" },
@@ -289,7 +291,6 @@ export const UI_DEFS = {
   },
 
   // Homepage real estate entry block
-  navRealEstate: { es: "Bienes Raíces", en: "Real Estate" },
   heroRealEstateLink: {
     es: "¿Buscas una casa? Explora propiedades locales.",
     en: "Looking for a home? Explore local listings.",

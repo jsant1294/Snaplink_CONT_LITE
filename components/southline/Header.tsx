@@ -17,8 +17,8 @@ interface NavItem {
 const DEFAULT_NAV: NavItem[] = [
   { key: "navHome", href: "/" },
   { key: "navHomes", href: "/homes", labelEs: "Casas", labelEn: "Homes" },
+  { key: "navRentals", href: "/rentals", labelEs: "Alquileres y Escapadas", labelEn: "Rentals & Getaways" },
   { key: "navIdeas", href: "/#categories" },
-  { key: "navRealEstate", href: "/#real-estate" },
   { key: "navProjects", href: "/planner" },
   { key: "navDIY", href: "/diy" },
   { key: "navPros", href: "/#professionals" },

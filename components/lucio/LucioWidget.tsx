@@ -15,7 +15,7 @@ import {
 } from "@/lib/lucio/widget-state";
 
 export interface LucioPageContext {
-  type: "home" | "property" | "contractor" | "diy" | "planner" | "book";
+  type: "home" | "property" | "contractor" | "diy" | "planner" | "book" | "rentals";
   ref?: string;
 }
 

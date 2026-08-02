@@ -4,7 +4,7 @@
 // Never writes to the database — purely a display-time substitution. Remove
 // once real inventory reliably exists for every consuming tenant.
 import { propertyRepository, type PropertyListOptions, type PropertyListResult } from "./repositories";
-import { demoProperties, demoTenant } from "./fixtures";
+import { demoProperties, demoRentals, demoTenant } from "./fixtures";
 import type { Property } from "./types";
 
 function matchesSearch(property: Property, search: string): boolean {
@@ -33,6 +33,21 @@ export async function findPropertyBySlugWithFallback(slug: string, tenantId: str
   if (real) return real;
   if (tenantId !== demoTenant.id) return null;
   return demoProperties.find((p) => p.slug === slug) ?? null;
+}
+
+// Rentals & Getaways slice: same display-time substitution as above, scoped to
+// `status: "rental"` inventory for the `/rentals` landing page. Falls back to
+// the curated demoRentals fixtures when the tenant has no published rentals.
+export async function listPublishedRentalsWithFallback(
+  tenantId: string,
+  options: PropertyListOptions = {}
+): Promise<PropertyListResult> {
+  const result = await propertyRepository.listPublishedProperties(tenantId, { ...options, status: "rental" });
+  if (result.properties.length > 0) return result;
+  if (tenantId !== demoTenant.id) return result;
+
+  const filtered = options.search ? demoRentals.filter((p) => matchesSearch(p, options.search!)) : demoRentals;
+  return { properties: filtered, total: filtered.length, page: 1, pageSize: filtered.length || 1 };
 }
 
 export async function resolveFeaturedPropertyWithFallback(
