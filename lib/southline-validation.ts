@@ -413,6 +413,47 @@ function validateLocalDiscovery(patch: Record<string, unknown>): string | null {
   return null;
 }
 
+const SNAPLINK_PROMO_LAYOUTS = ["image-left", "image-right", "full-background"];
+const SNAPLINK_PROMO_OVERLAYS = ["none", "light", "medium", "strong"];
+const SNAPLINK_PROMO_FOCAL_POINTS = ["left", "center", "right"];
+const SNAPLINK_PROMO_MOBILE_FOCAL_POINTS = ["top", "center", "bottom"];
+const SNAPLINK_PROMO_ALIGNMENTS = ["left", "right"];
+
+function validateSnapLinkPromo(patch: Record<string, unknown>): string | null {
+  if (patch.layout !== undefined && !SNAPLINK_PROMO_LAYOUTS.includes(patch.layout as string)) {
+    return `snapLinkPromo.layout must be one of ${SNAPLINK_PROMO_LAYOUTS.join(", ")}`;
+  }
+  if (patch.contentAlignment !== undefined && !SNAPLINK_PROMO_ALIGNMENTS.includes(patch.contentAlignment as string)) {
+    return `snapLinkPromo.contentAlignment must be one of ${SNAPLINK_PROMO_ALIGNMENTS.join(", ")}`;
+  }
+  if (patch.overlayStrength !== undefined && !SNAPLINK_PROMO_OVERLAYS.includes(patch.overlayStrength as string)) {
+    return `snapLinkPromo.overlayStrength must be one of ${SNAPLINK_PROMO_OVERLAYS.join(", ")}`;
+  }
+  if (patch.focalPoint !== undefined && !SNAPLINK_PROMO_FOCAL_POINTS.includes(patch.focalPoint as string)) {
+    return `snapLinkPromo.focalPoint must be one of ${SNAPLINK_PROMO_FOCAL_POINTS.join(", ")}`;
+  }
+  if (
+    patch.mobileFocalPoint !== undefined &&
+    !SNAPLINK_PROMO_MOBILE_FOCAL_POINTS.includes(patch.mobileFocalPoint as string)
+  ) {
+    return `snapLinkPromo.mobileFocalPoint must be one of ${SNAPLINK_PROMO_MOBILE_FOCAL_POINTS.join(", ")}`;
+  }
+  if (patch.desktopImageUrl !== undefined && !isNonEmptyString(patch.desktopImageUrl)) {
+    return "snapLinkPromo.desktopImageUrl must be a non-empty string";
+  }
+  for (const field of ["mobileImageUrl", "imageAltEn", "imageAltEs"]) {
+    if (patch[field] !== undefined && !isString(patch[field]) && patch[field] !== null) {
+      return `snapLinkPromo.${field} must be a string or null`;
+    }
+  }
+  for (const field of ["showBadge", "showChips", "showSecondaryLine"]) {
+    if (patch[field] !== undefined && !isBoolean(patch[field])) {
+      return `snapLinkPromo.${field} must be a boolean`;
+    }
+  }
+  return null;
+}
+
 export function validateSouthlineSettings(patch: unknown): string | null {
   if (!isRecord(patch)) return "Patch must be an object";
   if (patch.faq !== undefined) {
@@ -443,6 +484,11 @@ export function validateSouthlineSettings(patch: unknown): string | null {
   if (patch.seo !== undefined) {
     if (!isRecord(patch.seo)) return "seo must be an object";
     const err = validateSeo(patch.seo);
+    if (err) return err;
+  }
+  if (patch.snapLinkPromo !== undefined) {
+    if (!isRecord(patch.snapLinkPromo)) return "snapLinkPromo must be an object";
+    const err = validateSnapLinkPromo(patch.snapLinkPromo);
     if (err) return err;
   }
   return null;

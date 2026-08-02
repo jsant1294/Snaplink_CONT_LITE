@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import type { SouthlineSettings } from "./southline-types";
-import { defaultSouthlineSettings, mergeLocalDiscoveryContent } from "./southline-types";
+import { defaultSouthlineSettings, mergeLocalDiscoveryContent, mergeSnapLinkPromoContent } from "./southline-types";
 import { mergeSeoContent } from "./southline-seo";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -60,6 +60,7 @@ function mergeWithDefaults(stored: Partial<SouthlineSettings>): SouthlineSetting
     contact: { ...defaults.contact, ...stored.contact, hours: stored.contact?.hours ?? defaults.contact.hours },
     testimonials: { ...defaults.testimonials, ...stored.testimonials, items: stored.testimonials?.items ?? defaults.testimonials.items },
     localDiscovery: mergeLocalDiscoveryContent(stored.localDiscovery),
+    snapLinkPromo: mergeSnapLinkPromoContent(stored.snapLinkPromo),
     seo: mergeSeoContent(stored.seo),
     navigation: { items: [...orderedFromDefaults, ...customExtras] },
   };

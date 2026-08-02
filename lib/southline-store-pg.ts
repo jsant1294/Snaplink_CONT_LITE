@@ -9,7 +9,7 @@ import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { eq } from "drizzle-orm";
 import { southlineSettings } from "./db/schema";
 import type { SouthlineSettings } from "./southline-types";
-import { defaultSouthlineSettings, mergeLocalDiscoveryContent } from "./southline-types";
+import { defaultSouthlineSettings, mergeLocalDiscoveryContent, mergeSnapLinkPromoContent } from "./southline-types";
 import { mergeSeoContent } from "./southline-seo";
 import { databaseUrl, sslConfig } from "./db-url";
 
@@ -66,6 +66,7 @@ function mergeWithDefaults(stored: Partial<SouthlineSettings>): SouthlineSetting
       items: stored.testimonials?.items ?? defaults.testimonials.items,
     },
     localDiscovery: mergeLocalDiscoveryContent(stored.localDiscovery),
+    snapLinkPromo: mergeSnapLinkPromoContent(stored.snapLinkPromo),
     seo: mergeSeoContent(stored.seo),
     navigation: { items: [...orderedFromDefaults, ...customExtras] },
   };

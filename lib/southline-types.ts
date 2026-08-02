@@ -69,6 +69,33 @@ export interface CmsImage {
   altEn?: string;
 }
 
+export type SnapLinkPromoLayout = "image-left" | "image-right" | "full-background";
+export type SnapLinkPromoOverlay = "none" | "light" | "medium" | "strong";
+export type SnapLinkPromoFocalPoint = "left" | "center" | "right";
+export type SnapLinkPromoMobileFocalPoint = "top" | "center" | "bottom";
+
+// CMS content for the image-driven SnapLink Local cross-promo section
+// (components/southline/SnapLinkLocalPromo.tsx). Copy/eyebrow/CTA text still
+// comes from the i18n dictionary (localPromo* keys) — this only controls the
+// image and its presentation, matching the "content stays in i18n, media and
+// layout are CMS-editable" split used elsewhere on this homepage.
+export type SnapLinkPromoAlignment = "left" | "right";
+
+export interface SnapLinkPromoContent {
+  layout: SnapLinkPromoLayout;
+  contentAlignment: SnapLinkPromoAlignment;
+  desktopImageUrl: string;
+  mobileImageUrl: string | null;
+  imageAltEn: string;
+  imageAltEs: string;
+  focalPoint: SnapLinkPromoFocalPoint;
+  mobileFocalPoint: SnapLinkPromoMobileFocalPoint;
+  overlayStrength: SnapLinkPromoOverlay;
+  showBadge: boolean;
+  showChips: boolean;
+  showSecondaryLine: boolean;
+}
+
 export interface HomeServicesContent {
   eyebrowEs?: string;
   eyebrowEn?: string;
@@ -467,6 +494,7 @@ export interface SouthlineSettings {
   contact: SouthlineContactContent;
   testimonials: SouthlineTestimonialsContent;
   localDiscovery: SouthlineLocalDiscoveryContent;
+  snapLinkPromo: SnapLinkPromoContent;
   seo: SouthlineSeoContent;
   navigation: {
     items: { key: string; href: string; labelEs: string; labelEn: string; visible: boolean }[];
@@ -524,6 +552,37 @@ export const DEFAULT_HERO_IMAGE: CmsImage = {
   altEn: "Southline Living — homes and trusted professionals",
   altEs: "Southline Living — hogares y profesionales de confianza",
 };
+
+// Verified Unsplash source: https://unsplash.com/photos/Nldp5s4drz0 (Klaudia,
+// @ku_kla) — a warm, string-lit neighborhood dining alley in Copenhagen. No
+// readable business names or third-party logos; wide composition with sky/
+// foliage negative space at the top, works for both the split-card and
+// full-background layouts. See docs/snaplink-local-cross-promo/02-image-source.md.
+export const DEFAULT_SNAPLINK_PROMO: SnapLinkPromoContent = {
+  layout: "image-left",
+  contentAlignment: "right",
+  desktopImageUrl:
+    "https://images.unsplash.com/photo-1672177789763-18c8d0a3ab7f?auto=format&fit=crop&w=1800&q=80",
+  mobileImageUrl:
+    "https://images.unsplash.com/photo-1672177789763-18c8d0a3ab7f?auto=format&fit=crop&w=1200&h=1000&q=80",
+  imageAltEn: "A warm neighborhood alley strung with lights, lined with restaurants and people dining outdoors",
+  imageAltEs: "Un cálido callejón de vecindario con luces, restaurantes y personas cenando al aire libre",
+  focalPoint: "center",
+  mobileFocalPoint: "center",
+  overlayStrength: "none",
+  showBadge: true,
+  showChips: true,
+  showSecondaryLine: true,
+};
+
+// Deep-merges a stored (possibly partial or absent) SnapLink promo section
+// onto the defaults — same "old settings predate new fields" discipline as
+// mergeLocalDiscoveryContent/mergeSeoContent.
+export function mergeSnapLinkPromoContent(
+  stored: Partial<SnapLinkPromoContent> | null | undefined
+): SnapLinkPromoContent {
+  return { ...DEFAULT_SNAPLINK_PROMO, ...(stored ?? {}) };
+}
 
 // Empty by design — every field falls back to the i18n dictionary + demo fixture
 // until an operator edits it, so the section renders exactly as it does today.
@@ -900,6 +959,7 @@ export function defaultSouthlineSettings(): SouthlineSettings {
       ...DEFAULT_LOCAL_DISCOVERY,
       categories: DEFAULT_LOCAL_DISCOVERY.categories.map((category) => ({ ...category })),
     },
+    snapLinkPromo: { ...DEFAULT_SNAPLINK_PROMO },
     seo: cloneDefaultSeo(),
     navigation: {
       items: [

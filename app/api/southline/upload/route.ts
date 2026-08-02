@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { isOperator, pinFromRequest } from "@/lib/auth";
 
-const KINDS = ["hero", "services", "trending", "seasonal", "category", "spotlight", "general"] as const;
+const KINDS = ["hero", "services", "trending", "seasonal", "category", "spotlight", "snaplink-promo", "general"] as const;
 
 export async function POST(req: NextRequest) {
   const pin = pinFromRequest(req);

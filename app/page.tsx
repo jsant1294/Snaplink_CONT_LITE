@@ -90,7 +90,9 @@ export default async function HomePage() {
           <LocalDiscovery lang={lang} content={settings?.localDiscovery} />
         )}
 
-        {(!sections || sections.localPromo !== false) && <SnapLinkLocalPromo lang={lang} />}
+        {(!sections || sections.localPromo !== false) && (
+          <SnapLinkLocalPromo lang={lang} content={settings?.snapLinkPromo} />
+        )}
 
         {showRealEstateBlock && (
           <RealEstateEntryBlock lang={lang} property={featuredProperty} agents={featuredAgents} content={realEstateContent} />

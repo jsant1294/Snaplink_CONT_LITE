@@ -7,6 +7,7 @@ import type {
   HeroContent,
   SeasonalContent,
   SectionVisibility,
+  SnapLinkPromoContent,
   SouthlineCategory,
   SouthlineSettings,
   TrendingProjectItem,
@@ -30,7 +31,7 @@ function localInputToIso(value: string): string | undefined {
   return d.toISOString();
 }
 
-type Tab = "hero" | "sections" | "services" | "trending" | "seasonal" | "categories";
+type Tab = "hero" | "sections" | "services" | "trending" | "seasonal" | "categories" | "snapLinkPromo";
 
 export default function HomepageEditor({ pin }: { pin: string }) {
   const [settings, setSettings] = useState<SouthlineSettings | null>(null);
@@ -98,6 +99,7 @@ export default function HomepageEditor({ pin }: { pin: string }) {
     { key: "trending", label: "Trending" },
     { key: "seasonal", label: "Seasonal" },
     { key: "categories", label: "Categories" },
+    { key: "snapLinkPromo", label: "SnapLink Local Promo" },
     { key: "sections", label: "Sections" },
   ];
 
@@ -137,6 +139,9 @@ export default function HomepageEditor({ pin }: { pin: string }) {
       )}
       {activeTab === "categories" && (
         <CategoriesTab items={settings.categories} busy={busy} pin={pin} onSave={save} />
+      )}
+      {activeTab === "snapLinkPromo" && (
+        <SnapLinkPromoTab content={settings.snapLinkPromo} busy={busy} pin={pin} onSave={save} />
       )}
 
       {toast && (
@@ -931,6 +936,150 @@ function CategoriesTab({
           {busy ? "Saving…" : "Save categories"}
         </button>
       </div>
+    </div>
+  );
+}
+
+function SnapLinkPromoTab({
+  content,
+  busy,
+  pin,
+  onSave,
+}: {
+  content: SnapLinkPromoContent;
+  busy: boolean;
+  pin: string;
+  onSave: (p: Partial<SouthlineSettings>) => void;
+}) {
+  const [local, setLocal] = useState(content);
+
+  useEffect(() => setLocal(content), [content]);
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-muted">
+        Edit the image-driven SnapLink Local cross-promo section. Headline/body copy comes from the
+        site dictionary (EN/ES) — this tab controls the image and its presentation.
+      </p>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <ImageField
+          label="Image (desktop)"
+          value={local.desktopImageUrl}
+          onChange={(url) => setLocal({ ...local, desktopImageUrl: url })}
+          pin={pin}
+          kind="snaplink-promo"
+        />
+        <ImageField
+          label="Image (mobile)"
+          value={local.mobileImageUrl ?? ""}
+          onChange={(url) => setLocal({ ...local, mobileImageUrl: url || null })}
+          pin={pin}
+          kind="snaplink-promo"
+        />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Image alt (EN)</label>
+          <input
+            className="input"
+            value={local.imageAltEn}
+            onChange={(e) => setLocal({ ...local, imageAltEn: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="label">Image alt (ES)</label>
+          <input
+            className="input"
+            value={local.imageAltEs}
+            onChange={(e) => setLocal({ ...local, imageAltEs: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Layout</label>
+          <select
+            className="input"
+            value={local.layout}
+            onChange={(e) => setLocal({ ...local, layout: e.target.value as SnapLinkPromoContent["layout"] })}
+          >
+            <option value="image-left">Split card — image left</option>
+            <option value="image-right">Split card — image right</option>
+            <option value="full-background">Full-background image</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">Content alignment (full-background only)</label>
+          <select
+            className="input"
+            value={local.contentAlignment}
+            onChange={(e) => setLocal({ ...local, contentAlignment: e.target.value as SnapLinkPromoContent["contentAlignment"] })}
+          >
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">Overlay strength (full-background only)</label>
+          <select
+            className="input"
+            value={local.overlayStrength}
+            onChange={(e) => setLocal({ ...local, overlayStrength: e.target.value as SnapLinkPromoContent["overlayStrength"] })}
+          >
+            <option value="none">None</option>
+            <option value="light">Light</option>
+            <option value="medium">Medium</option>
+            <option value="strong">Strong</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">Focal point (desktop)</label>
+          <select
+            className="input"
+            value={local.focalPoint}
+            onChange={(e) => setLocal({ ...local, focalPoint: e.target.value as SnapLinkPromoContent["focalPoint"] })}
+          >
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">Focal point (mobile)</label>
+          <select
+            className="input"
+            value={local.mobileFocalPoint}
+            onChange={(e) => setLocal({ ...local, mobileFocalPoint: e.target.value as SnapLinkPromoContent["mobileFocalPoint"] })}
+          >
+            <option value="top">Top</option>
+            <option value="center">Center</option>
+            <option value="bottom">Bottom</option>
+          </select>
+        </div>
+      </div>
+
+      <label className="flex items-center justify-between py-3 border-b border-white/5">
+        <span className="text-sm">Show SnapLink badge</span>
+        <Toggle on={local.showBadge} onToggle={() => setLocal({ ...local, showBadge: !local.showBadge })} />
+      </label>
+      <label className="flex items-center justify-between py-3 border-b border-white/5">
+        <span className="text-sm">Show category chips</span>
+        <Toggle on={local.showChips} onToggle={() => setLocal({ ...local, showChips: !local.showChips })} />
+      </label>
+      <label className="flex items-center justify-between py-3 border-b border-white/5">
+        <span className="text-sm">Show secondary line</span>
+        <Toggle on={local.showSecondaryLine} onToggle={() => setLocal({ ...local, showSecondaryLine: !local.showSecondaryLine })} />
+      </label>
+
+      <button
+        onClick={() => onSave({ snapLinkPromo: local })}
+        disabled={busy}
+        className="btn-gold disabled:opacity-40"
+      >
+        {busy ? "Saving…" : "Save SnapLink Local promo"}
+      </button>
     </div>
   );
 }
