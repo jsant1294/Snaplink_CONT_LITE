@@ -1,14 +1,17 @@
 // Seed the default expense categories into Postgres.
 //   DATABASE_URL=... node scripts/seed-categories.mjs
 // Safe to re-run: ON CONFLICT DO NOTHING.
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env" });
 import pg from "pg";
+import { assertNotProductionDatabase } from "../lib/local-db-guard.ts";
 
 const DB_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
 if (!DB_URL) {
   console.error("No DATABASE_URL (or POSTGRES_URL) set. Add it to .env or pass it inline.");
   process.exit(1);
 }
+assertNotProductionDatabase(DB_URL, "scripts/seed-categories.mjs");
 
 const CATEGORIES = [
   ["cat_job_materials", "job_materials", "Job materials", "Materiales del trabajo", "38", "true", 10],

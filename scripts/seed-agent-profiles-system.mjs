@@ -12,14 +12,17 @@
 // Idempotent (ON CONFLICT DO NOTHING). Never auto-run — same convention as
 // every migration in this repo.
 // ---------------------------------------------------------------------------
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env" });
 import pg from "pg";
+import { assertNotProductionDatabase } from "../lib/local-db-guard.ts";
 
 const DB_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
 if (!DB_URL) {
   console.error("No DATABASE_URL (or POSTGRES_URL) set. Add it to .env or pass it inline.");
   process.exit(1);
 }
+assertNotProductionDatabase(DB_URL, "scripts/seed-agent-profiles-system.mjs");
 
 const MEMBERSHIP_ID = process.env.AGENT_PROFILES_SYSTEM_MEMBERSHIP_ID || "re_membership_agent_profiles_system";
 const TENANT_ID = "apx-system";

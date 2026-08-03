@@ -17,14 +17,17 @@
 // ALL DATA IS FICTIONAL DEMO CONTENT, same convention as scripts/seed-demo-ridgeline.mjs.
 // Idempotent (ON CONFLICT DO NOTHING). Never auto-run.
 // ---------------------------------------------------------------------------
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env" });
 import pg from "pg";
+import { assertNotProductionDatabase } from "../lib/local-db-guard.ts";
 
 const DB_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
 if (!DB_URL) {
   console.error("No DATABASE_URL (or POSTGRES_URL) set. Add it to .env or pass it inline.");
   process.exit(1);
 }
+assertNotProductionDatabase(DB_URL, "scripts/seed-agent-profiles-demo.mjs");
 
 const pool = new pg.Pool({
   connectionString: DB_URL,

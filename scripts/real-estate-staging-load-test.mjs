@@ -18,6 +18,7 @@
 // REAL_ESTATE_STAGING_API_KEY_B must belong to a DIFFERENT tenant than _A for the isolation
 // check to mean anything. Omit it to run the load test only.
 import "dotenv/config";
+import { assertNotProductionAppUrl } from "../lib/local-db-guard.ts";
 
 const baseUrl = (process.env.REAL_ESTATE_STAGING_BASE_URL || "").trim();
 const keyA = (process.env.REAL_ESTATE_STAGING_API_KEY_A || "").trim();
@@ -35,6 +36,9 @@ if (!baseUrl || !keyA) {
   );
   process.exit(1);
 }
+// This is a load test — it must never point at a real production deployment,
+// staging only. Fails closed unless ALLOW_PRODUCTION_DB=yes is explicit.
+assertNotProductionAppUrl(baseUrl, "scripts/real-estate-staging-load-test.mjs");
 
 async function timedFetch(url, apiKey) {
   const start = performance.now();

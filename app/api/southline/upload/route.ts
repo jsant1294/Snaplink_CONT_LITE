@@ -29,6 +29,17 @@ export async function POST(req: NextRequest) {
     );
     return NextResponse.json({ url: blob.url });
   }
+  // Storing the raw base64 data URL in southline_settings' jsonb (hero,
+  // category, promo images) is a real risk in production: every homepage
+  // view re-transfers that payload. Mirrors the production-refuses-to-
+  // degrade-silently convention in lib/db-url.ts — fail the upload instead
+  // of quietly bloating the database. Local dev keeps the fallback.
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "Image uploads are unavailable: BLOB_READ_WRITE_TOKEN is not configured." },
+      { status: 503 }
+    );
+  }
   const buffer = Buffer.from(await file.arrayBuffer());
   return NextResponse.json({ url: `data:${file.type};base64,${buffer.toString("base64")}` });
 }

@@ -11,7 +11,18 @@ async function canAccessProperty(id: string, principal: Awaited<ReturnType<typeo
 
 async function resolveImage(dataUrl: string, filename: string, propertyId: string): Promise<string> {
   if (!dataUrl.startsWith("data:image/")) throw new Error("A valid image is required");
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return dataUrl;
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    // Storing the raw base64 data URL in Postgres (property_media.url /
+    // properties.hero_image) is a real risk in production: every listing
+    // query re-transfers that payload on every page view. Mirrors the
+    // production-refuses-to-degrade-silently convention in lib/db-url.ts —
+    // fail the upload instead of quietly bloating the database. Local dev
+    // (no BLOB_READ_WRITE_TOKEN configured) keeps the convenient fallback.
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Image uploads are unavailable: BLOB_READ_WRITE_TOKEN is not configured.");
+    }
+    return dataUrl;
+  }
   const [meta, encoded] = dataUrl.split(",");
   const contentType = meta.match(/data:(.*?);/)?.[1] ?? "image/jpeg";
   const blob = await put(`snaplink-real-estate/${propertyId}/${Date.now()}-${filename}`, Buffer.from(encoded, "base64"), { access: "public", contentType });

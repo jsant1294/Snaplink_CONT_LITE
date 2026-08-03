@@ -12,14 +12,17 @@
 // sales page. Never put a real client, real TIN, or real money in here.
 // Safe to re-run: every insert is ON CONFLICT DO NOTHING.
 // ---------------------------------------------------------------------------
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env" });
 import pg from "pg";
+import { assertNotProductionDatabase } from "../lib/local-db-guard.ts";
 
 const DB_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
 if (!DB_URL) {
   console.error("No DATABASE_URL (or POSTGRES_URL) set. Add it to .env or pass it inline.");
   process.exit(1);
 }
+assertNotProductionDatabase(DB_URL, "scripts/seed-demo-ridgeline.mjs");
 
 const YEAR = Number(process.env.DEMO_YEAR || 2026);
 const CID = "ctr_ridgeline";
