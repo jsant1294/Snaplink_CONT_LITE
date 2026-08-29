@@ -3,22 +3,10 @@
 // lib/store-campaign-pg.ts.
 // ---------------------------------------------------------------------------
 
-import { Pool } from "pg";
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { and, eq, desc, inArray } from "drizzle-orm";
 import { professionalIntakeSessions } from "../db/schema.ts";
+import { db } from "../db/connection.ts";
 import type { IntakeSession, IntakeSessionStatus } from "./types.ts";
-import { databaseUrl, sslConfig } from "../db-url.ts";
-
-let _db: NodePgDatabase | null = null;
-
-function db(): NodePgDatabase {
-  if (!_db) {
-    const pool = new Pool({ connectionString: databaseUrl, ssl: sslConfig, max: 5 });
-    _db = drizzle(pool);
-  }
-  return _db;
-}
 
 const ACTIVE_STATUSES: IntakeSessionStatus[] = ["not_started", "in_progress", "completed"];
 
@@ -45,6 +33,15 @@ function rowToSession(row: SessionRow): IntakeSession {
 }
 
 export const pgIntakeSessionStore = {
+  /** Operator command-center listing of every intake session, newest-updated first. */
+  async listAll(): Promise<IntakeSession[]> {
+    const rows = await db()
+      .select()
+      .from(professionalIntakeSessions)
+      .orderBy(desc(professionalIntakeSessions.updatedAt));
+    return rows.map(rowToSession);
+  },
+
   async list(ownerType: string, ownerId: string): Promise<IntakeSession[]> {
     const rows = await db()
       .select()

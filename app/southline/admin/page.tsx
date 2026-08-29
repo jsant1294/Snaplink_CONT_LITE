@@ -9,6 +9,7 @@ import RecruitmentLeadsViewer from "@/components/southline/admin/RecruitmentLead
 import DiyEditor from "@/components/southline/admin/DiyEditor";
 import SpotlightEditor from "@/components/southline/admin/SpotlightEditor";
 import AgentProfilesPanel from "@/components/southline/admin/AgentProfilesPanel";
+import IntakeCenterPanel from "@/components/southline/admin/IntakeCenterPanel";
 import RealEstateBlockEditor from "@/components/southline/admin/RealEstateBlockEditor";
 import FaqEditor from "@/components/southline/admin/FaqEditor";
 import FooterEditor from "@/components/southline/admin/FooterEditor";
@@ -18,7 +19,7 @@ import LocalDiscoveryEditor from "@/components/southline/admin/LocalDiscoveryEdi
 import SeoEditor from "@/components/southline/admin/SeoEditor";
 import ProfessionalCatalogPanel from "@/components/southline/admin/ProfessionalCatalogPanel";
 
-type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "realestate" | "faq" | "footer" | "contact" | "testimonials" | "localDiscovery" | "seo" | "catalog";
+type Tab = "homepage" | "featured" | "flags" | "recruitment" | "diy" | "spotlight" | "agents" | "intake" | "realestate" | "faq" | "footer" | "contact" | "testimonials" | "localDiscovery" | "seo" | "catalog";
 
 export default function SouthlineAdminPage() {
   return (
@@ -37,6 +38,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
     { key: "featured", label: "Featured Pros" },
     { key: "recruitment", label: "Recruitment Leads" },
     { key: "agents", label: "Agent Management" },
+    { key: "intake", label: "Intake Center" },
     { key: "realestate", label: "Real Estate Block" },
     { key: "diy", label: "DIY Projects" },
     { key: "spotlight", label: "Community Spotlight" },
@@ -92,6 +94,7 @@ function SouthlineAdmin({ pin }: { pin: string }) {
           {tab === "featured" && <FeaturedProsPicker pin={pin} />}
           {tab === "recruitment" && <RecruitmentLeadsViewer pin={pin} />}
           {tab === "agents" && <AgentProfilesPanel pin={pin} />}
+          {tab === "intake" && <IntakeCenterPanel pin={pin} />}
           {tab === "realestate" && <RealEstateBlockEditor pin={pin} />}
           {tab === "diy" && <DiyEditor pin={pin} />}
           {tab === "spotlight" && <SpotlightEditor pin={pin} />}

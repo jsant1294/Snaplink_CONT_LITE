@@ -31,6 +31,12 @@ async function writeJson<T>(file: string, data: T): Promise<void> {
 }
 
 export const jsonIntakeSessionStore = {
+  /** Operator command-center listing of every intake session, newest-updated first. */
+  async listAll(): Promise<IntakeSession[]> {
+    const all = await readJson<IntakeSession[]>(SESSIONS_FILE, []);
+    return [...all].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  },
+
   async list(ownerType: string, ownerId: string): Promise<IntakeSession[]> {
     const all = await readJson<IntakeSession[]>(SESSIONS_FILE, []);
     return all
