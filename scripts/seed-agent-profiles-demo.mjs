@@ -37,14 +37,15 @@ const pool = new pg.Pool({
 await pool.query(
   `INSERT INTO agent_profiles (
      id, slug, status, name, brokerage_name, license_number, phone, email,
-     service_area, bio, languages, specialties, service_areas, years_experience, photo_url
+     service_area, bio, languages, specialties, service_areas, years_experience, photo_url, is_demo
    ) VALUES (
      'apx_demo_elena_martinez', 'elena-martinez', 'active', 'Elena Martinez',
      'Southline Realty Group', 'GA 412908', '(678) 555-0142', 'elena@example.com',
      'North Atlanta', 'Thoughtful residential representation throughout North Atlanta.',
      '["English","Español"]'::jsonb, '["Luxury residential","Relocation","New construction"]'::jsonb,
      '["Alpharetta","Milton","Roswell"]'::jsonb, 12,
-     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=85'
+     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=85',
+     true
    )
    ON CONFLICT (slug) DO NOTHING`
 );
@@ -53,7 +54,7 @@ await pool.query(
   `INSERT INTO agent_profiles (
      id, slug, status, name, profession_type, brokerage_name, phone, email,
      service_area, bio, tagline, languages, specialties, service_areas, years_experience, photo_url,
-     southline_status
+     southline_status, is_demo
    ) VALUES (
      'apx_demo_camila_ruiz', 'camila-ruiz-photography', 'active', 'Camila Ruiz',
      'photographer', 'Camila Ruiz Studio', '(470) 555-0177', 'camila@example.com',
@@ -62,7 +63,7 @@ await pool.query(
      '["Architecture","Interior","Real estate listing","Editorial"]'::jsonb,
      '["Decatur","Oakhurst","Avondale Estates"]'::jsonb, 9,
      'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&q=85',
-     'published'
+     'published', true
    )
    ON CONFLICT (slug) DO NOTHING`
 );

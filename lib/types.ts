@@ -117,6 +117,8 @@ export interface Contractor {
   manualPaymentNote?: string;
   manualPaymentSetAt?: string;
   manualPaymentSetBy?: string;
+  /** Demo/test record — excluded from ALL public discovery server-side. */
+  isDemo?: boolean;
 }
 
 export interface ClientContact {

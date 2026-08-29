@@ -142,8 +142,8 @@ for (const c of CONTRACTORS) {
     `INSERT INTO contractors (
        id, username, pin, preferred_language, profession_type, business_name, owner_name,
        phone, whatsapp, email, service_area, services, tagline, license_info,
-       website, brand_color, avatar_url, gallery_urls
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+       website, brand_color, avatar_url, gallery_urls, is_demo
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,true)
      ON CONFLICT (id) DO NOTHING`,
     [c.id, c.username, c.pin, "en", c.professionType, c.businessName, c.ownerName,
      c.phone, c.whatsapp, c.email, c.serviceArea, JSON.stringify(c.services), c.tagline,
@@ -256,8 +256,8 @@ for (const a of AGENTS) {
        profession_type, brokerage_name, license_number, license_state, phone, email,
        service_area, bio, tagline, photo_url, cover_photo_url, website, instagram,
        languages, specialties, service_areas, categories, neighborhoods,
-       service_radius, years_experience, featured, snaplink_status, southline_status
-     ) VALUES ($1,$2,$3,'active',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,'published',$30)
+       service_radius, years_experience, featured, snaplink_status, southline_status, is_demo
+     ) VALUES ($1,$2,$3,'active',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,'published',$30,true)
      ON CONFLICT (id) DO NOTHING`,
     [a.id, a.slug, a.slug, "987654", a.name, a.name.split(" ")[0], a.name.split(" ").slice(1).join(" "), a.name,
      a.professionType, a.brokerageName, a.licenseNumber ?? "", a.licenseState ?? "", a.phone, a.email,

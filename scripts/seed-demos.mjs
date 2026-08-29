@@ -23,8 +23,8 @@ const pool = new pg.Pool({
 });
 for (const d of demos) {
   await pool.query(
-    `INSERT INTO contractors (id, username, pin, preferred_language, business_name, owner_name, phone, whatsapp, email, service_area, services, tagline, license_info)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+    `INSERT INTO contractors (id, username, pin, preferred_language, business_name, owner_name, phone, whatsapp, email, service_area, services, tagline, license_info, is_demo)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, true)
      ON CONFLICT (id) DO NOTHING`,
     d
   );

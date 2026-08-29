@@ -107,6 +107,8 @@ export interface AgentProfile {
   manualPaymentNote?: string;
   manualPaymentSetAt?: string;
   manualPaymentSetBy?: string;
+  /** Demo/test record — excluded from ALL public discovery server-side. */
+  isDemo?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -190,6 +192,8 @@ export interface AgentOperatorCreateInput {
   status?: AgentProfileStatus;
   snaplinkStatus?: SnaplinkStatus;
   southlineStatus?: SouthlineStatus;
+  /** Demo/test record — excluded from public discovery. */
+  isDemo?: boolean;
 }
 
 /** Reserved so a username/slug can never shadow an existing top-level app route. */

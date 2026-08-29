@@ -149,6 +149,7 @@ export const jsonAgentProfileStore = {
       snaplinkStatus: input.snaplinkStatus ?? "draft",
       southlineStatus: input.southlineStatus ?? "draft",
       onboardingStatus: "invited",
+      isDemo: input.isDemo ?? false,
       seoTitle: input.seoTitle,
       seoDescription: input.seoDescription,
       marketplaceSummary: input.marketplaceSummary,

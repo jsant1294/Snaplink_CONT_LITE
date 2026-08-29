@@ -11,6 +11,6 @@ import { publicContractorDiscovery } from "@/lib/auth";
  * and manual-payment state, internal owner record) are never returned.
  */
 export async function GET() {
-  const contractors = await contractorStore.list();
+  const contractors = (await contractorStore.list()).filter((c) => !c.isDemo);
   return NextResponse.json({ contractors: contractors.map(publicContractorDiscovery) });
 }

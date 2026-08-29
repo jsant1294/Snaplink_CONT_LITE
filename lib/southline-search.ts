@@ -68,6 +68,16 @@ export function isSouthlineListedAgent(profile: AgentProfile): boolean {
   );
 }
 
+/** Runtime safety contract: demo/test contractors are never publicly discoverable. */
+export function isPublicContractor(c: Contractor): boolean {
+  return !c.isDemo;
+}
+
+/** Runtime safety contract: demo/test agents are never publicly discoverable. */
+export function isPublicAgent(a: AgentProfile): boolean {
+  return !a.isDemo;
+}
+
 function normalize(s: string): string {
   return s.toLowerCase().trim();
 }
@@ -119,6 +129,7 @@ export function searchProfessionals(
   const results: ProfessionalResult[] = [];
 
   for (const c of contractors) {
+    if (c.isDemo) continue;
     const catIds = categoryIdsForContractor(c);
     if (category && !catIds.includes(category)) continue;
     const profCat = professionCategoryId(c.professionType);
@@ -149,6 +160,7 @@ export function searchProfessionals(
   }
 
   for (const a of agents) {
+    if (a.isDemo) continue;
     if (!isSouthlineListedAgent(a)) continue;
     const catIds = categoryIdsForAgent(a);
     if (category && !catIds.includes(category)) continue;

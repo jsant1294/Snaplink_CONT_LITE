@@ -5,26 +5,10 @@
 // Blob and only the URL is persisted; otherwise the data URL is stored as-is.
 // ---------------------------------------------------------------------------
 
-import { Pool } from "pg";
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { eq, desc } from "drizzle-orm";
 import { contractors, leads, photos, estimates } from "./db/schema";
+import { db } from "./db/connection";
 import type { Lead, LeadStatus, AiSummary, Contractor, Estimate, Photo, Payment, PaymentMethods } from "./types";
-import { databaseUrl, sslConfig } from "./db-url";
-
-let _db: NodePgDatabase | null = null;
-
-function db(): NodePgDatabase {
-  if (!_db) {
-    const pool = new Pool({
-      connectionString: databaseUrl,
-      ssl: sslConfig,
-      max: 5,
-    });
-    _db = drizzle(pool);
-  }
-  return _db;
-}
 
 export async function maybeUploadToBlob(photo: { dataUrl: string; filename: string }, leadId: string): Promise<string> {
   if (!process.env.BLOB_READ_WRITE_TOKEN || !photo.dataUrl.startsWith("data:")) {
@@ -121,6 +105,7 @@ function rowToContractor(row: ContractorRow): Contractor {
     stripeDisabledReason: row.stripeDisabledReason ?? undefined,
     stripeLastSyncedAt: row.stripeLastSyncedAt ?? undefined,
     stripeConnectStatus: row.stripeConnectStatus as Contractor["stripeConnectStatus"],
+    isDemo: row.isDemo ?? false,
     createdAt: row.createdAt,
   };
 }
@@ -277,6 +262,7 @@ export const pgContractorStore = {
       brandColor: c.brandColor ?? null,
       avatarUrl: c.avatarUrl ?? null,
       logoUrl: c.logoUrl ?? null,
+      isDemo: c.isDemo ?? false,
       createdAt: c.createdAt,
     });
     return c;

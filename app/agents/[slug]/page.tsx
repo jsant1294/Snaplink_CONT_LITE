@@ -14,7 +14,7 @@ export default async function AgentProfileRoute({ params }: { params: Promise<{ 
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const profile = await agentProfileStore.getBySlug(slug);
-  if (!profile || profile.status !== "active" || (profile.southlineStatus !== "published" && profile.southlineStatus !== "featured")) notFound();
+  if (!profile || profile.isDemo || profile.status !== "active" || (profile.southlineStatus !== "published" && profile.southlineStatus !== "featured")) notFound();
 
   return (
     <>

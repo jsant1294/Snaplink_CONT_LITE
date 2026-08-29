@@ -8,9 +8,10 @@ import AgentProfilePublicPage from "@/components/agent-profiles/AgentProfilePubl
 
 export const dynamic = "force-dynamic";
 
-function isVisible(profile: { status: string; snaplinkStatus: string } | undefined | null): boolean {
+function isVisible(profile: { status: string; snaplinkStatus: string; isDemo?: boolean } | undefined | null): boolean {
   return Boolean(
     profile &&
+      !profile.isDemo &&
       profile.status !== "archived" &&
       profile.status !== "suspended" &&
       profile.snaplinkStatus === "published"
@@ -46,7 +47,7 @@ export default async function SnaplinkProfileRoute({ params }: { params: Promise
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const profile = await agentProfileStore.getByUsername(username.toLowerCase());
-  if (!profile || profile.status === "archived" || profile.status === "suspended" || profile.snaplinkStatus !== "published") notFound();
+  if (!profile || profile.isDemo || profile.status === "archived" || profile.status === "suspended" || profile.snaplinkStatus !== "published") notFound();
 
   return (
     <div className="min-h-screen bg-[#EEE7DA] py-6">

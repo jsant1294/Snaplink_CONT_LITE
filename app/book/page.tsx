@@ -17,7 +17,7 @@ export default async function BookPage({
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const { contractor: contractorId } = await searchParams;
 
-  const contractors = await contractorStore.list().catch(() => []);
+  const contractors = (await contractorStore.list().catch(() => [])).filter((c) => !c.isDemo);
 
   return (
     <>

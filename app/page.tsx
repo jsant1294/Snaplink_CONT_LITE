@@ -40,8 +40,8 @@ export default async function HomePage() {
 
   const [settings, allContractors, activeAgentProfiles, diyProjects] = await Promise.all([
     southlineStore.getSettings().catch(() => null),
-    contractorStore.list().catch(() => [] as import("@/lib/types").Contractor[]),
-    agentProfileStore.listActive().catch(() => [] as import("@/lib/agent-profiles/types").AgentProfile[]),
+    contractorStore.list().then((l) => l.filter((c) => !c.isDemo)).catch(() => [] as import("@/lib/types").Contractor[]),
+    agentProfileStore.listActive().then((l) => l.filter((p) => !p.isDemo)).catch(() => [] as import("@/lib/agent-profiles/types").AgentProfile[]),
     listProjects().catch(() => [] as import("@/lib/southline-diy").DIYProject[]),
   ]);
 

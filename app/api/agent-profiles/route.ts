@@ -5,7 +5,7 @@ import type { AgentProfileRequestInput } from "@/lib/agent-profiles/types";
 
 /** Public: active profiles only. Operator PIN: every profile (for the admin review queue). */
 export async function GET(req: NextRequest) {
-  const profiles = isOperator(pinFromRequest(req)) ? await agentProfileStore.list() : await agentProfileStore.listActive();
+  const profiles = isOperator(pinFromRequest(req)) ? await agentProfileStore.list() : (await agentProfileStore.listActive()).filter((p) => !p.isDemo);
   return NextResponse.json({ profiles: profiles.map(publicAgentProfile) });
 }
 

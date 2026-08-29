@@ -13,6 +13,7 @@ export default async function AgentsDirectoryPage() {
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const profiles = (await agentProfileStore.listActive())
+    .filter((p) => !p.isDemo)
     .filter((p) => p.southlineStatus === "published" || p.southlineStatus === "featured")
     .map(publicAgentProfile);
 

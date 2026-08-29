@@ -39,11 +39,11 @@ const q = (text, params) => pool.query(text, params);
 // --- contractor ------------------------------------------------------------
 await q(
   `INSERT INTO contractors (id, username, pin, preferred_language, business_name, owner_name,
-     phone, whatsapp, email, service_area, services, tagline, license_info)
+     phone, whatsapp, email, service_area, services, tagline, license_info, is_demo)
    VALUES ($1,$2,$3,'en','Ridgeline Remodeling','Tony Alvarez','+14045550118','+14045550118',
      'office@ridgeline-demo.example','Demo account · fictional data',
      $4,'Kitchens, baths, and additions. Licensed & insured. Hablamos español.',
-     'Demo license #DEMO-0000 · fictional')
+     'Demo license #DEMO-0000 · fictional', true)
    ON CONFLICT (id) DO NOTHING`,
   [CID, USER, PIN, JSON.stringify(["Kitchen Remodel","Bathroom Remodel","Flooring","Drywall Install / Repair","Interior Painting","Countertops"])]
 );

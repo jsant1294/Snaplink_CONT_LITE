@@ -12,7 +12,7 @@ export default async function PlannerPage() {
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
 
-  const contractors = await contractorStore.list().catch(() => []);
+  const contractors = (await contractorStore.list().catch(() => [])).filter((c) => !c.isDemo);
 
   return (
     <>

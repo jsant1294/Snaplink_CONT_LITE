@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [projects, contractors] = await Promise.all([
     listProjects().catch(() => []),
-    contractorStore.list().catch(() => []),
+    contractorStore.list().then((l) => l.filter((c) => !c.isDemo)).catch(() => []),
   ]);
   const diyRoutes = projects.map((p) => ({
     url: `${baseUrl}/diy/${p.slug}`,
@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
-  const contractorRoutes = contractors.map((c) => ({
+  const contractorRoutes = contractors.filter((c) => !c.isDemo).map((c) => ({
     url: `${baseUrl}/contractor/${c.username}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,

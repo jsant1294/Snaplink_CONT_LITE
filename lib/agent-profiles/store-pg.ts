@@ -4,22 +4,11 @@
 // API routes never know which backend is live.
 // ---------------------------------------------------------------------------
 
-import { Pool } from "pg";
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { eq, desc } from "drizzle-orm";
 import { agentProfiles } from "../db/schema";
-import { databaseUrl, sslConfig } from "../db-url";
+import { db } from "../db/connection";
 import type { AgentOperatorCreateInput, AgentProfile, AgentProfileRequestInput } from "./types";
 import { DEFAULT_AGENT_PROFESSION_TYPE } from "../profession-types.ts";
-
-let _db: NodePgDatabase | null = null;
-
-function db(): NodePgDatabase {
-  if (!_db) {
-    _db = drizzle(new Pool({ connectionString: databaseUrl, ssl: sslConfig, max: 5 }));
-  }
-  return _db;
-}
 
 type Row = typeof agentProfiles.$inferSelect;
 
@@ -66,6 +55,7 @@ function rowToProfile(row: Row): AgentProfile {
     snaplinkStatus: row.snaplinkStatus as AgentProfile["snaplinkStatus"],
     southlineStatus: row.southlineStatus as AgentProfile["southlineStatus"],
     onboardingStatus: row.onboardingStatus as AgentProfile["onboardingStatus"],
+    isDemo: row.isDemo ?? false,
     seoTitle: row.seoTitle ?? undefined,
     seoDescription: row.seoDescription ?? undefined,
     marketplaceSummary: row.marketplaceSummary ?? undefined,
@@ -187,6 +177,7 @@ export const pgAgentProfileStore = {
       snaplinkStatus: input.snaplinkStatus ?? "draft",
       southlineStatus: input.southlineStatus ?? "draft",
       onboardingStatus: "invited",
+      isDemo: input.isDemo ?? false,
       seoTitle: input.seoTitle,
       seoDescription: input.seoDescription,
       marketplaceSummary: input.marketplaceSummary,

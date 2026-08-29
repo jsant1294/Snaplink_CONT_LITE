@@ -69,7 +69,7 @@ export default async function CategoryPage({
   const allProjects = await listProjects();
   const diyKey = CATEGORY_TO_DIY[category];
   const projects = diyKey ? allProjects.filter((p) => p.category === diyKey) : [];
-  const allContractors = await contractorStore.list().catch(() => []);
+  const allContractors = (await contractorStore.list().catch(() => [])).filter((c) => !c.isDemo);
   const wantedServiceCategories = CATEGORY_TO_SERVICE_CATEGORIES[category] ?? [];
   const contractors = allContractors
     .filter((c) => categoryIdsForContractor(c).some((id) => wantedServiceCategories.includes(id)))

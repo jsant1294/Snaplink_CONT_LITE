@@ -17,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username } = await params;
   const contractor = await contractorStore.getByUsername(username);
-  if (!contractor) return {};
+  if (!contractor || contractor.isDemo) return {};
 
   const page = await landingPageStore.get(contractor.id);
   const title = (page?.published && page.headlineEn) || `${contractor.businessName} | SnapLink Contractor`;
@@ -43,7 +43,7 @@ export default async function ContractorProfilePage({
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const contractor = await contractorStore.getByUsername(username);
-  if (!contractor) notFound();
+  if (!contractor || contractor.isDemo) notFound();
   const landingPage = await landingPageStore.get(contractor.id);
 
   return (
