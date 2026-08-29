@@ -3,6 +3,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import type { DIYProject } from "@/lib/southline-diy";
+import { isOperator, pinFromRequest } from "@/lib/auth";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const DIY_FILE = path.join(DATA_DIR, "diy-projects.json");
@@ -26,8 +27,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const pin = req.headers.get("x-snaplink-pin");
-  if (pin !== process.env.OPERATOR_PIN && pin !== "0000") {
+  if (!isOperator(pinFromRequest(req))) {
     return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
   }
   try {

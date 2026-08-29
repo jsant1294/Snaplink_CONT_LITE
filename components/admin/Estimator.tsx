@@ -14,7 +14,7 @@ import {
 import { SERVICE_CATEGORIES, getService, serviceLabel, categoryLabel } from "@/lib/services";
 import { at, type Lang } from "@/lib/i18n";
 import { storedPin } from "@/components/admin/Dashboard";
-import type { Contractor } from "@/lib/types";
+import type { PublicContractorDiscovery } from "@/lib/auth";
 
 const money = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
@@ -27,7 +27,7 @@ function newLineId() {
 
 export default function Estimator({ leadId }: { leadId: string }) {
   const [lead, setLead] = useState<Lead | null>(null);
-  const [contractor, setContractor] = useState<Omit<Contractor, "pin"> | null>(null);
+  const [contractor, setContractor] = useState<PublicContractorDiscovery | null>(null);
   const [pin, setPin] = useState("");
   const [denied, setDenied] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -78,10 +78,10 @@ export default function Estimator({ leadId }: { leadId: string }) {
       setPin(goodPin);
       const lead = leadData;
       setLead(lead);
-      // Contractor language drives the estimator UI
-      const profRes = await fetch("/api/contractor/profiles");
+      // Contractor language drives the estimator UI (public projection — no auth)
+      const profRes = await fetch("/api/contractor/profiles/public");
       const { contractors } = await profRes.json();
-      const ctr = (contractors as Omit<Contractor, "pin">[]).find((c) => c.id === lead.contractorId);
+      const ctr = (contractors as PublicContractorDiscovery[]).find((c) => c.id === lead.contractorId);
       if (ctr) setContractor(ctr);
       // Default the library filter to the lead's trade category
       const svc = getService(lead.projectType);

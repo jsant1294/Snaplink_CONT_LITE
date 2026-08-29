@@ -289,7 +289,7 @@ test("22. an unknown profession-to-category mapping is surfaced as 'unmapped' in
 
 test("23. the admin panel loads contractors, agents, and curated settings from the existing authenticated endpoints", async () => {
   const text = await source("../components/southline/admin/ProfessionalCatalogPanel.tsx");
-  assert.match(text, /fetch\("\/api\/contractor\/profiles"\)/);
+  assert.match(text, /fetch\("\/api\/contractor\/profiles", \{ headers: \{ "x-snaplink-pin": pin \} \}\)/);
   assert.match(text, /fetch\("\/api\/agent-profiles", \{ headers: \{ "x-snaplink-pin": pin \} \}\)/);
   assert.match(text, /fetch\("\/api\/southline\/settings", \{ headers: \{ "x-snaplink-pin": pin \} \}\)/);
 });

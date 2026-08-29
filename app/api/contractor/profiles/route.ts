@@ -5,7 +5,15 @@ import { DEFAULT_PROFESSION_TYPE, isValidProfessionType } from "@/lib/profession
 import type { Contractor } from "@/lib/types";
 import { pinFromRequest, isOperator, canAccessContractor, publicContractor } from "@/lib/auth";
 
-export async function GET() {
+/**
+ * Full contractor roster — OPERATOR ONLY. Returns the full record minus the
+ * PIN. No public page depends on this endpoint; public discovery uses the
+ * server-side store or the dedicated public projection endpoint.
+ */
+export async function GET(req: NextRequest) {
+  if (!isOperator(pinFromRequest(req))) {
+    return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
+  }
   const contractors = await contractorStore.list();
   return NextResponse.json({ contractors: contractors.map(publicContractor) });
 }

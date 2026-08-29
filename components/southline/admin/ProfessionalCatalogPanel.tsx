@@ -55,7 +55,7 @@ export default function ProfessionalCatalogPanel({ pin }: { pin: string }) {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/contractor/profiles").then((r) => r.json()),
+      fetch("/api/contractor/profiles", { headers: { "x-snaplink-pin": pin } }).then((r) => r.json()),
       fetch("/api/agent-profiles", { headers: { "x-snaplink-pin": pin } }).then((r) => r.json()),
       fetch("/api/southline/settings", { headers: { "x-snaplink-pin": pin } }).then((r) => r.json()),
     ]).then(([profilesData, agentsData, settingsData]) => {

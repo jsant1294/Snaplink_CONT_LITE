@@ -23,10 +23,10 @@ function MasterView({ pin }: { pin: string }) {
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/contractor/profiles")
+    fetch("/api/contractor/profiles", { headers: { "x-snaplink-pin": pin } })
       .then((r) => r.json())
       .then((d) => setContractors(d.contractors ?? []));
-  }, []);
+  }, [pin]);
 
   function showToast(msg: string) {
     setToast(msg);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { isOperator, pinFromRequest } from "@/lib/auth";
 
 const DATA_FILE = path.join(process.cwd(), ".data", "recruitment-leads.json");
 
@@ -65,8 +66,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const pin = req.headers.get("x-snaplink-pin");
-  if (pin !== process.env.OPERATOR_PIN && pin !== "0000") {
+  if (!isOperator(pinFromRequest(req))) {
     return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
   }
   const leads = await readLeads();

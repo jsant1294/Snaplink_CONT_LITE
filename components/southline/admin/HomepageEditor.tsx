@@ -312,11 +312,11 @@ function HomeServicesTab({
   useEffect(() => setLocal(content), [content]);
 
   useEffect(() => {
-    fetch("/api/contractor/profiles")
+    fetch("/api/contractor/profiles", { headers: { "x-snaplink-pin": pin } })
       .then((r) => r.json())
       .then((d) => setContractors(d.contractors ?? []))
       .catch(() => {});
-  }, []);
+  }, [pin]);
 
   return (
     <div className="space-y-4">
