@@ -17,7 +17,8 @@ async function readProjects(): Promise<DIYProject[]> {
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   const category = req.nextUrl.searchParams.get("category")?.trim() ?? "";
-  if (q.length < 2 && !category) {
+  const location = req.nextUrl.searchParams.get("location")?.trim() ?? "";
+  if (q.length < 2 && !category && !location) {
     return NextResponse.json({ projects: [], contractors: [], agents: [] });
   }
 
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
       )
     : [];
 
-  const professionals = searchProfessionals(contractors, agentProfiles, { query: q, category });
+  const professionals = searchProfessionals(contractors, agentProfiles, { query: q, category, location });
   const agents = professionals.filter((p) => p.kind === "agent");
   const contractorResults = professionals.filter((p) => p.kind === "contractor");
 

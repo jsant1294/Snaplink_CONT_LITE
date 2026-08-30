@@ -59,6 +59,8 @@ export interface ProfessionalResult {
 export interface ProfessionalSearchOptions {
   query?: string;
   category?: string;
+  /** Zip, city, or market name — filtered against the pros' own coverage fields. */
+  location?: string;
 }
 
 export function isSouthlineListedAgent(profile: AgentProfile): boolean {
@@ -85,6 +87,19 @@ function normalize(s: string): string {
 export function matchesQuery(values: (string | undefined)[], q: string): boolean {
   if (!q) return true;
   const needle = normalize(q);
+  return values.some((v) => typeof v === "string" && normalize(v).includes(needle));
+}
+
+/**
+ * Location (zip / market / city) filter against the coverage fields the pros
+ * already carry. A filter that matches nothing returns nothing — it never
+ * silently widens to unrelated markets. No geocoder: normalized substring
+ * match, so a ZIP ("78702"), city ("austin"), or market ("central texas")
+ * all resolve without PostGIS or an external service.
+ */
+export function matchesLocation(values: (string | undefined)[], location?: string): boolean {
+  if (!location) return true;
+  const needle = normalize(location);
   return values.some((v) => typeof v === "string" && normalize(v).includes(needle));
 }
 
@@ -132,6 +147,7 @@ export function searchProfessionals(
     if (!isPublicContractor(c)) continue;
     const catIds = categoryIdsForContractor(c);
     if (category && !catIds.includes(category)) continue;
+    if (!matchesLocation([c.serviceArea], options.location)) continue;
     const profCat = professionCategoryId(c.professionType);
     const profTerms = profCat ? categoryMatchTerms(profCat) : [];
     const serviceTerms = c.services.flatMap((s) => specialtyMatchTerms(s));
@@ -164,6 +180,7 @@ export function searchProfessionals(
     if (!isSouthlineListedAgent(a)) continue;
     const catIds = categoryIdsForAgent(a);
     if (category && !catIds.includes(category)) continue;
+    if (!matchesLocation([a.serviceArea, ...a.serviceAreas], options.location)) continue;
     const profCat = professionCategoryId(a.professionType);
     const profTerms = profCat ? categoryMatchTerms(profCat) : [];
     const categoryTerms = a.categories.flatMap((c) => {

@@ -165,6 +165,7 @@ export const UI_DEFS = {
 
   // Search
   searchPlaceholder: { es: "Buscar ideas, proyectos, profesionales…", en: "Search ideas, projects, professionals…" },
+  searchLocation: { es: "Código postal o ciudad…", en: "ZIP or city…" },
   searchNoResults: {
     es: "No encontramos resultados para tu búsqueda.",
     en: "No results found for your search.",

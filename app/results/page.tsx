@@ -27,10 +27,10 @@ export const dynamic = "force-dynamic";
 export default async function ResultsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; location?: string }>;
 }) {
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
-  const { q, category } = await searchParams;
+  const { q, category, location } = await searchParams;
 
   const [contractors, agentProfiles, settings] = await Promise.all([
     contractorStore.list().catch(() => []),
@@ -41,7 +41,7 @@ export default async function ResultsPage({
   // Catalog adapter re-applies the curated featured order (featuredOrder asc →
   // updatedAt desc → displayName asc) and marks CMS-featured pros as featured.
   const professionals = orderProfessionalResults(
-    searchProfessionals(contractors, agentProfiles, { query: q, category }),
+    searchProfessionals(contractors, agentProfiles, { query: q, category, location }),
     settings?.featuredContractorIds ?? [],
     settings?.featuredAgentProfileIds ?? []
   );
@@ -71,6 +71,12 @@ export default async function ResultsPage({
                 placeholder={t("searchPlaceholder", lang)}
                 className="min-w-0 flex-1 rounded-xl border border-border-default bg-surface-raised/70 px-4 py-3 text-base text-primary placeholder:text-secondary/60 outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page"
               />
+              <input
+                name="location"
+                defaultValue={location}
+                placeholder={t("searchLocation", lang)}
+                className="w-40 rounded-xl border border-border-default bg-surface-raised/70 px-4 py-3 text-base text-primary placeholder:text-secondary/60 outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page sm:w-52"
+              />
               {category && <input type="hidden" name="category" value={category} />}
               <button className="southline-btn-secondary">
                 {t("heroSearch", lang)}
@@ -96,7 +102,7 @@ export default async function ResultsPage({
             </Link>
             {categories.map((c) => {
               const active = category === c.id;
-              const href = `?${new URLSearchParams({ ...(q ? { q } : {}), category: c.id }).toString()}`;
+              const href = `?${new URLSearchParams({ ...(q ? { q } : {}), ...(location ? { location } : {}), category: c.id }).toString()}`;
               return (
                 <Link
                   key={c.id}
