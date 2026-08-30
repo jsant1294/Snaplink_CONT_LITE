@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getQuestionsFor, questionLabel, optionLabel } from "@/lib/professional-intake/questions";
 import type { IntakeOwnerType, IntakeQuestion, IntakeSession, ProfileApplyMode, ProfileFieldPreview } from "@/lib/professional-intake/types";
 import { PROFILE_PAYMENT_STATUSES, type ProfessionalBillingSummary, type PublicationEligibility, type ProfilePaymentStatus } from "@/lib/professional-intake-payment/types";
@@ -17,16 +17,110 @@ async function api(pin: string, path: string, init?: RequestInit) {
   return data;
 }
 
-function QuestionField({
+function ImageAnswerField({
   question,
   lang,
   value,
   onChange,
+  pin,
+  ownerType,
+  ownerId,
 }: {
   question: IntakeQuestion;
   lang: Lang;
   value: unknown;
   onChange: (v: unknown) => void;
+  pin: string;
+  ownerType: IntakeOwnerType;
+  ownerId: string;
+}) {
+  const urls = Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const maxItems = question.maxItems ?? 6;
+  const full = urls.length >= maxItems;
+
+  async function upload(file: File) {
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const form = new FormData();
+      form.set("ownerType", ownerType);
+      form.set("ownerId", ownerId);
+      form.set("kind", question.id);
+      form.set("file", file);
+      const res = await fetch("/api/professional-intake/upload", {
+        method: "POST",
+        headers: { "x-snaplink-pin": pin },
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      const next = maxItems === 1 ? [data.url] : [...urls, data.url].slice(0, maxItems);
+      onChange(next);
+    } catch (e) {
+      setUploadError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      {urls.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {urls.map((url, i) => (
+            <div key={`${url}-${i}`} className="relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-white/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt="" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => onChange(urls.filter((_, idx) => idx !== i))}
+                aria-label={`Remove image ${i + 1}`}
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-obsidian/80 text-xs text-gold"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        disabled={uploading || full}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void upload(file);
+        }}
+        className="w-full text-xs text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:text-bone"
+      />
+      {uploading && <p className="text-xs text-muted">{lang === "es" ? "Subiendo…" : "Uploading…"}</p>}
+      {full && <p className="text-xs text-muted">{lang === "es" ? `Máximo ${maxItems} imagen(es).` : `Up to ${maxItems} image${maxItems === 1 ? "" : "s"} allowed.`}</p>}
+      {uploadError && <p className="text-xs text-red-400">{uploadError}</p>}
+    </div>
+  );
+}
+
+function QuestionField({
+  question,
+  lang,
+  value,
+  onChange,
+  pin,
+  ownerType,
+  ownerId,
+}: {
+  question: IntakeQuestion;
+  lang: Lang;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  pin: string;
+  ownerType: IntakeOwnerType;
+  ownerId: string;
 }) {
   const label = questionLabel(question, lang);
   const help = lang === "es" ? question.helpEs : question.helpEn;
@@ -101,9 +195,7 @@ function QuestionField({
       )}
 
       {question.type === "image" && (
-        <p className="text-xs text-muted italic">
-          {lang === "es" ? "Sube imágenes desde el panel de edición del perfil." : "Upload images from the profile edit panel."}
-        </p>
+        <ImageAnswerField question={question} lang={lang} value={value} onChange={onChange} pin={pin} ownerType={ownerType} ownerId={ownerId} />
       )}
     </div>
   );
@@ -379,7 +471,7 @@ export default function IntakeConsole({
       </p>
       <div className="space-y-5">
         {currentQuestions.map((q) => (
-          <QuestionField key={q.id} question={q} lang={lang} value={session.answers[q.id]} onChange={(v) => setAnswer(q.id, v)} />
+          <QuestionField key={q.id} question={q} lang={lang} value={session.answers[q.id]} onChange={(v) => setAnswer(q.id, v)} pin={pin} ownerType={ownerType} ownerId={ownerId} />
         ))}
       </div>
       <div className="flex items-center justify-between pt-2">

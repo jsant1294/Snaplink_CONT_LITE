@@ -25,9 +25,9 @@ const session = (overrides = {}) => ({
 
 test("C D: status/step classification buckets are truthful and filter-safe", () => {
   assert.equal(intakeSessionFilter(session({ status: "not_started" })), "New");
-  assert.equal(intakeSessionFilter(session({ status: "in_progress", answers: { profilePhoto: "u", coverImage: "u", galleryPhotos: ["a"] } })), "In Progress");
+  assert.equal(intakeSessionFilter(session({ status: "in_progress", answers: { profilePhoto: "u", coverPhoto: "u", galleryPhotos: ["a"] } })), "In Progress");
   assert.equal(intakeSessionFilter(session({ status: "in_progress", answers: {} })), "Needs Assets");
-  assert.equal(intakeSessionFilter(session({ status: "completed", answers: { profilePhoto: "u", coverImage: "u", galleryPhotos: ["a"] } })), "Ready");
+  assert.equal(intakeSessionFilter(session({ status: "completed", answers: { profilePhoto: "u", coverPhoto: "u", galleryPhotos: ["a"] } })), "Ready");
   assert.equal(intakeSessionFilter(session({ status: "completed", answers: {} })), "Needs Assets");
   assert.equal(intakeSessionFilter(session({ status: "applied", answers: {} })), "Completed");
 });
@@ -37,7 +37,7 @@ test("C: assets completeness derives from step-14 image answers only (never over
   const partial = intakeAssetCompleteness(session({ answers: { profilePhoto: "u" } }));
   assert.equal(partial.needsAssets, true);
   assert.equal(partial.completedImageAnswers.length, 1);
-  const full = intakeAssetCompleteness(session({ answers: { profilePhoto: "u", coverImage: "u", galleryPhotos: ["a", "b"] } }));
+  const full = intakeAssetCompleteness(session({ answers: { profilePhoto: "u", coverPhoto: "u", galleryPhotos: ["a", "b"] } }));
   assert.equal(full.needsAssets, false);
 });
 

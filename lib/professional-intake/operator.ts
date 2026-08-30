@@ -6,7 +6,7 @@
 
 import type { IntakeSession } from "./types.ts";
 
-export const IMAGE_QUESTION_IDS = ["profilePhoto", "coverImage", "galleryPhotos"] as const;
+export const IMAGE_QUESTION_IDS = ["profilePhoto", "coverPhoto", "galleryPhotos"] as const;
 
 export interface IntakeAssetCompleteness {
   needsAssets: boolean;
