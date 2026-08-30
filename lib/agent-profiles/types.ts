@@ -89,6 +89,8 @@ export interface AgentProfile {
   categories: string[];
   neighborhoods: string[];
   serviceRadius?: number;
+  /** Normalized 5-digit service ZIP (home base) for TRUE GEO radius search. Optional — never used to fabricate a radius match. */
+  serviceZip?: string;
   yearsExperience?: number;
   featured: boolean;
   snaplinkStatus: SnaplinkStatus;
@@ -180,6 +182,7 @@ export interface AgentOperatorCreateInput {
   categories?: string[];
   neighborhoods?: string[];
   serviceRadius?: number;
+  serviceZip?: string;
   seoTitle?: string;
   seoDescription?: string;
   marketplaceSummary?: string;

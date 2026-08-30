@@ -86,6 +86,8 @@ function rowToContractor(row: ContractorRow): Contractor {
     whatsapp: row.whatsapp ?? undefined,
     email: row.email,
     serviceArea: row.serviceArea,
+    serviceZip: row.serviceZip ?? undefined,
+    serviceRadiusMiles: row.serviceRadiusMiles ?? undefined,
     services: row.services ?? [],
     tagline: row.tagline ?? undefined,
     licenseInfo: row.licenseInfo ?? undefined,
@@ -257,6 +259,8 @@ export const pgContractorStore = {
       whatsapp: c.whatsapp ?? null,
       email: c.email,
       serviceArea: c.serviceArea,
+      serviceZip: c.serviceZip ?? null,
+      serviceRadiusMiles: c.serviceRadiusMiles ?? null,
       services: c.services,
       tagline: c.tagline ?? null,
       licenseInfo: c.licenseInfo ?? null,
@@ -299,6 +303,8 @@ export const pgContractorStore = {
     if (patch.whatsapp !== undefined) set.whatsapp = patch.whatsapp || null;
     if (patch.email !== undefined) set.email = patch.email;
     if (patch.serviceArea !== undefined) set.serviceArea = patch.serviceArea;
+    if (patch.serviceZip !== undefined) set.serviceZip = patch.serviceZip || null;
+    if (patch.serviceRadiusMiles !== undefined) set.serviceRadiusMiles = patch.serviceRadiusMiles ?? null;
     if (patch.services !== undefined) set.services = patch.services;
     if (patch.licenseInfo !== undefined) set.licenseInfo = patch.licenseInfo || null;
     if (patch.reviewsUrl !== undefined) set.reviewsUrl = patch.reviewsUrl || null;

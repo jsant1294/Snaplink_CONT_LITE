@@ -102,17 +102,21 @@ test("location never bypasses the publish gate: draft or demo contractors stay h
 test("the search API forwards a location param and never short-circuits a location-only search", async () => {
   const route = await source("../app/api/southline/search/route.ts");
   assert.match(route, /get\("location"\)/);
-  assert.match(route, /searchProfessionals\(contractors, agentProfiles, \{ query: q, category, location \}\)/);
+  assert.match(route, /searchProfessionals\(contractors, agentProfiles, \{ query: q, category, location, geo, geoUnknownZip \}\)/);
   assert.match(route, /!category && !location/);
+  assert.match(route, /zipCentroidStore\.find\(normalizeZip\(location\)\)/);
+  assert.match(route, /geoUnknownZip = true/);
 });
 
 test("the /results page wires location into search, the search form, and the category chips", async () => {
   const page = await source("../app/results/page.tsx");
   assert.match(page, /location\?: string/);
-  assert.match(page, /searchProfessionals\(contractors, agentProfiles, \{ query: q, category, location \}\)/);
+  assert.match(page, /searchProfessionals\(contractors, agentProfiles, \{ query: q, category, location, geo, geoUnknownZip \}\)/);
   assert.match(page, /name="location"/);
   assert.match(page, /"searchLocation", lang/);
   assert.match(page, /\.\.\.\(location \? \{ location \} : \{\}\)/);
+  assert.match(page, /"resultsGeoActiveLabel", lang/);
+  assert.match(page, /"resultsGeoUnknownZip", lang/);
 });
 
 test("matchesLocation is exported for reuse and treats empty location as no filter", async () => {

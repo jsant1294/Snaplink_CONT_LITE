@@ -1,0 +1,16 @@
+[
+  { "zip": "30004", "city": "Alpharetta", "state": "GA", "latitude": 34.119, "longitude": -84.287 },
+  { "zip": "30005", "city": "Alpharetta", "state": "GA", "latitude": 34.079, "longitude": -84.229 },
+  { "zip": "30022", "city": "Alpharetta", "state": "GA", "latitude": 33.998, "longitude": -84.285 },
+  { "zip": "30009", "city": "Alpharetta", "state": "GA", "latitude": 34.070, "longitude": -84.294 },
+  { "zip": "30107", "city": "Ball Ground", "state": "GA", "latitude": 34.326, "longitude": -84.369 },
+  { "zip": "78701", "city": "Austin", "state": "TX", "latitude": 30.271, "longitude": -97.744 },
+  { "zip": "78702", "city": "Austin", "state": "TX", "latitude": 30.262, "longitude": -97.718 },
+  { "zip": "78704", "city": "Austin", "state": "TX", "latitude": 30.250, "longitude": -97.762 },
+  { "zip": "78758", "city": "Austin", "state": "TX", "latitude": 30.373, "longitude": -97.703 },
+  { "zip": "78660", "city": "Pflugerville", "state": "TX", "latitude": 30.466, "longitude": -97.621 },
+  { "zip": "90210", "city": "Beverly Hills", "state": "CA", "latitude": 34.090, "longitude": -118.407 },
+  { "zip": "10001", "city": "New York", "state": "NY", "latitude": 40.751, "longitude": -73.997 },
+  { "zip": "33101", "city": "Miami", "state": "FL", "latitude": 25.773, "longitude": -80.192 },
+  { "zip": "97201", "city": "Portland", "state": "OR", "latitude": 45.505, "longitude": -122.679 }
+]

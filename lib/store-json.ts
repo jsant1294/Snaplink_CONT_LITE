@@ -177,6 +177,8 @@ export const jsonContractorStore = {
     if (patch.whatsapp !== undefined) c.whatsapp = patch.whatsapp || undefined;
     if (patch.email !== undefined) c.email = patch.email;
     if (patch.serviceArea !== undefined) c.serviceArea = patch.serviceArea;
+    if (patch.serviceZip !== undefined) c.serviceZip = patch.serviceZip || undefined;
+    if (patch.serviceRadiusMiles !== undefined) c.serviceRadiusMiles = patch.serviceRadiusMiles ?? undefined;
     if (patch.services !== undefined) c.services = patch.services;
     if (patch.licenseInfo !== undefined) c.licenseInfo = patch.licenseInfo || undefined;
     if (patch.reviewsUrl !== undefined) c.reviewsUrl = patch.reviewsUrl || undefined;

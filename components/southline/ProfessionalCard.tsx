@@ -1,4 +1,4 @@
-import { t, type Lang } from "@/lib/southline-i18n";
+import { t, formatDistanceMiles, type Lang } from "@/lib/southline-i18n";
 import { serviceLabel, categoryLabel } from "@/lib/services";
 import { professionPlaceholderPhotoFor, professionTypeLabel, agentProfessionTypeLabel } from "@/lib/profession-types";
 import type { ProfessionalResult } from "@/lib/southline-search";
@@ -52,6 +52,9 @@ export default function ProfessionalCard({ pro, lang }: { pro: ProfessionalResul
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span>{pro.serviceArea}</span>
+            {pro.distanceMiles != null && (
+              <span className="ml-1 font-semibold text-accent-gold">{formatDistanceMiles(pro.distanceMiles, lang)}</span>
+            )}
           </div>
         )}
 

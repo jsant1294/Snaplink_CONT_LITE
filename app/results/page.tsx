@@ -13,6 +13,8 @@ import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { southlineStore } from "@/lib/southline-store";
 import { searchProfessionals } from "@/lib/southline-search";
 import { orderProfessionalResults } from "@/lib/southline-professional-catalog";
+import { zipCentroidStore } from "@/lib/geo/store";
+import { isUsZip, normalizeZip } from "@/lib/geo/zip";
 
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 
@@ -38,13 +40,37 @@ export default async function ResultsPage({
     southlineStore.getSettings().catch(() => null),
   ]);
 
-  // Catalog adapter re-applies the curated featured order (featuredOrder asc →
-  // updatedAt desc → displayName asc) and marks CMS-featured pros as featured.
-  const professionals = orderProfessionalResults(
-    searchProfessionals(contractors, agentProfiles, { query: q, category, location }),
-    settings?.featuredContractorIds ?? [],
-    settings?.featuredAgentProfileIds ?? []
-  );
+  // TRUE GEO v1: a valid 5-digit ZIP is a real radius search (visitor centroid
+  // → professional centroid → Haversine ≤ service radius). Unresolvable ZIPs
+  // show an explicit message — never a silent broadening to text search.
+  let geo;
+  let geoUnknownZip = false;
+  if (isUsZip(location)) {
+    const centroid = await zipCentroidStore.find(normalizeZip(location));
+    if (centroid) {
+      const serviceZips = [
+        ...contractors.map((c) => c.serviceZip),
+        ...agentProfiles.map((a) => a.serviceZip),
+        centroid.zip,
+      ];
+      const centroids = await zipCentroidStore.listByZips(serviceZips);
+      geo = {
+        matchedZip: centroid.zip,
+        centroid: { latitude: centroid.latitude, longitude: centroid.longitude },
+        centroids,
+      };
+    } else {
+      geoUnknownZip = true;
+    }
+  }
+
+  // ZIP searches are distance-ordered by searchProfessionals; the curated
+  // featured re-order only applies to non-GEO (query/category/city) searches.
+  const searched = searchProfessionals(contractors, agentProfiles, { query: q, category, location, geo, geoUnknownZip });
+  const professionals =
+    geo && !geoUnknownZip
+      ? searched
+      : orderProfessionalResults(searched, settings?.featuredContractorIds ?? [], settings?.featuredAgentProfileIds ?? []);
 
   // Single display source: the shared taxonomy. audience: "both" lists every
   // active category (contractor + professional) with locale-resolved labels and
@@ -90,6 +116,11 @@ export default async function ResultsPage({
             <span className="text-xs font-medium uppercase tracking-wider text-secondary">
               {t("resultsFilterLabel", lang)}
             </span>
+            {location && (
+              <span className="inline-flex min-h-11 items-center rounded-full bg-accent-gold/10 px-3.5 py-1.5 text-xs font-semibold text-accent-gold">
+                {t("resultsGeoActiveLabel", lang)} {location}
+              </span>
+            )}
             <Link
               href="/results"
               className={`inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
@@ -123,10 +154,14 @@ export default async function ResultsPage({
             {professionals.length === 0 ? (
               <div className="rounded-[18px] border border-border-default bg-surface p-10 text-center">
                 <h2 className="font-display text-2xl">
-                  {category ? t("catalogEmptyTitle", lang) : t("searchNoResults", lang)}
+                  {geoUnknownZip ? t("searchNoResults", lang) : category ? t("catalogEmptyTitle", lang) : t("searchNoResults", lang)}
                 </h2>
                 <p className="mt-2 text-sm text-text-muted">
-                  {category ? t("catalogEmptyBody", lang) : t("resultsEmpty", lang)}
+                  {geoUnknownZip
+                    ? t("resultsGeoUnknownZip", lang)
+                    : category
+                      ? t("catalogEmptyBody", lang)
+                      : t("resultsEmpty", lang)}
                 </p>
                 {category && (
                   <Link

@@ -144,6 +144,7 @@ export const jsonAgentProfileStore = {
       categories: input.categories ?? [],
       neighborhoods: input.neighborhoods ?? [],
       serviceRadius: input.serviceRadius,
+      serviceZip: input.serviceZip,
       yearsExperience: input.yearsExperience,
       featured: input.featured ?? false,
       snaplinkStatus: input.snaplinkStatus ?? "draft",

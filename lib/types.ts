@@ -62,6 +62,8 @@ export type ContractorProfilePatch = Partial<
     | "whatsapp"
     | "email"
     | "serviceArea"
+    | "serviceZip"
+    | "serviceRadiusMiles"
     | "services"
     | "licenseInfo"
     | "reviewsUrl"
@@ -93,6 +95,10 @@ export interface Contractor {
   whatsapp?: string;
   email: string;
   serviceArea: string;
+  /** Normalized 5-digit service ZIP (home base) for TRUE GEO radius search. Optional — never used to fabricate a radius match. */
+  serviceZip?: string;
+  /** Service radius in miles around serviceZip. TRUE GEO eligibility gate: distanceMiles from the visitor's ZIP centroid must be <= this. */
+  serviceRadiusMiles?: number;
   services: ProjectType[];
   tagline?: string;
   licenseInfo?: string;

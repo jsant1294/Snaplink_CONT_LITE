@@ -34,6 +34,8 @@ import {
 } from "./home-service-taxonomy.ts";
 import type { Contractor } from "./types.ts";
 import type { AgentProfile } from "./agent-profiles/types.ts";
+import type { ZipCentroid } from "./geo/zip-centroids.ts";
+import { haversineMiles, isUsZip, normalizeZip } from "./geo/zip.ts";
 
 export interface ProfessionalResult {
   kind: "agent" | "contractor";
@@ -54,13 +56,50 @@ export interface ProfessionalResult {
   href: string;
   photoUrl?: string;
   featured: boolean;
+  /** TRUE GEO v1: straight-line distance (mi) from the visitor ZIP centroid. Present only when a radius match actually satisfied the location filter. */
+  distanceMiles?: number;
+  /** TRUE GEO v1: normalized visitor ZIP that drove the radius search. */
+  matchedZip?: string;
+  /** TRUE GEO v1: the professional's declared service radius (contractor serviceRadiusMiles / agent serviceRadius). */
+  serviceRadiusMiles?: number;
+  /** True when a visitor location filter (radius match or text match) was applied and satisfied. */
+  locationMatched?: boolean;
+}
+
+/**
+ * TRUE GEO v1 — resolved visitor context passed by the caller (API route /
+ * /results page). The caller owns the async ZIP→centroid resolution (single
+ * indexed zip_centroids lookup) and one batch fetch of every candidate
+ * professional service ZIP's centroid. searchProfessionals stays pure and
+ * computes radius eligibility + distance deterministically.
+ */
+export interface ProfessionalSearchGeoContext {
+  /** Normalized visitor 5-digit ZIP that resolved to a centroid. */
+  matchedZip: string;
+  /** Visitor centroid. */
+  centroid: { latitude: number; longitude: number };
+  /** Professional service ZIP → centroid map (batch fetch; missing = not geo-locatable). */
+  centroids: ReadonlyMap<string, ZipCentroid>;
 }
 
 export interface ProfessionalSearchOptions {
   query?: string;
   category?: string;
-  /** Zip, city, or market name — filtered against the pros' own coverage fields. */
+  /** Zip, city, or market name — filtered against the pros' own coverage fields. A valid 5-digit ZIP activates TRUE GEO radius search (via `geo`); anything else keeps the text/city/market substring filter. */
   location?: string;
+  /**
+   * TRUE GEO v1 context. When set, ZIP-radius eligibility REPLACES the
+   * substring location filter. Professionals without a complete geo record
+   * (serviceZip + centroid + declared radius) are excluded — never a
+   * fabricated match.
+   */
+  geo?: ProfessionalSearchGeoContext | null;
+  /**
+   * True when the caller could NOT resolve a valid-looking ZIP to a centroid.
+   * Results are empty and no location filter is silently broadened — the UI
+   * shows an explicit "we couldn't find that ZIP" message.
+   */
+  geoUnknownZip?: boolean;
 }
 
 export function isSouthlineListedAgent(profile: AgentProfile): boolean {
@@ -141,13 +180,48 @@ export function searchProfessionals(
   // alias). An UNRESOLVED value is preserved as-is so it still filters to an
   // empty result set — never a silent fallback to an unrelated category.
   const category = resolveCategoryId(options.category ?? "") ?? options.category ?? "";
+  const geo = options.geo ?? null;
+  const geoActive = Boolean(geo && geo.matchedZip && isUsZip(geo.matchedZip));
+  const origin = geoActive && geo ? geo.centroid : null;
+  // A valid-looking ZIP that failed centroid resolution is a hard stop: empty
+  // results, never a silent broadening to text searches. The UI states it.
+  if (options.geoUnknownZip === true && !geoActive) return [];
+
+  /**
+   * TRUE GEO eligibility for one professional. Returns the distance metadata
+   * only when the ZIP resolved, a positive radius was declared, and the
+   * great-circle distance is within it. Any missing piece → no match (never a
+   * fabricated radius result).
+   */
+  const radiusMatch = (
+    serviceZip: string | null | undefined,
+    radiusMiles: number | null | undefined
+  ): { distanceMiles: number; serviceRadiusMiles: number } | undefined => {
+    if (!geoActive || !origin || !geo) return undefined;
+    if (!radiusMiles || radiusMiles <= 0) return undefined;
+    const zip = normalizeZip(serviceZip);
+    if (!zip || !isUsZip(zip)) return undefined;
+    const centroid = geo.centroids.get(zip);
+    if (!centroid) return undefined;
+    const distanceMiles = haversineMiles(origin.latitude, origin.longitude, centroid.latitude, centroid.longitude);
+    if (distanceMiles > radiusMiles) return undefined;
+    return { distanceMiles, serviceRadiusMiles: radiusMiles };
+  };
+
+  const locationIntro: string | undefined = geoActive || options.location ? options.location || geo?.matchedZip : undefined;
+
   const results: ProfessionalResult[] = [];
 
   for (const c of contractors) {
     if (!isPublicContractor(c)) continue;
     const catIds = categoryIdsForContractor(c);
     if (category && !catIds.includes(category)) continue;
-    if (!matchesLocation([c.serviceArea], options.location)) continue;
+    const geoMatch = radiusMatch(c.serviceZip, c.serviceRadiusMiles);
+    if (geoActive) {
+      if (!geoMatch) continue;
+    } else if (!matchesLocation([c.serviceArea], options.location)) {
+      continue;
+    }
     const profCat = professionCategoryId(c.professionType);
     const profTerms = profCat ? categoryMatchTerms(profCat) : [];
     const serviceTerms = c.services.flatMap((s) => specialtyMatchTerms(s));
@@ -172,6 +246,10 @@ export function searchProfessionals(
       href: `/contractor/${c.username}`,
       photoUrl: c.avatarUrl || c.logoUrl,
       featured: false,
+      distanceMiles: geoMatch?.distanceMiles,
+      serviceRadiusMiles: geoMatch?.serviceRadiusMiles,
+      matchedZip: geoActive ? geo!.matchedZip : undefined,
+      locationMatched: locationIntro ? true : undefined,
     });
   }
 
@@ -180,7 +258,12 @@ export function searchProfessionals(
     if (!isSouthlineListedAgent(a)) continue;
     const catIds = categoryIdsForAgent(a);
     if (category && !catIds.includes(category)) continue;
-    if (!matchesLocation([a.serviceArea, ...a.serviceAreas], options.location)) continue;
+    const geoMatch = radiusMatch(a.serviceZip, a.serviceRadius ?? undefined);
+    if (geoActive) {
+      if (!geoMatch) continue;
+    } else if (!matchesLocation([a.serviceArea, ...a.serviceAreas], options.location)) {
+      continue;
+    }
     const profCat = professionCategoryId(a.professionType);
     const profTerms = profCat ? categoryMatchTerms(profCat) : [];
     const categoryTerms = a.categories.flatMap((c) => {
@@ -213,9 +296,22 @@ export function searchProfessionals(
       href: `/agents/${a.slug}`,
       photoUrl: a.photoUrl,
       featured: a.southlineStatus === "featured",
+      distanceMiles: geoMatch?.distanceMiles,
+      serviceRadiusMiles: geoMatch?.serviceRadiusMiles,
+      matchedZip: geoActive ? geo!.matchedZip : undefined,
+      locationMatched: locationIntro ? true : undefined,
     });
   }
 
-  results.sort((x, y) => Number(y.featured) - Number(x.featured) || x.name.localeCompare(y.name));
+  // TRUE GEO: rank distance ascending, then featured, then name. Non-GEO keeps
+  // the existing featured-then-name order.
+  results.sort((x, y) => {
+    if (geoActive) {
+      const dx = x.distanceMiles ?? Number.POSITIVE_INFINITY;
+      const dy = y.distanceMiles ?? Number.POSITIVE_INFINITY;
+      if (dx !== dy) return dx - dy;
+    }
+    return Number(y.featured) - Number(x.featured) || x.name.localeCompare(y.name);
+  });
   return results;
 }

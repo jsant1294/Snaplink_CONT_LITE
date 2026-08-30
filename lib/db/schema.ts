@@ -10,6 +10,7 @@ import {
   text,
   integer,
   real,
+  numeric,
   timestamp,
   jsonb,
   uniqueIndex,
@@ -33,6 +34,10 @@ export const contractors = pgTable(
     whatsapp: text("whatsapp"),
     email: text("email").notNull().default(""),
     serviceArea: text("service_area").notNull().default(""),
+    /** Normalized 5-digit service ZIP (home base) used for TRUE GEO radius search. Nullable = not geo-configured; never the source of a fabricated radius match. */
+    serviceZip: text("service_zip"),
+    /** Service radius in miles around serviceZip — TRUE GEO eligibility gate (distanceMiles <= radius). Nullable = no radius declared. */
+    serviceRadiusMiles: real("service_radius_miles"),
     services: jsonb("services").$type<string[]>().notNull().default([]),
     payments: jsonb("payments"),
     tagline: text("tagline"),
@@ -1231,8 +1236,28 @@ export const realEstateBillingInvoices=pgTable("real_estate_billing_invoices",{i
 // professionals). Additive only — every new column has a default so existing rows
 // (created via the public request-form path) remain valid. See
 // docs/architecture/AGENT_MANAGEMENT.md for the full field-by-field rationale.
-export const agentProfiles=pgTable("agent_profiles",{id:text("id").primaryKey(),slug:text("slug").notNull(),username:text("username"),status:text("status").notNull().default("pending"),pin:text("pin"),name:text("name").notNull(),firstName:text("first_name").notNull().default(""),lastName:text("last_name").notNull().default(""),displayName:text("display_name").notNull().default(""),professionType:text("profession_type").notNull().default("realtor"),brokerageName:text("brokerage_name").notNull().default(""),officeName:text("office_name").notNull().default(""),teamName:text("team_name").notNull().default(""),licenseNumber:text("license_number").notNull().default(""),licenseState:text("license_state").notNull().default(""),phone:text("phone").notNull().default(""),email:text("email").notNull(),serviceArea:text("service_area").notNull().default(""),bio:text("bio").notNull().default(""),tagline:text("tagline"),photoUrl:text("photo_url"),coverPhotoUrl:text("cover_photo_url"),preferredLanguage:text("preferred_language").notNull().default("en"),smsPhone:text("sms_phone").notNull().default(""),whatsapp:text("whatsapp").notNull().default(""),website:text("website").notNull().default(""),bookingLink:text("booking_link").notNull().default(""),facebook:text("facebook").notNull().default(""),instagram:text("instagram").notNull().default(""),linkedin:text("linkedin").notNull().default(""),languages:jsonb("languages").$type<string[]>().notNull().default([]),specialties:jsonb("specialties").$type<string[]>().notNull().default([]),serviceAreas:jsonb("service_areas").$type<string[]>().notNull().default([]),categories:jsonb("categories").$type<string[]>().notNull().default([]),neighborhoods:jsonb("neighborhoods").$type<string[]>().notNull().default([]),serviceRadius:integer("service_radius"),yearsExperience:integer("years_experience"),featured:boolean("featured").notNull().default(false),snaplinkStatus:text("snaplink_status").notNull().default("draft"),southlineStatus:text("southline_status").notNull().default("draft"),onboardingStatus:text("onboarding_status").notNull().default("not_started"),isDemo:boolean("is_demo").notNull().default(false),seoTitle:text("seo_title"),seoDescription:text("seo_description"),marketplaceSummary:text("marketplace_summary"),modules:jsonb("modules").$type<Record<string,boolean>>().notNull().default({}),tier:text("tier"),billingTenantId:text("billing_tenant_id"),billingOrganizationId:text("billing_organization_id"),billingSubscriptionId:text("billing_subscription_id"),manualPaymentStatus:text("manual_payment_status"),manualPaymentNote:text("manual_payment_note"),manualPaymentSetAt:timestamp("manual_payment_set_at",{withTimezone:true,mode:"string"}),manualPaymentSetBy:text("manual_payment_set_by"),createdAt:timestamp("created_at",{withTimezone:true,mode:"string"}).notNull().defaultNow(),updatedAt:timestamp("updated_at",{withTimezone:true,mode:"string"}).notNull().defaultNow()},t=>[uniqueIndex("agent_profiles_slug_idx").on(t.slug),uniqueIndex("agent_profiles_username_idx").on(t.username),index("agent_profiles_status_idx").on(t.status)]);
+export const agentProfiles=pgTable("agent_profiles",{id:text("id").primaryKey(),slug:text("slug").notNull(),username:text("username"),status:text("status").notNull().default("pending"),pin:text("pin"),name:text("name").notNull(),firstName:text("first_name").notNull().default(""),lastName:text("last_name").notNull().default(""),displayName:text("display_name").notNull().default(""),professionType:text("profession_type").notNull().default("realtor"),brokerageName:text("brokerage_name").notNull().default(""),officeName:text("office_name").notNull().default(""),teamName:text("team_name").notNull().default(""),licenseNumber:text("license_number").notNull().default(""),licenseState:text("license_state").notNull().default(""),phone:text("phone").notNull().default(""),email:text("email").notNull(),serviceArea:text("service_area").notNull().default(""),bio:text("bio").notNull().default(""),tagline:text("tagline"),photoUrl:text("photo_url"),coverPhotoUrl:text("cover_photo_url"),preferredLanguage:text("preferred_language").notNull().default("en"),smsPhone:text("sms_phone").notNull().default(""),whatsapp:text("whatsapp").notNull().default(""),website:text("website").notNull().default(""),bookingLink:text("booking_link").notNull().default(""),facebook:text("facebook").notNull().default(""),instagram:text("instagram").notNull().default(""),linkedin:text("linkedin").notNull().default(""),languages:jsonb("languages").$type<string[]>().notNull().default([]),specialties:jsonb("specialties").$type<string[]>().notNull().default([]),serviceAreas:jsonb("service_areas").$type<string[]>().notNull().default([]),categories:jsonb("categories").$type<string[]>().notNull().default([]),neighborhoods:jsonb("neighborhoods").$type<string[]>().notNull().default([]),serviceRadius:integer("service_radius"),serviceZip:text("service_zip"),yearsExperience:integer("years_experience"),featured:boolean("featured").notNull().default(false),snaplinkStatus:text("snaplink_status").notNull().default("draft"),southlineStatus:text("southline_status").notNull().default("draft"),onboardingStatus:text("onboarding_status").notNull().default("not_started"),isDemo:boolean("is_demo").notNull().default(false),seoTitle:text("seo_title"),seoDescription:text("seo_description"),marketplaceSummary:text("marketplace_summary"),modules:jsonb("modules").$type<Record<string,boolean>>().notNull().default({}),tier:text("tier"),billingTenantId:text("billing_tenant_id"),billingOrganizationId:text("billing_organization_id"),billingSubscriptionId:text("billing_subscription_id"),manualPaymentStatus:text("manual_payment_status"),manualPaymentNote:text("manual_payment_note"),manualPaymentSetAt:timestamp("manual_payment_set_at",{withTimezone:true,mode:"string"}),manualPaymentSetBy:text("manual_payment_set_by"),createdAt:timestamp("created_at",{withTimezone:true,mode:"string"}).notNull().defaultNow(),updatedAt:timestamp("updated_at",{withTimezone:true,mode:"string"}).notNull().defaultNow()},t=>[uniqueIndex("agent_profiles_slug_idx").on(t.slug),uniqueIndex("agent_profiles_username_idx").on(t.username),index("agent_profiles_status_idx").on(t.status)]);
 export const agentProfileEvents=pgTable("agent_profile_events",{id:text("id").primaryKey(),agentProfileId:text("agent_profile_id").notNull().references(()=>agentProfiles.id,{onDelete:"cascade"}),eventType:text("event_type").notNull(),anonymousSessionId:text("anonymous_session_id"),referrer:text("referrer"),createdAt:timestamp("created_at",{withTimezone:true,mode:"string"}).notNull().defaultNow()},t=>[index("agent_profile_events_profile_idx").on(t.agentProfileId,t.eventType,t.createdAt)]);
+
+// ---------------------------------------------------------------------------
+// TRUE GEO v1 — US ZIP centroid lookup table.
+// Static, locally-loaded reference data (no runtime geocoder, no PostGIS, no
+// external API): maps a normalized 5-digit ZIP to its centroid so visitor ZIPs
+// and professional service ZIPs can be compared by Haversine distance.
+// Source/license/import documented in docs/geo/ZIP_CENTROIDS.md.
+// ---------------------------------------------------------------------------
+export const zipCentroids = pgTable(
+  "zip_centroids",
+  {
+    /** Normalized 5-digit US ZIP (ZIP+4 inputs are truncated to zip). */
+    zip: text("zip").primaryKey(),
+    city: text("city"),
+    state: text("state"),
+    latitude: numeric("latitude", { precision: 10, scale: 6, mode: "number" }),
+    longitude: numeric("longitude", { precision: 10, scale: 6, mode: "number" }),
+  },
+  (t) => [index("zip_centroids_state_idx").on(t.state)]
+);
 
 // ---------------------------------------------------------------------------
 // Lucio (smart planning assistant) — anonymous, no-auth analytics events.

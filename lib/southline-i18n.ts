@@ -181,6 +181,11 @@ export const UI_DEFS = {
   },
   resultsAll: { es: "Todos los servicios", en: "All services" },
   resultsFilterLabel: { es: "Filtrar por servicio", en: "Filter by service" },
+  resultsGeoActiveLabel: { es: "Cerca de:", en: "Near:" },
+  resultsGeoUnknownZip: {
+    es: "No pudimos encontrar ese código postal. Prueba con un código postal cercano o el nombre de una ciudad.",
+    en: "We couldn't find that ZIP. Try a nearby ZIP or a city name.",
+  },
   resultsViewAll: { es: "Ver todos los resultados", en: "View all results" },
   licensedProfessional: { es: "Profesional certificado", en: "Licensed Professional" },
   catalogEmptyTitle: {
@@ -553,4 +558,10 @@ export const UI_DEFS = {
 
 export function t(key: UIKey, lang: Lang): string {
   return UI_DEFS[key][lang];
+}
+
+/** TRUE GEO distance label: "8.4 mi away" / "a 8.4 mi de distancia". Whole miles ≥ 10; one decimal below. */
+export function formatDistanceMiles(miles: number, lang: Lang): string {
+  const value = miles >= 10 ? Math.round(miles).toString() : miles.toFixed(1);
+  return lang === "es" ? `a ${value} mi de distancia` : `${value} mi away`;
 }
