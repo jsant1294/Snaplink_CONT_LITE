@@ -151,7 +151,7 @@ export const jsonContractorStore = {
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete" | "stripeDetailsSubmitted" | "stripeChargesEnabled" | "stripePayoutsEnabled" | "stripeRequirementsCurrentlyDue" | "stripeDisabledReason" | "stripeLastSyncedAt" | "stripeConnectStatus">> &
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete" | "stripeDetailsSubmitted" | "stripeChargesEnabled" | "stripePayoutsEnabled" | "stripeRequirementsCurrentlyDue" | "stripeDisabledReason" | "stripeLastSyncedAt" | "stripeConnectStatus" | "status">> &
       import("./types").ContractorProfilePatch
   ): Promise<Contractor | undefined> {
     const list = await readContractors();
@@ -169,6 +169,7 @@ export const jsonContractorStore = {
     if (patch.stripeDisabledReason !== undefined) c.stripeDisabledReason = patch.stripeDisabledReason || undefined;
     if (patch.stripeLastSyncedAt !== undefined) c.stripeLastSyncedAt = patch.stripeLastSyncedAt;
     if (patch.stripeConnectStatus !== undefined) c.stripeConnectStatus = patch.stripeConnectStatus;
+    if (patch.status !== undefined) c.status = patch.status as Contractor["status"];
     if (patch.businessName !== undefined) c.businessName = patch.businessName;
     if (patch.ownerName !== undefined) c.ownerName = patch.ownerName;
     if (patch.tagline !== undefined) c.tagline = patch.tagline || undefined;

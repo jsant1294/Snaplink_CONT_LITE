@@ -106,6 +106,11 @@ function rowToContractor(row: ContractorRow): Contractor {
     stripeLastSyncedAt: row.stripeLastSyncedAt ?? undefined,
     stripeConnectStatus: row.stripeConnectStatus as Contractor["stripeConnectStatus"],
     isDemo: row.isDemo ?? false,
+    status: row.status as Contractor["status"],
+    manualPaymentStatus: row.manualPaymentStatus ?? undefined,
+    manualPaymentNote: row.manualPaymentNote ?? undefined,
+    manualPaymentSetAt: row.manualPaymentSetAt ?? undefined,
+    manualPaymentSetBy: row.manualPaymentSetBy ?? undefined,
     createdAt: row.createdAt,
   };
 }
@@ -263,13 +268,14 @@ export const pgContractorStore = {
       avatarUrl: c.avatarUrl ?? null,
       logoUrl: c.logoUrl ?? null,
       isDemo: c.isDemo ?? false,
+      status: c.status ?? "draft",
       createdAt: c.createdAt,
     });
     return c;
   },
   async update(
     id: string,
-    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete" | "stripeDetailsSubmitted" | "stripeChargesEnabled" | "stripePayoutsEnabled" | "stripeRequirementsCurrentlyDue" | "stripeDisabledReason" | "stripeLastSyncedAt" | "stripeConnectStatus">> &
+    patch: Partial<Pick<Contractor, "pin" | "preferredLanguage" | "payments" | "stripeAccountId" | "stripeOnboardingComplete" | "stripeDetailsSubmitted" | "stripeChargesEnabled" | "stripePayoutsEnabled" | "stripeRequirementsCurrentlyDue" | "stripeDisabledReason" | "stripeLastSyncedAt" | "stripeConnectStatus" | "status">> &
       import("./types").ContractorProfilePatch
   ): Promise<Contractor | undefined> {
     const set: Record<string, unknown> = {};
@@ -285,6 +291,7 @@ export const pgContractorStore = {
     if (patch.stripeDisabledReason !== undefined) set.stripeDisabledReason = patch.stripeDisabledReason || null;
     if (patch.stripeLastSyncedAt !== undefined) set.stripeLastSyncedAt = patch.stripeLastSyncedAt;
     if (patch.stripeConnectStatus !== undefined) set.stripeConnectStatus = patch.stripeConnectStatus;
+    if (patch.status !== undefined) set.status = patch.status;
     if (patch.businessName !== undefined) set.businessName = patch.businessName;
     if (patch.ownerName !== undefined) set.ownerName = patch.ownerName;
     if (patch.tagline !== undefined) set.tagline = patch.tagline || null;

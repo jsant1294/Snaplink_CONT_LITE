@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
+import { isPublicContractor } from "@/lib/southline-search";
 import { publicContractorDiscovery } from "@/lib/auth";
 
 /**
@@ -11,6 +12,6 @@ import { publicContractorDiscovery } from "@/lib/auth";
  * and manual-payment state, internal owner record) are never returned.
  */
 export async function GET() {
-  const contractors = (await contractorStore.list()).filter((c) => !c.isDemo);
+  const contractors = (await contractorStore.list()).filter((c) => isPublicContractor(c));
   return NextResponse.json({ contractors: contractors.map(publicContractorDiscovery) });
 }

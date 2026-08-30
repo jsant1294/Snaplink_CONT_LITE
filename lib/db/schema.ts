@@ -60,6 +60,8 @@ export const contractors = pgTable(
     manualPaymentSetBy: text("manual_payment_set_by"),
     /** Runtime safety contract: demo/test records are excluded from ALL public discovery server-side. See the September closure sprint. */
     isDemo: boolean("is_demo").notNull().default(false),
+    /** Contractor lifecycle — draft | onboarding | ready | published | suspended. Only `published` is publicly discoverable; created contractors start `draft`. See the September closure sprint. */
+    status: text("status").notNull().default("draft"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .notNull()
       .defaultNow(),

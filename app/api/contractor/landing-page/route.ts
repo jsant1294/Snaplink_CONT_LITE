@@ -1,9 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contractorStore, landingPageStore, newId } from "@/lib/store";
 import { authorizeContractorId, isOperator, pinFromRequest } from "@/lib/auth";
+import { getProfessionalBillingSummary } from "@/lib/professional-intake-payment/adapters";
+import { evaluateProfilePublicationEligibility } from "@/lib/professional-intake-payment/eligibility";
 import type { LandingPagePatch } from "@/lib/landing-page-types";
 
-/** GET ?contractorId= — any authorized party (contractor's own PIN or operator) can read. */
+/** Eligibility for the standalone landing-page editor. `profileApproved` is derived from the contractor lifecycle (not draft/suspended), never hardcoded. */
+async function landingPageEligibility(contractorId: string, contractorStatus?: string) {
+  const billing = await getProfessionalBillingSummary({ ownerType: "contractor", ownerId: contractorId });
+  if (!billing) return null;
+  const profileApproved = Boolean(contractorStatus && contractorStatus !== "draft" && contractorStatus !== "suspended");
+  const eligibility = evaluateProfilePublicationEligibility({
+    profileApproved,
+    paymentStatus: billing.paymentStatus,
+    planActive: billing.planActive,
+    entitlementValid: billing.entitlementValid,
+  });
+  return { billing, eligibility };
+}
+
+/** GET ?contractorId= — any authorized party (contractor's own PIN or operator) can read. Operator requests also get billing + eligibility for gating the UI. */
 export async function GET(req: NextRequest) {
   const contractorId = req.nextUrl.searchParams.get("contractorId") ?? "";
   if (!contractorId) return NextResponse.json({ error: "contractorId is required" }, { status: 400 });
@@ -17,10 +33,12 @@ export async function GET(req: NextRequest) {
     createdAt: "",
     updatedAt: "",
   };
-  return NextResponse.json({ page });
+
+  const gate = isOperator(pinFromRequest(req)) ? await landingPageEligibility(contractorId) : null;
+  return NextResponse.json({ page, ...(gate ? { billing: gate.billing, eligibility: gate.eligibility } : {}) });
 }
 
-/** PATCH — operator only, mirrors the contractor profile edit route. */
+/** PATCH — operator only, mirrors the contractor profile edit route. Publishing is gated by the shared eligibility rule (never relies on a disabled UI toggle). */
 export async function PATCH(req: NextRequest) {
   if (!isOperator(pinFromRequest(req))) {
     return NextResponse.json({ error: "Operator PIN required" }, { status: 401 });
@@ -30,8 +48,19 @@ export async function PATCH(req: NextRequest) {
   const contractor = await contractorStore.getById(contractorId);
   if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
 
+  const desiredPublished = body.published === undefined ? undefined : Boolean(body.published);
+  if (desiredPublished) {
+    const gate = await landingPageEligibility(contractorId, contractor.status);
+    if (!gate || !gate.eligibility.canPublish) {
+      return NextResponse.json(
+        { error: "Landing page is not eligible to publish", eligibility: gate?.eligibility ?? null, billing: gate?.billing ?? null },
+        { status: 409 }
+      );
+    }
+  }
+
   const patch: LandingPagePatch = {};
-  if (body.published !== undefined) patch.published = Boolean(body.published);
+  if (desiredPublished !== undefined) patch.published = desiredPublished;
   if (body.templateKey !== undefined) patch.templateKey = String(body.templateKey).trim();
   if (body.headlineEn !== undefined) patch.headlineEn = String(body.headlineEn).trim();
   if (body.headlineEs !== undefined) patch.headlineEs = String(body.headlineEs).trim();

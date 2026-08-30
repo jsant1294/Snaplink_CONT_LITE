@@ -69,14 +69,16 @@ const agent = (overrides = {}) => ({
   ...overrides,
 });
 
-test("A C F: demo contractor is excluded from public search; real contractor remains discoverable", () => {
-  const demo = contractor({ id: "ctr_demo", username: "demo-brightbuild", isDemo: true });
-  const real = contractor({ id: "ctr_real", username: "real-remodel", isDemo: false });
+test("A C F: demo + draft contractors are excluded from public search; published contractors remain discoverable", () => {
+  const demo = contractor({ id: "ctr_demo", username: "demo-brightbuild", isDemo: true, status: "published" });
+  const draft = contractor({ id: "ctr_draft", username: "draft-remodel", isDemo: false, status: "draft" });
+  const real = contractor({ id: "ctr_real", username: "real-remodel", isDemo: false, status: "published" });
 
-  const out = searchProfessionals([demo, real], [], { query: "" });
+  const out = searchProfessionals([demo, draft, real], [], { query: "" });
   const ids = out.map((r) => r.id);
   assert.ok(!ids.includes("ctr_demo"), "demo contractor leaked into search");
-  assert.ok(ids.includes("ctr_real"), "real contractor disappeared from search");
+  assert.ok(!ids.includes("ctr_draft"), "draft contractor leaked into search (lifecycle publish gate)");
+  assert.ok(ids.includes("ctr_real"), "published contractor disappeared from search");
 });
 
 test("A D: demo agent is excluded from public search even when otherwise eligible", () => {
@@ -99,9 +101,11 @@ test("C: /results path must route through searchProfessionals (which excludes de
 });
 
 test("F: isPublicContractor / isPublicAgent predicates are strict about undefined (safe default)", () => {
-  assert.equal(isPublicContractor({ isDemo: false }), true);
-  assert.equal(isPublicContractor({}), true, "absent isDemo flag defaults to public but only when non-demo");
+  assert.equal(isPublicContractor({ isDemo: false }), false, "a contractor without a lifecycle status is not public (draft default)");
+  assert.equal(isPublicContractor({}), false, "absent isDemo and absent status defaults to hidden (never a silent leak)");
   assert.equal(isPublicContractor({ isDemo: true }), false);
+  assert.equal(isPublicContractor({ status: "published", isDemo: false }), true, "published + non-demo is publicly discoverable");
+  assert.equal(isPublicContractor({ status: "suspended", isDemo: false }), false, "suspended is never publicly discoverable");
   assert.equal(isPublicAgent({ isDemo: true }), false);
 });
 

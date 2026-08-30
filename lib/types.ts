@@ -74,6 +74,9 @@ export type ContractorProfilePatch = Partial<
   >
 >;
 
+/** Contractor lifecycle state. Only `published` is publicly discoverable. */
+export type ContractorStatus = "draft" | "onboarding" | "ready" | "published" | "suspended";
+
 export interface Contractor {
   id: string;
   username: string; // /contractor/[username]
@@ -119,6 +122,8 @@ export interface Contractor {
   manualPaymentSetBy?: string;
   /** Demo/test record — excluded from ALL public discovery server-side. */
   isDemo?: boolean;
+  /** Contractor lifecycle — only `published` is publicly discoverable. */
+  status?: ContractorStatus;
 }
 
 export interface ClientContact {

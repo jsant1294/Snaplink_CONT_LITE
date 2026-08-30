@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Contractor } from "@/lib/types";
 import type { ContractorLandingPage } from "@/lib/landing-page-types";
+import type { PublicationEligibility } from "@/lib/professional-intake-payment/types";
 import { PROFESSION_TYPES } from "@/lib/profession-types";
 import { LANDING_TEMPLATES, landingTemplateFor } from "@/lib/landing-templates";
 
@@ -32,6 +33,7 @@ export default function LandingPageEditor({ pin, contractor }: { pin: string; co
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [eligibility, setEligibility] = useState<PublicationEligibility | null>(null);
 
   const authHeaders = { "x-snaplink-pin": pin };
 
@@ -41,6 +43,7 @@ export default function LandingPageEditor({ pin, contractor }: { pin: string; co
       .then((r) => r.json())
       .then((d) => {
         const page: ContractorLandingPage = d.page;
+        setEligibility(d.eligibility ?? null);
         setForm({
           headlineEn: page.headlineEn ?? "",
           headlineEs: page.headlineEs ?? "",
@@ -181,11 +184,17 @@ export default function LandingPageEditor({ pin, contractor }: { pin: string; co
                 ? `Live — /contractor/${contractor.username} shows this landing page.`
                 : `Off — /contractor/${contractor.username} keeps its current simple layout.`}
             </p>
+            {eligibility && !eligibility.canPublish && published !== true && (
+              <p className="mt-1 text-[11px] text-amber-300">Can&apos;t publish: {eligibility.reasons.join(" ")}</p>
+            )}
           </div>
           <button
             onClick={() => setPublished((v) => !v)}
-            className={`w-12 h-7 rounded-full relative transition-colors ${published ? "bg-gold" : "bg-white/15"}`}
+            disabled={!published && Boolean(eligibility) && !eligibility!.canPublish}
             aria-label="Toggle published"
+            className={`w-12 h-7 rounded-full relative transition-colors ${
+              published ? "bg-gold" : "bg-white/15"
+            } ${!published && eligibility && !eligibility.canPublish ? "opacity-40 cursor-not-allowed" : ""}`}
           >
             <span
               className={`absolute top-1 h-5 w-5 rounded-full bg-obsidian transition-transform ${

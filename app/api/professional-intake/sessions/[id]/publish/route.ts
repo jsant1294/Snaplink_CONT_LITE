@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { intakeSessionStore } from "@/lib/store";
+import { intakeSessionStore, contractorStore } from "@/lib/store";
 import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { isOperatorRequest } from "@/lib/professional-intake/auth";
 import { getProfessionalBillingSummary } from "@/lib/professional-intake-payment/adapters";
@@ -28,10 +28,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   );
   if (!eligibility.canPublish) return NextResponse.json({ error: "Profile is not eligible to publish", eligibility, billing }, { status: 409 });
 
-  // Contractors have no draft/published axis in the existing data model; their public
-  // page is already controlled by record existence. Do not invent a second status system.
+  // Contractors: transition the lifecycle to `published` so the profile becomes
+  // publicly discoverable (isPublicContractor requires status === "published").
   if (session.ownerType === "contractor") {
-    return NextResponse.json({ ok: true, published: true, publicationMode: "existing_public_profile", eligibility, billing });
+    const contractor = await contractorStore.update(session.ownerId, { status: "published" });
+    if (!contractor) return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
+    return NextResponse.json({ ok: true, published: true, publicationMode: "contractor_status_published", eligibility, billing });
   }
   const profile = await agentProfileStore.update(session.ownerId, {
     snaplinkStatus: "published",

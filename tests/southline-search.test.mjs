@@ -24,6 +24,7 @@ const contractor = (overrides = {}) => ({
   services: ["Roofing", "Gutters & Downspouts"],
   tagline: "Local roofers you can trust",
   preferredLanguage: "en",
+  status: "published",
   createdAt: "2026-01-01T00:00:00.000Z",
   ...overrides,
 });

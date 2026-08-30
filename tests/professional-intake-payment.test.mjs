@@ -313,9 +313,12 @@ test("content approval is persisted in both intake stores", async () => {
   }
 });
 
-test("publish route never invents a second status system for contractors", async () => {
+test("publish route transitions contractors to the lifecycle published status through the same eligibility gate", async () => {
   const route = await source("../app/api/professional-intake/sessions/[id]/publish/route.ts");
-  assert.match(route, /publicationMode: "existing_public_profile"/);
+  assert.match(route, /contractorStore\.update\(session\.ownerId, \{ status: "published" \}\)/);
+  assert.match(route, /publicationMode: "contractor_status_published"/);
+  assert.match(route, /evaluateProfilePublicationEligibility/);
+  assert.match(route, /eligibility\.canPublish/);
 });
 
 test("secrets are never exposed by the payment routes", async () => {

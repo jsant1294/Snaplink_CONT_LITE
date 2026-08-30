@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { contractorStore, landingPageStore } from "@/lib/store";
+import { isPublicContractor } from "@/lib/southline-search";
 import type { Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
@@ -17,7 +18,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username } = await params;
   const contractor = await contractorStore.getByUsername(username);
-  if (!contractor || contractor.isDemo) return {};
+  if (!contractor || !isPublicContractor(contractor)) return {};
 
   const page = await landingPageStore.get(contractor.id);
   const title = (page?.published && page.headlineEn) || `${contractor.businessName} | SnapLink Contractor`;
@@ -43,7 +44,7 @@ export default async function ContractorProfilePage({
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const contractor = await contractorStore.getByUsername(username);
-  if (!contractor || contractor.isDemo) notFound();
+  if (!contractor || !isPublicContractor(contractor)) notFound();
   const landingPage = await landingPageStore.get(contractor.id);
 
   return (

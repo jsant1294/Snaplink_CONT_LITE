@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { contractorStore, newId } from "@/lib/store";
 import { SERVICE_LIBRARY } from "@/lib/services";
 import { DEFAULT_PROFESSION_TYPE, isValidProfessionType } from "@/lib/profession-types";
-import type { Contractor } from "@/lib/types";
+import type { Contractor, ContractorStatus } from "@/lib/types";
 import { pinFromRequest, isOperator, canAccessContractor, publicContractor } from "@/lib/auth";
 
 /**
@@ -110,6 +110,7 @@ export async function PATCH(req: NextRequest) {
     pin?: string;
     preferredLanguage?: "en" | "es";
     payments?: import("@/lib/types").PaymentMethods;
+    status?: ContractorStatus;
   } & import("@/lib/types").ContractorProfilePatch = {};
 
   if (body.pin !== undefined) {
@@ -154,6 +155,12 @@ export async function PATCH(req: NextRequest) {
     }
     if (body.professionType !== undefined && isValidProfessionType(body.professionType)) {
       patch.professionType = body.professionType;
+    }
+    if (body.status !== undefined) {
+      if (!["draft", "onboarding", "ready", "published", "suspended"].includes(body.status)) {
+        return NextResponse.json({ error: "Invalid contractor status" }, { status: 400 });
+      }
+      patch.status = body.status as ContractorStatus;
     }
   }
 
