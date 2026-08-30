@@ -63,17 +63,34 @@ SELECT to_regclass('zip_centroids');                                            
 
 ## Step 2 — Load GEO data (`zip_centroids`)
 
-Recommended production data: the public-domain CivicSpace Labs
-`free-zipcode-database.csv` derived from US Census ZCTA data (~33k rows).
-Any acceptable alternative is fine; record the choice in the ops journal.
+Production data source: the **US Census 2025 ZCTA5 Gazetteer** (public
+domain), prepared offline into importer CSV. See
+`docs/geo/ZIP_CENTROIDS.md` for the full source/limits contract. The
+double-confirmation import gate in `scripts/geo/import-zip-centroids.mjs`
+refuses production unless **both** `ALLOW_PRODUCTION_DB=yes` **and**
+`--confirm-production-import` are supplied (see Step 8 of the directive;
+env-var alone or flag alone both abort, and the target is printed as a host
+fingerprint only).
 
 ```
-node scripts/geo/import-zip-centroids.mjs ./free-zipcode-database.csv
+# 1. offline transform (no network, no DB)
+node scripts/geo/prepare-census-zcta.mjs \
+  --input  2025_Gaz_zcta_national.txt \
+  --output /tmp/zip-centroids.csv
+
+# 2. dry-run against the intended target
+node scripts/geo/import-zip-centroids.mjs --file /tmp/zip-centroids.csv --dry-run
+
+# 3. production (double confirmation — refused otherwise)
+ALLOW_PRODUCTION_DB=yes node scripts/geo/import-zip-centroids.mjs \
+  --file /tmp/zip-centroids.csv \
+  --confirm-production-import
 ```
 
-The script is idempotent (`ON CONFLICT (zip) DO UPDATE`), collapses ZIP+4 to
-5-digit, refuses production (`assertNotProductionDatabase`), and prints input /
-upserted / skipped / total counts. If you already loaded the tiny fixture in
+The import is idempotent (`ON CONFLICT (zip) DO UPDATE`), collapses ZIP+4 to
+5-digit, rejects malformed rows, keeps the first occurrence of a duplicate,
+and prints inserted / updated / rejected / duplicated / total counts. The full
+2025 Census file loads 33,791 rows. If you already loaded the tiny fixture in
 dev, load the full file the same way afterwards — the full set simply
 overwrites the fixture rows and adds the rest.
 
