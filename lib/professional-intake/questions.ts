@@ -147,6 +147,18 @@ export const CORE_QUESTIONS: IntakeQuestion[] = [
     profileTargets: ["serviceRadius"],
   },
   {
+    id: "serviceZip",
+    step: 6,
+    type: "text",
+    labelEn: "Service ZIP (5-digit home base)",
+    labelEs: "Código postal del área de servicio (5 dígitos)",
+    helpEn: "Home-base ZIP used for distance-based search. Leave blank if unknown — profiles without a service ZIP are not shown in ZIP radius results.",
+    helpEs: "Código postal base utilizado para la búsqueda por distancia. Déjalo en blanco si no lo sabes: los perfiles sin código postal de servicio no aparecen en resultados de radio por código postal.",
+    required: false,
+    maxLength: 10,
+    profileTargets: ["serviceZip"],
+  },
+  {
     id: "idealCustomer",
     step: 7,
     type: "textarea",

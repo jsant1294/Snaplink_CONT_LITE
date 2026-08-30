@@ -164,6 +164,29 @@ test("15. agent profile mapping uses real AgentProfile fields", () => {
   assert.ok(patch.marketplaceSummary.includes("First-time buyers"));
 });
 
+test("15b. intake maps serviceZip + radius into TRUE GEO fields for both owner types", () => {
+  const ctr = buildContractorPatch({
+    serviceZip: "  30005-1234  ",
+    serviceRadius: "15",
+  });
+  assert.equal(ctr.serviceZip, "30005");
+  assert.equal(ctr.serviceRadiusMiles, 15);
+
+  const agent = buildAgentPatch({
+    serviceZip: "30005",
+    serviceRadius: "25",
+  });
+  assert.equal(agent.serviceZip, "30005");
+  assert.equal(agent.serviceRadius, 25);
+});
+
+test("15c. intake never fabricates GEO values from invalid/blank input", () => {
+  assert.ok(!("serviceZip" in buildContractorPatch({ serviceZip: "abc" })), "non-ZIP must not be set");
+  assert.ok(!("serviceZip" in buildAgentPatch({ serviceZip: "123" })), "partial ZIP must not be set");
+  assert.ok(!("serviceRadiusMiles" in buildContractorPatch({ serviceZip: "30005", serviceRadius: "0" })), "0 radius must not be set");
+  assert.ok(!("serviceRadiusMiles" in buildContractorPatch({ serviceZip: "30005", serviceRadius: "not-a-number" })), "non-numeric radius must not be set");
+});
+
 // --- 16/17: apply modes -------------------------------------------------------
 
 test("16. existing non-empty fields are preserved by default (fill_empty)", () => {

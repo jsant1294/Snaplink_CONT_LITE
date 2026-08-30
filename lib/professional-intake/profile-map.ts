@@ -15,6 +15,7 @@ import type { ContractorProfilePatch } from "../types.ts";
 import type { AgentProfile } from "../agent-profiles/types.ts";
 import { isValidProfessionType } from "../profession-types.ts";
 import { isValidAgentProfessionType } from "../profession-types.ts";
+import { normalizeZip } from "../geo/zip.ts";
 import type { IntakeAnswers } from "./types.ts";
 
 /**
@@ -34,6 +35,8 @@ export const CONTRACTOR_INTAKE_FIELD_MAP: Record<string, string[]> = {
   email: ["email"],
   website: ["website"],
   serviceArea: ["serviceAreaCity", "serviceAreaState", "serviceAreaZips"],
+  serviceZip: ["serviceZip"],
+  serviceRadiusMiles: ["serviceRadius"],
   licenseInfo: ["experienceQualifications", "yearsInBusiness", "licenseInfo", "insuranceCarried"],
   avatarUrl: ["profilePhoto"],
   logoUrl: ["profilePhoto"],
@@ -55,6 +58,7 @@ export const AGENT_INTAKE_FIELD_MAP: Record<string, string[]> = {
   licenseState: ["licenseState"],
   categories: ["primaryService", "additionalServices"],
   serviceArea: ["serviceAreaCity", "serviceAreaState", "serviceAreaZips"],
+  serviceZip: ["serviceZip"],
   serviceRadius: ["serviceRadius"],
   neighborhoods: ["neighborhoodsFocus"],
   marketplaceSummary: ["idealCustomer", "customerProblem", "differentiator"],
@@ -75,6 +79,26 @@ function composeServiceArea(answers: IntakeAnswers): string | undefined {
   const base = [city, state].filter(Boolean).join(", ");
   if (!base) return undefined;
   return zips ? `${base} (ZIPs: ${zips})` : base;
+}
+
+/**
+ * Normalizes a service-ZIP answer to a 5-digit US ZIP (ZIP+4 → 5). Any value
+ * that is not a clean 5-digit ZIP is dropped entirely (never fabricated), so a
+ * professional without a valid home-base ZIP is simply not GEO-indexable —
+ * matching the TRUE GEO contract in lib/geo/zip.ts + southline-search.ts.
+ */
+function resolveServiceZip(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = normalizeZip(value);
+  return /^\d{5}$/.test(normalized) ? normalized : undefined;
+}
+
+/** Parses a numeric radius (miles). Only finite, > 0 values are accepted — 0/blank never fabricate a radius. */
+function resolveRadiusMiles(value: unknown): number | undefined {
+  if (typeof value !== "string") return undefined;
+  const radius = Number(value);
+  if (!Number.isFinite(radius) || radius <= 0) return undefined;
+  return radius;
 }
 
 function composeLicenseInfo(answers: IntakeAnswers): string | undefined {
@@ -123,6 +147,11 @@ export function buildContractorPatch(answers: IntakeAnswers): ContractorProfileP
   const serviceArea = composeServiceArea(answers);
   if (serviceArea) patch.serviceArea = serviceArea;
 
+  const serviceZip = resolveServiceZip(answers.serviceZip);
+  if (serviceZip) patch.serviceZip = serviceZip;
+  const radiusMiles = resolveRadiusMiles(answers.serviceRadius);
+  if (radiusMiles !== undefined) patch.serviceRadiusMiles = radiusMiles;
+
   const licenseInfo = composeLicenseInfo(answers);
   if (licenseInfo) patch.licenseInfo = licenseInfo;
 
@@ -150,6 +179,7 @@ export type AgentIntakePatch = Partial<
     | "licenseState"
     | "categories"
     | "serviceArea"
+    | "serviceZip"
     | "serviceRadius"
     | "neighborhoods"
     | "marketplaceSummary"
@@ -187,6 +217,8 @@ export function buildAgentPatch(answers: IntakeAnswers): AgentIntakePatch {
     const radius = Number(answers.serviceRadius);
     if (Number.isFinite(radius)) patch.serviceRadius = radius;
   }
+  const serviceZip = resolveServiceZip(answers.serviceZip);
+  if (serviceZip) patch.serviceZip = serviceZip;
   if (typeof answers.neighborhoodsFocus === "string" && answers.neighborhoodsFocus) {
     patch.neighborhoods = answers.neighborhoodsFocus
       .split(",")
