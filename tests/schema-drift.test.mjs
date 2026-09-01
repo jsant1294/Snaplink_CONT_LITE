@@ -58,6 +58,47 @@ const REQUIRED_AGENT_PROFILE_COLUMNS = [
   "updated_at",
 ];
 
+test("0027 explicitly marks the known public demo contractor (ridgeline-demo) is_demo=true", async () => {
+  const sql = await source("../drizzle/0027_0027_september_demo_safety.sql");
+  assert.match(sql, /ALTER TABLE "contractors" ADD COLUMN "is_demo" boolean DEFAULT false NOT NULL/);
+  assert.match(
+    sql,
+    /UPDATE "contractors" SET "is_demo" = true WHERE "username" = 'ridgeline-demo'/,
+    "0027 must deterministically mark ridgeline-demo is_demo=true so the lifecycle backfill can never publish it"
+  );
+  assert.doesNotMatch(sql, /LIKE '%demo%'/, "0027 must not rely on broad demo matching");
+});
+
+test("0028 legacy publish backfill excludes demo rows; real legacy rows become published", async () => {
+  const sql = await source("../drizzle/0028_0028_september_contractor_lifecycle.sql");
+  assert.match(sql, /ALTER TABLE "contractors" ADD COLUMN "status" text DEFAULT 'draft' NOT NULL/);
+  assert.match(
+    sql,
+    /UPDATE "contractors" SET "status" = 'published' WHERE "status" = 'draft' AND "is_demo" = false/,
+    "0028 backfill must set published only for non-demo contractors"
+  );
+});
+
+test("migration safety: demo stays draft and hidden while real legacy rows go published", async () => {
+  const { isPublicContractor } = await import("../lib/southline-search.ts");
+  const jj = { isDemo: false, status: "published" };
+  const southline = { isDemo: false, status: "published" };
+  const ridgelineDemo = { isDemo: true, status: "draft" };
+  assert.equal(isPublicContractor(jj), true);
+  assert.equal(isPublicContractor(southline), true);
+  assert.equal(isPublicContractor(ridgelineDemo), false, "demo row must never be publicly eligible");
+});
+
+test("0029 remains additive-only (zip_centroids + service_zip/radius; no destructive statements)", async () => {
+  const sql = await source("../drizzle/0029_true_geo_v1.sql");
+  assert.match(sql, /CREATE TABLE "zip_centroids"/);
+  assert.match(sql, /ALTER TABLE "agent_profiles" ADD COLUMN "service_zip"/);
+  assert.match(sql, /ALTER TABLE "contractors" ADD COLUMN "service_zip"/);
+  assert.match(sql, /ALTER TABLE "contractors" ADD COLUMN "service_radius_miles"/);
+  assert.doesNotMatch(sql, /\bDROP\b/i, "0029 must not drop anything");
+  assert.doesNotMatch(sql, /ALTER TABLE[^;]*\bDROP COLUMN\b/i, "0029 must not drop columns");
+});
+
 test("agent_profiles in lib/db/schema.ts keeps every runtime-critical column", async () => {
   const schema = await source("../lib/db/schema.ts");
   const match = schema.match(/pgTable\("agent_profiles",\{(.*?)\},t=>/);
