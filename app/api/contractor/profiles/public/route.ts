@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { contractorStore } from "@/lib/store";
-import { isPublicContractor } from "@/lib/southline-search";
 import { publicContractorDiscovery } from "@/lib/auth";
 
 /**
@@ -12,6 +11,7 @@ import { publicContractorDiscovery } from "@/lib/auth";
  * and manual-payment state, internal owner record) are never returned.
  */
 export async function GET() {
-  const contractors = (await contractorStore.list()).filter((c) => isPublicContractor(c));
+  // Public-discovery query: lifecycle publish gate is enforced in SQL.
+  const contractors = await contractorStore.listPublished();
   return NextResponse.json({ contractors: contractors.map(publicContractorDiscovery) });
 }

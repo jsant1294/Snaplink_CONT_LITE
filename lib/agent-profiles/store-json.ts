@@ -42,6 +42,17 @@ export const jsonAgentProfileStore = {
   async listPending(): Promise<AgentProfile[]> {
     return (await read()).filter((p) => p.status === "pending");
   },
+  // Public-discovery query — same contract as isSouthlineListedAgent + the demo
+  // gate (see lib/southline-search.ts). JSON backend filters in memory; the PG
+  // backend pushes the same predicate into SQL (lib/agent-profiles/store-pg.ts).
+  async listPublicActive(): Promise<AgentProfile[]> {
+    return (await read()).filter(
+      (p) =>
+        p.status === "active" &&
+        !p.isDemo &&
+        (p.southlineStatus === "published" || p.southlineStatus === "featured")
+    );
+  },
   async getBySlug(slug: string): Promise<AgentProfile | undefined> {
     return (await read()).find((p) => p.slug === slug);
   },

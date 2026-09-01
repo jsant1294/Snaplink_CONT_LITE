@@ -19,10 +19,16 @@ test("real-estate homes-fallback layer is read-only: it never writes to the data
 });
 
 test("homepage, /homes, and /homes/[slug] all use the same fallback layer so a home surfaced on one page never dead-links on another", async () => {
-  for (const file of ["../app/page.tsx", "../app/homes/page.tsx", "../app/homes/[slug]/page.tsx"]) {
+  for (const file of ["../app/homes/page.tsx", "../app/homes/[slug]/page.tsx"]) {
     const text = await source(file);
     assert.match(text, /homes-fallback/, `${file} must use the real-estate fallback layer`);
   }
+  // The homepage routes homes/rentals through lib/public-cache.ts (cached
+  // public-catalog data), which itself uses the same homes-fallback layer.
+  const page = await source("../app/page.tsx");
+  assert.match(page, /public-cache/, "homepage uses the public-catalog cache layer");
+  const cache = await source("../lib/public-cache.ts");
+  assert.match(cache, /homes-fallback/, "public-cache must use the real-estate fallback layer");
 });
 
 test("footer says Professionals (not Contractors) and links to Agent profiles", async () => {

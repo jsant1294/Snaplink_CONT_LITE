@@ -34,9 +34,12 @@ export default async function ResultsPage({
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
   const { q, category, location } = await searchParams;
 
+  // Public-discovery queries: publish gates (lifecycle + southline listing +
+  // demo) are enforced in SQL, so searchProfessionals (which re-checks as
+  // defense-in-depth) only sees discoverable professionals.
   const [contractors, agentProfiles, settings] = await Promise.all([
-    contractorStore.list().catch(() => []),
-    agentProfileStore.list().catch(() => []),
+    contractorStore.listPublished().catch(() => []),
+    agentProfileStore.listPublicActive().catch(() => []),
     southlineStore.getSettings().catch(() => null),
   ]);
 

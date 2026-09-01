@@ -31,7 +31,8 @@ test("FeaturedRentals uses the existing fallback and canonical property routes",
     source("../app/page.tsx"),
     source("../components/southline/FeaturedRentals.tsx"),
   ]);
-  assert.match(page, /listPublishedRentalsWithFallback/);
+  assert.match(page, /getCachedPublishedRentals\(\)/, "homepage renders rentals via the cached public-catalog layer");
+  assert.match(page, /public-cache/, "homepage imports the public catalog cache wrapper");
   assert.match(component, /href=\{`\/homes\/\$\{property\.slug\}`\}/);
   assert.match(component, /href="\/rentals"/);
   assert.doesNotMatch(component, /Airbnb|availability|available|per night|nightly|formatPropertyPrice/i);

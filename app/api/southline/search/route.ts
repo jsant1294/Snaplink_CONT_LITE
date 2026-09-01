@@ -26,8 +26,11 @@ export async function GET(req: NextRequest) {
 
   const [projects, contractors, agentProfiles] = await Promise.all([
     readProjects(),
-    contractorStore.list().catch(() => [] as any[]),
-    agentProfileStore.list().catch(() => [] as any[]),
+    // Public-discovery queries: the publish gates are enforced in SQL, so
+    // searchProfessionals (which re-checks eligibility as defense-in-depth)
+    // only ever sees discoverable professionals.
+    contractorStore.listPublished().catch(() => [] as any[]),
+    agentProfileStore.listPublicActive().catch(() => [] as any[]),
   ]);
 
   // TRUE GEO v1: a valid 5-digit location is resolved to a centroid and used

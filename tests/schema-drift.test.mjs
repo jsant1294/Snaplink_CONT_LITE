@@ -1,8 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { config as dotenvConfig } from "dotenv";
 
 const source = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
@@ -75,12 +73,30 @@ test("agent_profiles in lib/db/schema.ts keeps every runtime-critical column", a
   );
 });
 
-dotenvConfig({ path: fileURLToPath(new URL("../.env.local", import.meta.url)) });
-const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+// The live schema-drift check is intentionally isolated from the everyday dev
+// Neon project. It runs ONLY against an explicitly-provided scratch/test
+// database variable (SCHEMA_TEST_DATABASE_URL) so a plain `npm test` / CI run
+// never unexpectedly wakes the primary dev Neon project. When the variable is
+// absent the live check skips cleanly; the static source check above always
+// runs, so coverage is not silently lost.
+const url = process.env.SCHEMA_TEST_DATABASE_URL || "";
+
+// Refuse to run against a DATABASE_URL/POSTGRES_URL the environment would
+// otherwise use for the app's everyday work — the drift check must never
+// target the primary dev/prod Neon endpoint by accident.
+const everydayUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+const sameAsEveryday =
+  everydayUrl && everydayUrl.replace(/\/[^/]*$/, "") === url.replace(/\/[^/]*$/, "");
 
 test(
   "live DB has every schema.ts table and column (read-only drift check)",
-  { skip: !url ? "DATABASE_URL is not configured" : false },
+  {
+    skip: !url
+      ? "SCHEMA_TEST_DATABASE_URL is not configured — live drift check skipped (set it to a dedicated scratch DB to run)"
+      : sameAsEveryday
+        ? "SCHEMA_TEST_DATABASE_URL must not point at the everyday DATABASE_URL/POSTGRES_URL; set it to a dedicated scratch DB"
+        : false,
+  },
   async () => {
     const schema = await import("../lib/db/schema.ts");
     const nameSym = Symbol.for("drizzle:Name");

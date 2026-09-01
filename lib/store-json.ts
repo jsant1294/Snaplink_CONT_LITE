@@ -128,6 +128,13 @@ export const jsonContractorStore = {
   async list(): Promise<Contractor[]> {
     return readContractors();
   },
+  // Public-discovery query — same publish gate as isPublicContractor (see
+  // lib/southline-search.ts). JSON backend has no SQL, so it filters in memory,
+  // but the PG backend pushes the same predicate into SQL (lib/store-pg.ts).
+  async listPublished(): Promise<Contractor[]> {
+    const list = await readContractors();
+    return list.filter((c) => !c.isDemo && c.status === "published");
+  },
   async getByUsername(username: string): Promise<Contractor | undefined> {
     const list = await readContractors();
     return list.find((c) => c.username === username.toLowerCase());

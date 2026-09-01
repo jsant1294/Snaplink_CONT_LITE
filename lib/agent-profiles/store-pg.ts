@@ -4,7 +4,7 @@
 // API routes never know which backend is live.
 // ---------------------------------------------------------------------------
 
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, inArray } from "drizzle-orm";
 import { agentProfiles } from "../db/schema";
 import { db } from "../db/connection";
 import type { AgentOperatorCreateInput, AgentProfile, AgentProfileRequestInput } from "./types";
@@ -89,6 +89,24 @@ export const pgAgentProfileStore = {
   },
   async listPending(): Promise<AgentProfile[]> {
     const rows = await db().select().from(agentProfiles).where(eq(agentProfiles.status, "pending")).orderBy(agentProfiles.createdAt);
+    return rows.map(rowToProfile);
+  },
+  // Public-discovery query. Pushes the public listing contract into SQL:
+  // status=active, is_demo=false, and southlineStatus ∈ {published, featured}
+  // (mirrors isSouthlineListedAgent + isPublicAgent in lib/southline-search.ts).
+  // Admin/internal code that must see drafts/demo keeps using list()/listActive().
+  async listPublicActive(): Promise<AgentProfile[]> {
+    const rows = await db()
+      .select()
+      .from(agentProfiles)
+      .where(
+        and(
+          eq(agentProfiles.status, "active"),
+          eq(agentProfiles.isDemo, false),
+          inArray(agentProfiles.southlineStatus, ["published", "featured"])
+        )
+      )
+      .orderBy(desc(agentProfiles.createdAt));
     return rows.map(rowToProfile);
   },
   async getBySlug(slug: string): Promise<AgentProfile | undefined> {

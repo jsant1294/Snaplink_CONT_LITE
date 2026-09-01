@@ -1,12 +1,15 @@
 import { cookies } from "next/headers";
-import { contractorStore } from "@/lib/store";
-import { isPublicContractor } from "@/lib/southline-search";
-import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { publicAgentProfile } from "@/lib/agent-profiles/auth";
-import { southlineStore } from "@/lib/southline-store";
 import { demoTenant } from "@/lib/real-estate/fixtures";
-import { listPublishedPropertiesWithFallback, listPublishedRentalsWithFallback, resolveFeaturedPropertyWithFallback } from "@/lib/real-estate/homes-fallback";
 import { listProjects } from "@/lib/southline-diy";
+import {
+  getCachedSettings,
+  getCachedPublishedContractors,
+  getCachedPublicAgents,
+  getCachedFeaturedProperty,
+  getCachedPublishedHomes,
+  getCachedPublishedRentals,
+} from "@/lib/public-cache";
 import type { Lang } from "@/lib/southline-i18n";
 import { DEFAULT_FEATURED_RENTALS, DEFAULT_REAL_ESTATE_BLOCK } from "@/lib/southline-types";
 
@@ -40,9 +43,14 @@ export default async function HomePage() {
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
 
   const [settings, allContractors, activeAgentProfiles, diyProjects] = await Promise.all([
-    southlineStore.getSettings().catch(() => null),
-    contractorStore.list().then((l) => l.filter((c) => isPublicContractor(c))).catch(() => [] as import("@/lib/types").Contractor[]),
-    agentProfileStore.listActive().then((l) => l.filter((p) => !p.isDemo)).catch(() => [] as import("@/lib/agent-profiles/types").AgentProfile[]),
+    getCachedSettings()().catch(() => null),
+    // Public-discovery query: lifecycle publish gate is enforced in SQL (draft/
+    // onboarding/ready/suspended/demo rows are never fetched); cached for
+    // REVALIDATE_SECONDS so repeated loads don't re-hit Neon every request.
+    getCachedPublishedContractors()().catch(() => [] as import("@/lib/types").Contractor[]),
+    // Active agents (non-demo) — public catalog data, cached. Eligibility for
+    // Southline listing is applied by the consuming components/sections.
+    getCachedPublicAgents()().then((l) => l.filter((p) => !p.isDemo)).catch(() => [] as import("@/lib/agent-profiles/types").AgentProfile[]),
     listProjects().catch(() => [] as import("@/lib/southline-diy").DIYProject[]),
   ]);
 
@@ -63,7 +71,7 @@ export default async function HomePage() {
   // homepage" toggle, still defaults visible so existing settings aren't silently hidden.
   const showRealEstateBlock = !sections || sections.featuredAgents !== false;
   const featuredProperty = showRealEstateBlock
-    ? await resolveFeaturedPropertyWithFallback(demoTenant.id, realEstateContent.featuredPropertyId)
+    ? await getCachedFeaturedProperty()(demoTenant.id, realEstateContent.featuredPropertyId)
     : null;
   const featuredContractorId = settings?.homeServices?.featuredContractorId;
   const featuredContractor = featuredContractorId
@@ -72,7 +80,7 @@ export default async function HomePage() {
 
   const showFeaturedHomes = !sections || sections.featuredHomes !== false;
   const featuredHomesResult = showFeaturedHomes
-    ? await listPublishedPropertiesWithFallback(demoTenant.id, { pageSize: 4 })
+    ? await getCachedPublishedHomes()(demoTenant.id, 4)
     : null;
   const homepageHomes = featuredHomesResult?.properties ?? [];
   const featuredHomes = [
@@ -85,7 +93,7 @@ export default async function HomePage() {
   const rentalsContent = settings?.featuredRentals ?? DEFAULT_FEATURED_RENTALS;
   const showFeaturedRentals = !sections || sections.featuredRentals !== false;
   const featuredRentalsResult = showFeaturedRentals
-    ? await listPublishedRentalsWithFallback(demoTenant.id, { pageSize: 4 })
+    ? await getCachedPublishedRentals()(demoTenant.id, 4)
     : null;
   const availableRentals = featuredRentalsResult?.properties ?? [];
   const selectedRentalIds = rentalsContent.selectedRentalIds;

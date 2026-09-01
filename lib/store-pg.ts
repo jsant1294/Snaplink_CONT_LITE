@@ -5,7 +5,7 @@
 // Blob and only the URL is persisted; otherwise the data URL is stored as-is.
 // ---------------------------------------------------------------------------
 
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { contractors, leads, photos, estimates } from "./db/schema";
 import { db } from "./db/connection";
 import type { Lead, LeadStatus, AiSummary, Contractor, Estimate, Photo, Payment, PaymentMethods } from "./types";
@@ -229,6 +229,19 @@ export const pgLeadStore = {
 export const pgContractorStore = {
   async list(): Promise<Contractor[]> {
     const rows = await db().select().from(contractors).orderBy(contractors.createdAt);
+    return rows.map(rowToContractor);
+  },
+  // Public-discovery query. Pushes the lifecycle publish gate (is_demo=false,
+  // status=published) into SQL so callers never fetch drafts/onboarding/ready/
+  // suspended/demo rows and filter in JavaScript. Admin/internal code that must
+  // see every contractor (including drafts/demo) keeps using list(). The
+  // eligibility predicate mirrors isPublicContractor in lib/southline-search.ts.
+  async listPublished(): Promise<Contractor[]> {
+    const rows = await db()
+      .select()
+      .from(contractors)
+      .where(and(eq(contractors.isDemo, false), eq(contractors.status, "published")))
+      .orderBy(contractors.createdAt);
     return rows.map(rowToContractor);
   },
   async getByUsername(username: string): Promise<Contractor | undefined> {

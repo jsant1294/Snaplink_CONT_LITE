@@ -90,20 +90,38 @@ test("operator transition: profiles PATCH accepts operator-only status with vali
 });
 
 test("public surfaces route contractors through the lifecycle publish gate", async () => {
-  const checks = [
-    ["../app/contractor/[username]/page.tsx", /isPublicContractor\(contractor\)/],
-    ["../app/page.tsx", /isPublicContractor\(c\)/],
-    ["../app/sitemap.ts", /isPublicContractor\(c\)/],
-    ["../app/book/page.tsx", /isPublicContractor\(c\)/],
-    ["../app/planner/page.tsx", /isPublicContractor\(c\)/],
-    ["../app/for-contractors/page.tsx", /isPublicContractor\(c\)/],
-    ["../app/ideas/[category]/page.tsx", /isPublicContractor\(c\)/],
-    ["../app/api/contractor/profiles/public/route.ts", /isPublicContractor\(c\)/],
+  // Every public-discovery surface either calls listPublished() — the SQL-side
+  // publish gate (is_demo=false AND status=published) — or re-checks
+  // isPublicContractor as the single-page lookup guard. The store's
+  // listPublished() predicate is itself asserted to equal isPublicContractor.
+  const sqlGated = [
+    ["../app/page.tsx", /getCachedPublishedContractors\(\)/],
+    ["../app/sitemap.ts", /listPublished\(\)/],
+    ["../app/book/page.tsx", /listPublished\(\)/],
+    ["../app/planner/page.tsx", /listPublished\(\)/],
+    ["../app/for-contractors/page.tsx", /listPublished\(\)/],
+    ["../app/ideas/[category]/page.tsx", /listPublished\(\)/],
+    ["../app/api/contractor/profiles/public/route.ts", /listPublished\(\)/],
+    ["../app/api/southline/search/route.ts", /listPublished\(\)/],
+    ["../app/results/page.tsx", /listPublished\(\)/],
   ];
-  for (const [file, re] of checks) {
+  const lookupGated = [
+    ["../app/contractor/[username]/page.tsx", /isPublicContractor\(contractor\)/],
+  ];
+  for (const [file, re] of sqlGated) {
     const src = await source(file);
-    assert.match(src, re, `${file} must use the lifecycle publish gate`);
+    assert.match(src, re, `${file} must use the SQL-side publish gate (listPublished)`);
   }
+  for (const [file, re] of lookupGated) {
+    const src = await source(file);
+    assert.match(src, re, `${file} must still apply the lifecycle publish gate`);
+  }
+  // The homepage caches public professionals via lib/public-cache.ts, which
+  // must still enforce the publish gate in SQL so a cached entry can never
+  // expose unpublished/demo rows.
+  const cache = await source("../lib/public-cache.ts");
+  assert.match(cache, /contractorStore\.listPublished\(\)/, "public-cache.ts must call listPublished() (SQL-side gate)");
+  assert.match(cache, /agentProfileStore\.listActive\(\)/, "public-cache.ts caches active agents");
 });
 
 test("landing-page paid gate: server enforces eligibility on publish, UI disables the toggle", async () => {

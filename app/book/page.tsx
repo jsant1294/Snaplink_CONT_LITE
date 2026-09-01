@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { contractorStore } from "@/lib/store";
-import { isPublicContractor } from "@/lib/southline-search";
 import type { Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
@@ -18,7 +17,8 @@ export default async function BookPage({
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
   const { contractor: contractorId } = await searchParams;
 
-  const contractors = (await contractorStore.list().catch(() => [])).filter((c) => isPublicContractor(c));
+  // Public-discovery query: lifecycle publish gate is enforced in SQL.
+  const contractors = (await contractorStore.listPublished().catch(() => []));
 
   return (
     <>

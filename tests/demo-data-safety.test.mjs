@@ -92,7 +92,7 @@ test("A D: demo agent is excluded from public search even when otherwise eligibl
 
 test("A E: public agent discovery surface (\"/agents\") filter excludes demo agents", async () => {
   const src = await source("../app/agents/page.tsx");
-  assert.match(src, /\.filter\(\(p\) => !p\.isDemo\)/, "app/agents/page.tsx must filter demo agents");
+  assert.match(src, /listPublicActive\(\)/, "app/agents/page.tsx must use the SQL-side public-active query (demo excluded in DB)");
 });
 
 test("C: /results path must route through searchProfessionals (which excludes demo)", async () => {

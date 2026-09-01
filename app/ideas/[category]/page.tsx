@@ -4,7 +4,7 @@ import type { Lang } from "@/lib/southline-i18n";
 import { t } from "@/lib/southline-i18n";
 import { listProjects } from "@/lib/southline-diy";
 import { contractorStore } from "@/lib/store";
-import { categoryIdsForContractor, isPublicContractor } from "@/lib/southline-search";
+import { categoryIdsForContractor } from "@/lib/southline-search";
 import { professionPlaceholderPhotoFor, professionTypeLabel } from "@/lib/profession-types";
 import Header from "@/components/southline/Header";
 import Footer from "@/components/southline/Footer";
@@ -69,7 +69,8 @@ export default async function CategoryPage({
   const allProjects = await listProjects();
   const diyKey = CATEGORY_TO_DIY[category];
   const projects = diyKey ? allProjects.filter((p) => p.category === diyKey) : [];
-  const allContractors = (await contractorStore.list().catch(() => [])).filter((c) => isPublicContractor(c));
+  // Public-discovery query: lifecycle publish gate is enforced in SQL.
+  const allContractors = (await contractorStore.listPublished().catch(() => []));
   const wantedServiceCategories = CATEGORY_TO_SERVICE_CATEGORIES[category] ?? [];
   const contractors = allContractors
     .filter((c) => categoryIdsForContractor(c).some((id) => wantedServiceCategories.includes(id)))
