@@ -157,10 +157,12 @@ function usageError() {
 
 // Only run when invoked as the main module (never on import, so requiring this
 // file for tests, or an accidental downstream import, cannot connect or mutate
-// anything).
+// anything). `import.meta.url` is already a file:// URL; normalize the CLI
+// argv[1] to the same representation (file:// URL) so the comparison matches on
+// direct invocation and is false on import.
 const isMain =
   process.argv[1] &&
-  fileURLToPath(import.meta.url) === pathToFileURL(process.argv[1]).href;
+  import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isMain) {
   await main();
