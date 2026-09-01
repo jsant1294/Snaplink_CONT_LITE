@@ -8,6 +8,11 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { AgentOperatorCreateInput, AgentProfile, AgentProfileRequestInput } from "./types";
 import { DEFAULT_AGENT_PROFESSION_TYPE } from "../profession-types.ts";
+import {
+  invalidateAgentCatalog,
+  shouldInvalidateAgentCreate,
+  shouldInvalidateAgentUpdate,
+} from "../public-catalog-invalidate";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const FILE = path.join(DATA_DIR, "agent-profiles.json");
@@ -111,6 +116,7 @@ export const jsonAgentProfileStore = {
     };
     list.push(profile);
     await write(list);
+    if (shouldInvalidateAgentCreate(profile)) await invalidateAgentCatalog();
     return profile;
   },
   /** Mirrors pgAgentProfileStore.createAgent — see that file's doc comment. */
@@ -172,6 +178,9 @@ export const jsonAgentProfileStore = {
     };
     list.push(profile);
     await write(list);
+    // A newly created active non-demo agent is immediately publicly eligible ->
+    // purge the cached agent catalog so it appears without waiting for the TTL.
+    if (shouldInvalidateAgentCreate(profile)) await invalidateAgentCatalog();
     return profile;
   },
   async update(id: string, patch: Partial<Omit<AgentProfile, "id" | "createdAt">>): Promise<AgentProfile | undefined> {
@@ -180,6 +189,9 @@ export const jsonAgentProfileStore = {
     if (!profile) return undefined;
     Object.assign(profile, patch, { updatedAt: new Date().toISOString() });
     await write(list);
+    // status / southlineStatus / isDemo transitions flip the public agent gates ->
+    // purge the cached agent catalog immediately (see lib/public-catalog-invalidate.ts).
+    if (shouldInvalidateAgentUpdate(patch)) await invalidateAgentCatalog();
     return profile;
   },
 

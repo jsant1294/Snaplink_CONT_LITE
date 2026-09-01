@@ -8,6 +8,7 @@
 import { eq, desc, and } from "drizzle-orm";
 import { contractors, leads, photos, estimates } from "./db/schema";
 import { db } from "./db/connection";
+import { invalidateContractorCatalog, shouldInvalidateContractorUpdate } from "./public-catalog-invalidate";
 import type { Lead, LeadStatus, AiSummary, Contractor, Estimate, Photo, Payment, PaymentMethods } from "./types";
 
 export async function maybeUploadToBlob(photo: { dataUrl: string; filename: string }, leadId: string): Promise<string> {
@@ -329,6 +330,14 @@ export const pgContractorStore = {
     if (patch.logoUrl !== undefined) set.logoUrl = patch.logoUrl || null;
     if (Object.keys(set).length > 0) {
       await db().update(contractors).set(set).where(eq(contractors.id, id));
+    }
+    // A status transition (publish / unpublish / suspend / ready-draft-onboarding)
+    // flips the public eligibility predicate, so purge the cached public
+    // contractor catalog immediately. In a Next runtime a failure here propagates
+    // (the mutation does not report success with a dropped cache purge); in plain
+    // node runs it is a safe no-op.
+    if (shouldInvalidateContractorUpdate(patch)) {
+      await invalidateContractorCatalog();
     }
     return this.getById(id);
   },

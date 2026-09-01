@@ -35,6 +35,9 @@ semantics change, no onboarding/lifecycle behavior change.
   contractors, public agents, featured property, published homes, published rentals. SQL gate runs
   before cache → safety preserved even on cache hit.
 - `app/page.tsx` consumes the cached getters; render order and imports reduced. JSX untouched.
+- **Follow-up (lifecycle invalidation, see ADDENDUM below):** every cache entry is now tagged and the
+  public contractor/agent catalogs are purged by tag when an eligibility mutation occurs, so a
+  published→unpublished/suspend change is reflected immediately rather than after the 5-minute TTL.
 
 ### PHASE 3 — Force-dynamic audit (classification only, NO removals)
 - **REQUIRED:** results, book, diy, diy/[slug], ideas/[category], contractor/[username], homes,
@@ -95,4 +98,30 @@ and tests `public-discovery-query`, `contractor-lifecycle-publish-gate`, `demo-d
   `revalidate` on the sitemap — separate decision).
 - `allowExitOnIdle:true` is fine for serverless/dev but worth re-confirming if a long-running local server
   shows idle teardown; low risk for the dev singleton.
+
+## ADDENDUM — Public-cache lifecycle invalidation (follow-up fix)
+Commit 8c79947 cached the published/public professional catalog for 300s. If a professional was later
+unpublished / suspended / set ready-draft-onboarding / marked demo / hidden (or a new one published), they
+could stay in an existing cache entry until the TTL. Addressed by tag-targeted `revalidateTag` invalidation:
+
+- **Tags** (`lib/public-catalog-invalidate.ts`, reused by `lib/public-cache.ts`):
+  `public-contractors`, `public-agents`. Each `unstable_cache` entry tagged with its single shared constant;
+  other homepage data (settings, homes, rentals, featured) has its own tags but is NOT lifecycle-purged.
+- **Mutation routes** — invalidation lives in the store mutation layer (`pg`/`json` `update`/`createAgent`),
+  so every route that can change eligibility drains through it:
+  - Contractors → `contractorStore.update({ status })` fires `invalidateContractorCatalog()`:
+    `app/api/contractor/profiles/route.ts` PATCH, `app/api/professional-intake/sessions/[id]/publish/route.ts`.
+  - Agents → `agentProfileStore.update` on `status`/`southlineStatus`/`isDemo`, and
+    `createAgent` when the new agent is active-non-demo, fire `invalidateAgentCatalog()`:
+    `app/api/agent-profiles/[id]/route.ts` PATCH, `app/api/agent-profiles/create/route.ts`,
+    `app/api/professional-intake/sessions/[id]/publish/route.ts`.
+  - Non-eligibility edits (business info, billing, snaplink-only) do NOT invalidate (no blind purge).
+- **Fail-open safety:** the invalidators are safe no-ops outside a Next runtime (plain `node --test`), but
+  inside Next a failed `revalidateTag` propagates so a mutation never reports success with a dropped purge.
+- **Behavior** (before → after): a suspended/unpublished pro stays visible up to 5 min → removed immediately
+  on commit; a newly published pro hidden up to 5 min → appears immediately. SQL publish/demo gates still
+  run at cache fill, so a cache entry can never itself expose an ineligible row.
+- **Tests:** `tests/public-cache-invalidation.test.mjs` (18 deterministic cases: pure invalidation
+  predicates, tag/tag-wiring, store wiring, direct-public-route server-side guards). Full suite 802 tests,
+  14 pre-existing failures unchanged; `npx next build` compiled successfully.
 - Indexing of `isDemo`/`status` columns was not changed; SQL filters still use existing indices.

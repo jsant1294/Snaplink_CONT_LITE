@@ -7,6 +7,11 @@
 import { eq, desc, and, inArray } from "drizzle-orm";
 import { agentProfiles } from "../db/schema";
 import { db } from "../db/connection";
+import {
+  invalidateAgentCatalog,
+  shouldInvalidateAgentCreate,
+  shouldInvalidateAgentUpdate,
+} from "../public-catalog-invalidate";
 import type { AgentOperatorCreateInput, AgentProfile, AgentProfileRequestInput } from "./types";
 import { DEFAULT_AGENT_PROFESSION_TYPE } from "../profession-types.ts";
 
@@ -145,7 +150,9 @@ export const pgAgentProfileStore = {
       createdAt: now,
       updatedAt: now,
     }).returning();
-    return rowToProfile(rows[0]);
+    const profile = rowToProfile(rows[0]);
+    if (shouldInvalidateAgentCreate(profile)) await invalidateAgentCatalog();
+    return profile;
   },
   /**
    * Operator-driven "New Agent" workflow. One INSERT creates the account,
@@ -210,12 +217,19 @@ export const pgAgentProfileStore = {
       createdAt: now,
       updatedAt: now,
     }).returning();
-    return rowToProfile(rows[0]);
+    const profile = rowToProfile(rows[0]);
+    // A newly created active non-demo agent is immediately publicly eligible ->
+    // purge the cached agent catalog so it appears without waiting for the TTL.
+    if (shouldInvalidateAgentCreate(profile)) await invalidateAgentCatalog();
+    return profile;
   },
   async update(id: string, patch: Partial<Omit<AgentProfile, "id" | "createdAt">>): Promise<AgentProfile | undefined> {
     const set: Record<string, unknown> = { updatedAt: new Date().toISOString() };
     for (const [key, value] of Object.entries(patch)) if (value !== undefined) set[key] = value;
     if (Object.keys(set).length > 1) await db().update(agentProfiles).set(set).where(eq(agentProfiles.id, id));
+    // status / southlineStatus / isDemo transitions flip the public agent gates ->
+    // purge the cached agent catalog immediately (see lib/public-catalog-invalidate.ts).
+    if (shouldInvalidateAgentUpdate(patch)) await invalidateAgentCatalog();
     return this.getById(id);
   },
 

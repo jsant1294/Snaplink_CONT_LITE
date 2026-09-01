@@ -10,6 +10,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { Lead, LeadStatus, AiSummary, Contractor, Estimate, Payment } from "./types";
 import { CONTRACTOR_SEEDS } from "./contractors";
+import { invalidateContractorCatalog, shouldInvalidateContractorUpdate } from "./public-catalog-invalidate";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
@@ -196,6 +197,11 @@ export const jsonContractorStore = {
     if (patch.avatarUrl !== undefined) c.avatarUrl = patch.avatarUrl || undefined;
     if (patch.logoUrl !== undefined) c.logoUrl = patch.logoUrl || undefined;
     await writeContractors(list);
+    // A status transition flips public eligibility -> purge the cached public
+    // contractor catalog immediately (see lib/public-catalog-invalidate.ts).
+    if (shouldInvalidateContractorUpdate(patch)) {
+      await invalidateContractorCatalog();
+    }
     return c;
   },
 
