@@ -75,13 +75,6 @@ export default function Hero({
 
             <div className="max-w-lg mb-8">
               <form action="/results" className="relative">
-                <input
-                  type="text"
-                  name="q"
-                  placeholder={searchPrompt}
-                  aria-label={searchPrompt}
-                  className="w-full bg-accent-dark/30 backdrop-blur-sm border border-on-dark/20 rounded-2xl px-5 py-4 pl-12 text-on-dark placeholder:text-on-dark/40 focus:outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-on-dark text-base shadow-lg"
-                />
                 <svg
                   className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-dark-muted"
                   fill="none"
@@ -95,6 +88,29 @@ export default function Hero({
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="text"
+                    name="q"
+                    placeholder={searchPrompt}
+                    aria-label={searchPrompt}
+                    className="min-w-0 flex-1 rounded-2xl border border-on-dark/20 bg-accent-dark/30 px-5 py-4 pl-12 text-on-dark backdrop-blur-sm placeholder:text-on-dark/40 focus:border-accent-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark sm:rounded-r-none"
+                  />
+                  <input
+                    type="text"
+                    name="location"
+                    inputMode="numeric"
+                    placeholder={t("searchLocation", lang)}
+                    aria-label={t("searchLocation", lang)}
+                    className="min-w-0 w-full rounded-2xl border border-on-dark/20 bg-accent-dark/30 px-5 py-4 text-on-dark backdrop-blur-sm placeholder:text-on-dark/40 focus:border-accent-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark sm:w-44 sm:rounded-none sm:border-l-0"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-accent-gold px-6 py-4 text-sm font-semibold text-primary transition-colors hover:bg-accent-gold/90 active:scale-[0.98] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-on-dark sm:rounded-l-none"
+                  >
+                    {t("heroSearch", lang)}
+                  </button>
+                </div>
               </form>
             </div>
 

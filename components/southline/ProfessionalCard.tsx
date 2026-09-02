@@ -25,7 +25,7 @@ export default function ProfessionalCard({ pro, lang }: { pro: ProfessionalResul
   return (
     <article className="marketplace-card flex flex-col transition-shadow hover:shadow-md">
       <div className="marketplace-card-media">
-        <img src={photo} alt="" loading="lazy" className={pro.kind === "agent" ? "marketplace-image-portrait" : "marketplace-image-project"} />
+        <img src={photo} alt={pro.name} loading="lazy" className={pro.kind === "agent" ? "marketplace-image-portrait" : "marketplace-image-project"} />
         <span className="absolute left-3 top-3 rounded-full bg-accent-dark/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-on-dark">
           {badgeLabel}
         </span>
@@ -52,9 +52,17 @@ export default function ProfessionalCard({ pro, lang }: { pro: ProfessionalResul
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span>{pro.serviceArea}</span>
-            {pro.distanceMiles != null && (
-              <span className="ml-1 font-semibold text-accent-gold">{formatDistanceMiles(pro.distanceMiles, lang)}</span>
-            )}
+          </div>
+        )}
+
+        {pro.distanceMiles != null && (
+          <div className="mb-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-gold/10 px-2.5 py-1 text-xs font-semibold text-accent-gold">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              {t("servesYourArea", lang)} · {formatDistanceMiles(pro.distanceMiles, lang)}
+            </span>
           </div>
         )}
 
@@ -66,7 +74,7 @@ export default function ProfessionalCard({ pro, lang }: { pro: ProfessionalResul
               </span>
             ))}
             {pro.services.length > 4 && (
-              <span className="text-xs text-text-muted/60 px-1 py-1">+{pro.services.length - 4}</span>
+              <span className="text-xs text-text-muted px-1 py-1">+{pro.services.length - 4}</span>
             )}
           </div>
         )}
@@ -76,18 +84,12 @@ export default function ProfessionalCard({ pro, lang }: { pro: ProfessionalResul
         )}
       </div>
 
-      <div className="border-t border-border-default p-4 sm:p-5 flex gap-2">
+      <div className="border-t border-border-default p-4 sm:p-5">
         <a
           href={pro.href}
-          className="flex min-h-11 flex-1 items-center justify-center rounded-xl border border-secondary bg-surface-raised py-2.5 text-center text-sm font-semibold text-secondary transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+          className="flex min-h-11 w-full items-center justify-center rounded-xl bg-accent-dark py-2.5 text-center text-sm font-semibold text-on-dark transition-colors hover:bg-accent-dark/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
         >
-          {t("viewProfile", lang)}
-        </a>
-        <a
-          href={pro.href}
-          className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-accent-dark py-2.5 text-center text-sm font-semibold text-on-dark transition-colors hover:bg-accent-dark/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
-        >
-          {pro.kind === "contractor" ? t("requestQuote", lang) : t("bookingTitle", lang)}
+          {t("viewProfessional", lang)}
         </a>
       </div>
     </article>

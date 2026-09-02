@@ -93,18 +93,20 @@ export default async function ResultsPage({
               {t("resultsTitle", lang)}
             </h1>
             <p className="mt-4 max-w-2xl leading-relaxed text-secondary">{t("resultsSubtitle", lang)}</p>
-            <form className="mt-7 flex max-w-xl gap-2">
+            <form className="mt-7 flex max-w-xl flex-col gap-2 sm:flex-row">
               <input
                 name="q"
+                aria-label={t("searchPlaceholder", lang)}
                 defaultValue={q}
                 placeholder={t("searchPlaceholder", lang)}
                 className="min-w-0 flex-1 rounded-xl border border-border-default bg-surface-raised/70 px-4 py-3 text-base text-primary placeholder:text-secondary/60 outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page"
               />
               <input
                 name="location"
+                aria-label={t("searchLocation", lang)}
                 defaultValue={location}
                 placeholder={t("searchLocation", lang)}
-                className="w-40 rounded-xl border border-border-default bg-surface-raised/70 px-4 py-3 text-base text-primary placeholder:text-secondary/60 outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page sm:w-52"
+                className="min-w-0 rounded-xl border border-border-default bg-surface-raised/70 px-4 py-3 text-base text-primary placeholder:text-secondary/60 outline-none focus:border-accent-gold focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page sm:w-52"
               />
               {category && <input type="hidden" name="category" value={category} />}
               <button className="southline-btn-secondary">
@@ -126,6 +128,7 @@ export default async function ResultsPage({
             )}
             <Link
               href="/results"
+              aria-current={!category ? "page" : undefined}
               className={`inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                 !category
                   ? "bg-accent-dark text-on-dark"
@@ -141,6 +144,7 @@ export default async function ResultsPage({
                 <Link
                   key={c.id}
                   href={href}
+                  aria-current={active ? "page" : undefined}
                   className={`inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                     active
                       ? "bg-accent-dark text-on-dark"
@@ -157,7 +161,11 @@ export default async function ResultsPage({
             {professionals.length === 0 ? (
               <div className="rounded-[18px] border border-border-default bg-surface p-10 text-center">
                 <h2 className="font-display text-2xl">
-                  {geoUnknownZip ? t("searchNoResults", lang) : category ? t("catalogEmptyTitle", lang) : t("searchNoResults", lang)}
+                  {geoUnknownZip
+                    ? t("resultsGeoUnknownZipTitle", lang)
+                    : category
+                      ? t("catalogEmptyTitle", lang)
+                      : t("searchNoResults", lang)}
                 </h2>
                 <p className="mt-2 text-sm text-text-muted">
                   {geoUnknownZip
@@ -166,14 +174,12 @@ export default async function ResultsPage({
                       ? t("catalogEmptyBody", lang)
                       : t("resultsEmpty", lang)}
                 </p>
-                {category && (
-                  <Link
-                    href="/results"
-                    className="southline-btn-secondary mt-6"
-                  >
-                    {t("catalogEmptyExplore", lang)}
-                  </Link>
-                )}
+                <Link
+                  href="/results"
+                  className="southline-btn-secondary mt-6"
+                >
+                  {t("browseAllServices", lang)}
+                </Link>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

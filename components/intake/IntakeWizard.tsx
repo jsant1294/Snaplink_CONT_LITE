@@ -112,7 +112,7 @@ export default function IntakeWizard({
   const stepIndex = ["type", "questions", "photos", "contact", "review"].indexOf(step);
 
   return (
-    <main className="min-h-screen max-w-md mx-auto px-5 pb-16 pt-8">
+    <main className="min-h-screen max-w-md mx-auto px-5 pb-32 pt-8 text-bone">
       <header className="mb-6">
         <button onClick={onExit} className="text-sm text-muted mb-3">
           ← {contractor.businessName}
@@ -122,7 +122,7 @@ export default function IntakeWizard({
             {[0, 1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className={`h-1 flex-1 rounded-full ${i <= stepIndex ? "bg-gold" : "bg-white/10"}`}
+                className={`h-1 flex-1 rounded-full transition-colors ${i <= stepIndex ? "bg-gold" : "bg-white/10"}`}
               />
             ))}
           </div>
@@ -136,9 +136,9 @@ export default function IntakeWizard({
       {/* STEP: project type */}
       {step === "type" && (
         <section>
-          <h1 className="font-display text-3xl mb-1">{t("whatsTheProject", lang)}</h1>
-          <p className="text-muted text-sm mb-5">{t("pickClosest", lang)}</p>
-          <div className="space-y-5">
+          <h1 className="font-display text-3xl mb-1 text-bone">{t("whatsTheProject", lang)}</h1>
+          <p className="text-muted text-sm mb-6">{t("pickClosest", lang)}</p>
+          <div className="space-y-6">
             {serviceGroups.map((g) => (
               <div key={g.category.id}>
                 <p className="text-[11px] uppercase tracking-[0.2em] text-gold mb-2">
@@ -152,7 +152,12 @@ export default function IntakeWizard({
                         setProjectType(s.name);
                         setStep("questions");
                       }}
-                      className={`card p-3.5 text-left text-sm font-medium ${projectType === s.name ? "border-gold" : ""}`}
+                      aria-pressed={projectType === s.name}
+                      className={`card p-3.5 text-left text-sm font-medium min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${
+                        projectType === s.name
+                          ? "border-gold bg-[#2b2415] text-goldlight"
+                          : "border-white/5 text-bone hover:border-gold/40"
+                      }`}
                     >
                       {serviceLabel(s.name, lang)}
                     </button>
@@ -179,10 +184,11 @@ export default function IntakeWizard({
                       <button
                         key={opt.value}
                         onClick={() => setAnswers((a) => ({ ...a, [q.label.en]: opt.value }))}
-                        className={`px-3 py-2 rounded-lg text-sm border ${
+                        aria-pressed={answers[q.label.en] === opt.value}
+                        className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${
                           answers[q.label.en] === opt.value
                             ? "bg-gold text-obsidian border-gold font-medium"
-                            : "border-white/15 text-bone"
+                            : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"
                         }`}
                       >
                         {optLabel(opt, lang)}
@@ -281,7 +287,8 @@ export default function IntakeWizard({
                   <button
                     key={m.value}
                     onClick={() => setContact({ ...contact, preferredContact: m.value as ContactMethod })}
-                    className={`px-3 py-2 rounded-lg text-sm border ${contact.preferredContact === m.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15"}`}
+                    aria-pressed={contact.preferredContact === m.value}
+                    className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${contact.preferredContact === m.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"}`}
                   >
                     {optLabel(m, lang)}
                   </button>
@@ -296,7 +303,7 @@ export default function IntakeWizard({
               <label className="label">{t("timeline", lang)}</label>
               <div className="flex flex-wrap gap-2">
                 {TIMELINE_OPTIONS.map((o) => (
-                  <button key={o.value} onClick={() => setContact({ ...contact, timeline: o.value })} className={`px-3 py-2 rounded-lg text-sm border ${contact.timeline === o.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15"}`}>
+                  <button key={o.value} onClick={() => setContact({ ...contact, timeline: o.value })} aria-pressed={contact.timeline === o.value} className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${contact.timeline === o.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"}`}>
                     {optLabel(o, lang)}
                   </button>
                 ))}
@@ -306,7 +313,7 @@ export default function IntakeWizard({
               <label className="label">{t("budgetRange", lang)}</label>
               <div className="flex flex-wrap gap-2">
                 {BUDGET_OPTIONS.map((o) => (
-                  <button key={o.value} onClick={() => setContact({ ...contact, budgetRange: o.value })} className={`px-3 py-2 rounded-lg text-sm border ${contact.budgetRange === o.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15"}`}>
+                  <button key={o.value} onClick={() => setContact({ ...contact, budgetRange: o.value })} aria-pressed={contact.budgetRange === o.value} className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${contact.budgetRange === o.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"}`}>
                     {optLabel(o, lang)}
                   </button>
                 ))}
