@@ -112,9 +112,12 @@ export default function IntakeWizard({
   const stepIndex = ["type", "questions", "photos", "contact", "review"].indexOf(step);
 
   return (
-    <main className="min-h-screen max-w-md mx-auto px-5 pb-32 pt-8 text-bone">
+    <main className="min-h-screen max-w-md mx-auto px-5 pb-32 pt-8 text-[#2F2923]">
       <header className="mb-6">
-        <button onClick={onExit} className="text-sm text-muted mb-3">
+        <button
+          onClick={onExit}
+          className="text-sm text-[#625A52] mb-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA] rounded"
+        >
           ← {contractor.businessName}
         </button>
         {step !== "done" && (
@@ -122,7 +125,7 @@ export default function IntakeWizard({
             {[0, 1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className={`h-1 flex-1 rounded-full transition-colors ${i <= stepIndex ? "bg-gold" : "bg-white/10"}`}
+                className={`h-1 flex-1 rounded-full transition-colors ${i <= stepIndex ? "bg-gold" : "bg-[#D8CEBF]"}`}
               />
             ))}
           </div>
@@ -130,18 +133,18 @@ export default function IntakeWizard({
       </header>
 
       {error && (
-        <div className="card border-danger/40 p-3 mb-4 text-sm text-danger">{error}</div>
+        <div className="rounded-xl bg-[#F5EFE4]/60 border border-danger/40 p-3 mb-4 text-sm text-danger">{error}</div>
       )}
 
       {/* STEP: project type */}
       {step === "type" && (
         <section>
-          <h1 className="font-display text-3xl mb-1 text-bone">{t("whatsTheProject", lang)}</h1>
-          <p className="text-muted text-sm mb-6">{t("pickClosest", lang)}</p>
+          <h1 className="font-display text-3xl mb-1 text-[#2F2923]">{t("whatsTheProject", lang)}</h1>
+          <p className="text-[#6B6156] text-sm mb-6">{t("pickClosest", lang)}</p>
           <div className="space-y-6">
             {serviceGroups.map((g) => (
               <div key={g.category.id}>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-gold mb-2">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[#8a6a1f] mb-2">
                   {categoryLabel(g.category.id, lang)}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
@@ -153,10 +156,10 @@ export default function IntakeWizard({
                         setStep("questions");
                       }}
                       aria-pressed={projectType === s.name}
-                      className={`card p-3.5 text-left text-sm font-medium min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${
+                      className={`p-3.5 text-left text-sm font-medium min-h-[44px] transition-colors rounded-2xl border focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA] ${
                         projectType === s.name
                           ? "border-gold bg-[#2b2415] text-goldlight"
-                          : "border-white/5 text-bone hover:border-gold/40"
+                          : "border-[#D8CEBF] bg-[#F5EFE4]/60 text-[#2F2923] hover:border-gold/60 hover:bg-[#F5EFE4]"
                       }`}
                     >
                       {serviceLabel(s.name, lang)}
@@ -172,12 +175,12 @@ export default function IntakeWizard({
       {/* STEP: dynamic questions */}
       {step === "questions" && projectType && (
         <section>
-          <h1 className="font-display text-3xl mb-1">{serviceLabel(projectType, lang)}</h1>
-          <p className="text-muted text-sm mb-5">{t("quickDetails", lang)}</p>
+          <h1 className="font-display text-3xl mb-1 text-[#2F2923]">{serviceLabel(projectType, lang)}</h1>
+          <p className="text-[#6B6156] text-sm mb-5">{t("quickDetails", lang)}</p>
           <div className="space-y-4">
             {questions.map((q) => (
               <div key={q.id}>
-                <label className="label">{qLabel(q, lang)}</label>
+                <label className="label !text-[#625A52]">{qLabel(q, lang)}</label>
                 {q.type === "select" ? (
                   <div className="flex flex-wrap gap-2">
                     {q.options!.map((opt) => (
@@ -185,10 +188,10 @@ export default function IntakeWizard({
                         key={opt.value}
                         onClick={() => setAnswers((a) => ({ ...a, [q.label.en]: opt.value }))}
                         aria-pressed={answers[q.label.en] === opt.value}
-                        className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${
+                        className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA] ${
                           answers[q.label.en] === opt.value
                             ? "bg-gold text-obsidian border-gold font-medium"
-                            : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"
+                            : "border-[#D8CEBF] bg-white/45 text-[#3B342D] hover:border-gold/60 hover:bg-white/70"
                         }`}
                       >
                         {optLabel(opt, lang)}
@@ -197,7 +200,7 @@ export default function IntakeWizard({
                   </div>
                 ) : (
                   <input
-                    className="input"
+                    className="input focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]"
                     placeholder={qPlaceholder(q, lang)}
                     value={answers[q.label.en] ?? ""}
                     onChange={(e) => setAnswers((a) => ({ ...a, [q.label.en]: e.target.value }))}
@@ -215,16 +218,16 @@ export default function IntakeWizard({
       {/* STEP: photos */}
       {step === "photos" && (
         <section>
-          <h1 className="font-display text-3xl mb-1">{t("addPhotos", lang)}</h1>
-          <p className="text-muted text-sm mb-5">{t("photosHelp", lang)}</p>
+          <h1 className="font-display text-3xl mb-1 text-[#2F2923]">{t("addPhotos", lang)}</h1>
+          <p className="text-[#6B6156] text-sm mb-5">{t("photosHelp", lang)}</p>
           <div className="space-y-4">
             {(photoPrompts.length
               ? photoPrompts
               : ([{ id: "p", label: { en: "Upload photos", es: "Sube fotos" }, type: "photos", photoKind: "current" }] as Question[])
             ).map((q) => (
-              <label key={q.id} className="card block p-4 cursor-pointer">
+              <label key={q.id} className="block p-4 cursor-pointer rounded-2xl border border-[#D8CEBF] bg-[#F5EFE4]/60 text-[#2F2923]">
                 <span className="text-sm font-medium">{qLabel(q, lang)}</span>
-                <span className="block text-xs text-gold mt-1">{t("tapToAdd", lang)}</span>
+                <span className="block text-xs text-[#8a6a1f] mt-1">{t("tapToAdd", lang)}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -243,7 +246,7 @@ export default function IntakeWizard({
                   <img src={p.dataUrl} alt={p.filename} className="rounded-lg aspect-square object-cover" />
                   <button
                     onClick={() => setPhotos((ph) => ph.filter((_, j) => j !== i))}
-                    className="absolute top-1 right-1 bg-obsidian/80 rounded-full w-6 h-6 text-xs"
+                    className="absolute top-1 right-1 bg-obsidian/80 rounded-full w-8 h-8 text-white text-sm leading-none inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]"
                     aria-label={t("removePhoto", lang)}
                   >
                     ✕
@@ -261,34 +264,38 @@ export default function IntakeWizard({
       {/* STEP: contact */}
       {step === "contact" && (
         <section>
-          <h1 className="font-display text-3xl mb-1">{t("howReachYou", lang)}</h1>
-          <p className="text-muted text-sm mb-5">{t("onlyFollowUp", lang)}</p>
+          <h1 className="font-display text-3xl mb-1 text-[#2F2923]">{t("howReachYou", lang)}</h1>
+          <p className="text-[#6B6156] text-sm mb-5">{t("onlyFollowUp", lang)}</p>
           <div className="space-y-4">
             <div>
-              <label className="label">{t("name", lang)}</label>
-              <input className="input" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
+              <label className="label !text-[#625A52]">{t("name", lang)}</label>
+              <input className="input focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
             </div>
             <div>
-              <label className="label">{t("phone", lang)}</label>
-              <input className="input" type="tel" inputMode="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
+              <label className="label !text-[#625A52]">{t("phone", lang)}</label>
+              <input className="input focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]" type="tel" inputMode="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
             </div>
             <div>
-              <label className="label">{t("email", lang)}</label>
-              <input className="input" type="email" inputMode="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+              <label className="label !text-[#625A52]">{t("email", lang)}</label>
+              <input className="input focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]" type="email" inputMode="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
             </div>
             <div>
-              <label className="label">{t("projectAddress", lang)}</label>
-              <input className="input" value={contact.projectAddress} onChange={(e) => setContact({ ...contact, projectAddress: e.target.value })} placeholder={t("addressPlaceholder", lang)} />
+              <label className="label !text-[#625A52]">{t("projectAddress", lang)}</label>
+              <input className="input focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]" value={contact.projectAddress} onChange={(e) => setContact({ ...contact, projectAddress: e.target.value })} placeholder={t("addressPlaceholder", lang)} />
             </div>
             <div>
-              <label className="label">{t("preferredContact", lang)}</label>
+              <label className="label !text-[#625A52]">{t("preferredContact", lang)}</label>
               <div className="flex flex-wrap gap-2">
                 {CONTACT_METHOD_OPTIONS.map((m) => (
                   <button
                     key={m.value}
                     onClick={() => setContact({ ...contact, preferredContact: m.value as ContactMethod })}
                     aria-pressed={contact.preferredContact === m.value}
-                    className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${contact.preferredContact === m.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"}`}
+                    className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA] ${
+                      contact.preferredContact === m.value
+                        ? "bg-gold text-obsidian border-gold font-medium"
+                        : "border-[#D8CEBF] bg-white/45 text-[#3B342D] hover:border-gold/60 hover:bg-white/70"
+                    }`}
                   >
                     {optLabel(m, lang)}
                   </button>
@@ -296,32 +303,40 @@ export default function IntakeWizard({
               </div>
             </div>
             <div>
-              <label className="label">{t("bestTime", lang)}</label>
-              <input className="input" value={contact.bestTimeToContact} onChange={(e) => setContact({ ...contact, bestTimeToContact: e.target.value })} placeholder={t("bestTimePlaceholder", lang)} />
+              <label className="label !text-[#625A52]">{t("bestTime", lang)}</label>
+              <input className="input focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]" value={contact.bestTimeToContact} onChange={(e) => setContact({ ...contact, bestTimeToContact: e.target.value })} placeholder={t("bestTimePlaceholder", lang)} />
             </div>
             <div>
-              <label className="label">{t("timeline", lang)}</label>
+              <label className="label !text-[#625A52]">{t("timeline", lang)}</label>
               <div className="flex flex-wrap gap-2">
                 {TIMELINE_OPTIONS.map((o) => (
-                  <button key={o.value} onClick={() => setContact({ ...contact, timeline: o.value })} aria-pressed={contact.timeline === o.value} className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${contact.timeline === o.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"}`}>
+                  <button key={o.value} onClick={() => setContact({ ...contact, timeline: o.value })} aria-pressed={contact.timeline === o.value} className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA] ${
+                    contact.timeline === o.value
+                      ? "bg-gold text-obsidian border-gold font-medium"
+                      : "border-[#D8CEBF] bg-white/45 text-[#3B342D] hover:border-gold/60 hover:bg-white/70"
+                  }`}>
                     {optLabel(o, lang)}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="label">{t("budgetRange", lang)}</label>
+              <label className="label !text-[#625A52]">{t("budgetRange", lang)}</label>
               <div className="flex flex-wrap gap-2">
                 {BUDGET_OPTIONS.map((o) => (
-                  <button key={o.value} onClick={() => setContact({ ...contact, budgetRange: o.value })} aria-pressed={contact.budgetRange === o.value} className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${contact.budgetRange === o.value ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone hover:border-gold/40 hover:bg-white/5"}`}>
+                  <button key={o.value} onClick={() => setContact({ ...contact, budgetRange: o.value })} aria-pressed={contact.budgetRange === o.value} className={`px-3 py-2 rounded-lg text-sm border min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA] ${
+                    contact.budgetRange === o.value
+                      ? "bg-gold text-obsidian border-gold font-medium"
+                      : "border-[#D8CEBF] bg-white/45 text-[#3B342D] hover:border-gold/60 hover:bg-white/70"
+                  }`}>
                     {optLabel(o, lang)}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="label">{t("anythingElse", lang)}</label>
-              <textarea className="input min-h-[90px]" value={contact.notes} onChange={(e) => setContact({ ...contact, notes: e.target.value })} />
+              <label className="label !text-[#625A52]">{t("anythingElse", lang)}</label>
+              <textarea className="input min-h-[90px] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]" value={contact.notes} onChange={(e) => setContact({ ...contact, notes: e.target.value })} />
             </div>
           </div>
           <button
@@ -337,8 +352,8 @@ export default function IntakeWizard({
       {/* STEP: review */}
       {step === "review" && (
         <section>
-          <h1 className="font-display text-3xl mb-5">{t("reviewAndSend", lang)}</h1>
-          <div className="card p-4 space-y-2 text-sm">
+          <h1 className="font-display text-3xl mb-5 text-[#2F2923]">{t("reviewAndSend", lang)}</h1>
+          <div className="rounded-2xl border border-[#D8CEBF] bg-[#F5EFE4]/60 p-4 space-y-2 text-sm text-[#2F2923]">
             <Row k={t("project", lang)} v={projectType ? serviceLabel(projectType, lang) : ""} />
             <Row k={t("name", lang).replace(" *", "")} v={contact.name} />
             <Row k={t("phone", lang).replace(" *", "")} v={contact.phone} />
@@ -372,14 +387,19 @@ export default function IntakeWizard({
       {step === "done" && (
         <section className="text-center pt-16">
           <p className="text-5xl mb-4">✓</p>
-          <h1 className="font-display text-3xl mb-2">{t("requestSent", lang)}</h1>
-          <p className="text-muted text-sm max-w-xs mx-auto mb-8">
+          <h1 className="font-display text-3xl mb-2 text-[#2F2923]">{t("requestSent", lang)}</h1>
+          <p className="text-[#6B6156] text-sm max-w-xs mx-auto mb-8">
             {contractor.businessName} {t("requestSentBody", lang)}{" "}
             {contact.bestTimeToContact ? `(${contact.bestTimeToContact.toLowerCase()})` : t("soon", lang)}.
           </p>
           <div className="space-y-3 max-w-xs mx-auto">
             <a href={`tel:${contractor.phone}`} className="btn-gold block">{t("callNow", lang)}</a>
-            <button onClick={onExit} className="btn-outline w-full">{t("backToPage", lang)}</button>
+            <button
+              onClick={onExit}
+              className="w-full rounded-xl border border-gold/60 bg-white/45 px-4 py-3 text-center text-sm font-semibold text-[#6F552A] active:scale-[0.98] motion-reduce:active:scale-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#EEE7DA]"
+            >
+              {t("backToPage", lang)}
+            </button>
           </div>
         </section>
       )}
@@ -389,9 +409,9 @@ export default function IntakeWizard({
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0">
-      <span className="text-muted">{k}</span>
-      <span className="text-right font-medium">{v}</span>
+    <div className="flex justify-between gap-4 border-b border-[#D8CEBF]/70 pb-2 last:border-0 last:pb-0">
+      <span className="text-[#625A52]">{k}</span>
+      <span className="text-right font-medium text-[#2F2923]">{v}</span>
     </div>
   );
 }
