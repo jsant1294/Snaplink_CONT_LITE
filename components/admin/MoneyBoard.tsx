@@ -251,7 +251,7 @@ export default function MoneyBoard({
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[11px] tracking-[0.35em] uppercase text-gold">{contractor?.businessName}</p>
-          <h1 className="font-display text-4xl mt-1 text-bone">{mt("moneyTitle", lang)}</h1>
+          <h1 className="font-display text-4xl mt-1 text-obsidian">{mt("moneyTitle", lang)}</h1>
           <p className="text-[11px] text-gold/80 mt-1">{mt("poweredByLfc", lang)}</p>
           {username && (
             <a href={`/contractor-admin/${username}`} className="text-xs text-gold underline">
@@ -594,7 +594,7 @@ export default function MoneyBoard({
 
       {/* Expense list */}
       <section>
-        <h2 className="font-display text-2xl mb-3 text-bone">{mt("expenses", lang)}</h2>
+        <h2 className="font-display text-2xl mb-3 text-obsidian">{mt("expenses", lang)}</h2>
         {!loading && expenses.length === 0 && (
           <div className="card p-8 text-center">
             <p className="text-muted text-sm">{mt("noExpenses", lang)}</p>

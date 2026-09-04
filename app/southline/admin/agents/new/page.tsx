@@ -55,7 +55,7 @@ function NewAgentForm({ pin }: { pin: string }) {
   if (result) {
     const { profile, urls } = result;
     return (
-      <main className="mx-auto max-w-2xl px-6 py-16 text-bone">
+      <main className="min-h-screen bg-obsidian mx-auto max-w-2xl px-6 py-16 text-bone">
         <h1 className="font-display text-2xl text-gold">Agent created</h1>
         <div className="mt-6 space-y-2 rounded-xl border border-white/10 bg-obsidian p-5 text-sm">
           <p><span className="text-muted">Name:</span> {profile.name}</p>
@@ -79,7 +79,7 @@ function NewAgentForm({ pin }: { pin: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16 text-bone">
+    <main className="min-h-screen bg-obsidian mx-auto max-w-3xl px-6 py-16 text-bone">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl text-gold">New Agent</h1>
         <Link href="/southline/admin" className="text-xs text-muted underline">Back to Agent Management</Link>

@@ -83,11 +83,11 @@ function EditAgentForm({ pin }: { pin: string }) {
     }
   }
 
-  if (loading) return <main className="px-6 py-16 text-center text-sm text-muted">Loading…</main>;
-  if (!profile || !values) return <main className="px-6 py-16 text-center text-sm text-danger">{error || "Agent not found"}</main>;
+  if (loading) return <main className="min-h-screen bg-obsidian px-6 py-16 text-center text-sm text-muted">Loading…</main>;
+  if (!profile || !values) return <main className="min-h-screen bg-obsidian px-6 py-16 text-center text-sm text-danger">{error || "Agent not found"}</main>;
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16 text-bone">
+    <main className="min-h-screen bg-obsidian mx-auto max-w-3xl px-6 py-16 text-bone">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl text-gold">Edit Agent — {profile.name}</h1>
         <Link href="/southline/admin" className="text-xs text-muted underline">Back to Agent Management</Link>
