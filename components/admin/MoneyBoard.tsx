@@ -251,7 +251,7 @@ export default function MoneyBoard({
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[11px] tracking-[0.35em] uppercase text-gold">{contractor?.businessName}</p>
-          <h1 className="font-display text-4xl mt-1">{mt("moneyTitle", lang)}</h1>
+          <h1 className="font-display text-4xl mt-1 text-bone">{mt("moneyTitle", lang)}</h1>
           <p className="text-[11px] text-gold/80 mt-1">{mt("poweredByLfc", lang)}</p>
           {username && (
             <a href={`/contractor-admin/${username}`} className="text-xs text-gold underline">
@@ -312,7 +312,7 @@ export default function MoneyBoard({
             {summary.unbilledMaterialCents > 0 && (
               <div className="bg-slateink rounded-xl p-3 mb-4">
                 <p className="text-xs uppercase tracking-wider text-warn mb-1">{mt("unbilledMaterials", lang)}</p>
-                <p className="text-lg font-semibold">{formatCents(summary.unbilledMaterialCents, lang)}</p>
+                <p className="text-lg font-semibold text-bone">{formatCents(summary.unbilledMaterialCents, lang)}</p>
                 <p className="text-xs text-muted mt-1">{mt("unbilledHelp", lang)}</p>
               </div>
             )}
@@ -324,7 +324,7 @@ export default function MoneyBoard({
                   {summary.byCategory.map((c) => (
                     <li key={c.categoryId} className="flex justify-between border-b border-white/5 pb-1">
                       <span className="text-muted">{lang === "es" ? c.labelEs : c.labelEn}</span>
-                      <span>{formatCents(c.totalCents, lang)}</span>
+                      <span className="text-bone">{formatCents(c.totalCents, lang)}</span>
                     </li>
                   ))}
                 </ul>
@@ -452,7 +452,7 @@ export default function MoneyBoard({
           </div>
         ) : (
           <div className="card p-5">
-            <h2 className="font-semibold mb-4">{mt("addExpense", lang)}</h2>
+            <h2 className="font-semibold mb-4 text-bone">{mt("addExpense", lang)}</h2>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -506,7 +506,7 @@ export default function MoneyBoard({
                   <button
                     onClick={() => setIsJob(false)}
                     className={`px-3 py-3 rounded-xl text-sm border text-left ${
-                      !isJob ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15"
+                      !isJob ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone"
                     }`}
                   >
                     {mt("overhead", lang)}
@@ -514,7 +514,7 @@ export default function MoneyBoard({
                   <button
                     onClick={() => setIsJob(true)}
                     className={`px-3 py-3 rounded-xl text-sm border text-left ${
-                      isJob ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15"
+                      isJob ? "bg-gold text-obsidian border-gold font-medium" : "border-white/15 text-bone"
                     }`}
                   >
                     {mt("jobMaterial", lang)}
@@ -594,7 +594,7 @@ export default function MoneyBoard({
 
       {/* Expense list */}
       <section>
-        <h2 className="font-display text-2xl mb-3">{mt("expenses", lang)}</h2>
+        <h2 className="font-display text-2xl mb-3 text-bone">{mt("expenses", lang)}</h2>
         {!loading && expenses.length === 0 && (
           <div className="card p-8 text-center">
             <p className="text-muted text-sm">{mt("noExpenses", lang)}</p>
@@ -614,7 +614,7 @@ export default function MoneyBoard({
                     <div className="w-12 h-12 rounded-lg bg-slateink shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-sm font-medium truncate text-bone">
                       {catLabel(e.categoryId)}
                       {e.vendor ? ` · ${e.vendor}` : ""}
                     </p>
@@ -637,7 +637,7 @@ export default function MoneyBoard({
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-semibold">{formatCents(e.amountCents, lang)}</p>
+                    <p className="font-semibold text-bone">{formatCents(e.amountCents, lang)}</p>
                     <button onClick={() => removeExpense(e)} className="text-[11px] text-danger">
                       {mt("deleteExpense", lang)}
                     </button>
@@ -650,7 +650,7 @@ export default function MoneyBoard({
       </section>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-charcoal border border-gold/40 rounded-xl px-4 py-2.5 text-sm shadow-card z-50">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-charcoal border border-gold/40 rounded-xl px-4 py-2.5 text-sm text-bone shadow-card z-50">
           {toast}
         </div>
       )}
@@ -674,7 +674,7 @@ function Stat({
       <p className="text-[11px] uppercase tracking-wider text-muted">{label}</p>
       <p
         className={`${big ? "font-display text-3xl" : "text-lg font-semibold"} ${
-          negative ? "text-danger" : big ? "text-goldlight" : ""
+          negative ? "text-danger" : big ? "text-goldlight" : "text-bone"
         }`}
       >
         {value}
