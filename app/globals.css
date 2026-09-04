@@ -98,8 +98,24 @@ body {
     @apply border border-gold/50 text-goldlight rounded-xl px-4 py-3 text-center active:scale-[0.98] transition
       motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2;
   }
+  /* bg-charcoal is always dark, so the class itself must establish a light
+     default foreground — otherwise any descendant that forgets its own
+     text-* color silently inherits the page's light-surface default
+     (text-obsidian, near-black) and becomes unreadable. Individual children
+     still override for gold/muted/status colors as needed; usages that force
+     a light card via !bg-[...] already pair it with their own !text-[...]
+     override, so this default never fights them. */
   .card {
-    @apply bg-charcoal border border-white/5 rounded-2xl shadow-card;
+    @apply bg-charcoal text-bone border border-white/5 rounded-2xl shadow-card;
+  }
+  /* Same reasoning as .card above, for the two other always-dark surface
+     colors used as raw utility backgrounds throughout the dark admin UI
+     (nested boxes inside cards, standalone dark rows/panels). Utility-layer
+     text-* classes on the element itself still win over this components-layer
+     default, so any element that already sets its own color is unaffected. */
+  .bg-slateink,
+  .bg-obsidian {
+    @apply text-bone;
   }
   .input {
     @apply w-full bg-slateink border border-white/10 rounded-xl px-4 py-3 text-bone placeholder:text-muted focus:outline-none focus:border-gold/60;
