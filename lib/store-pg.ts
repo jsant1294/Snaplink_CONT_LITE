@@ -5,28 +5,35 @@
 // Blob and only the URL is persisted; otherwise the data URL is stored as-is.
 // ---------------------------------------------------------------------------
 
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, inArray } from "drizzle-orm";
 import { contractors, leads, photos, estimates } from "./db/schema";
 import { db } from "./db/connection";
 import { invalidateContractorCatalog, shouldInvalidateContractorUpdate } from "./public-catalog-invalidate";
 import type { Lead, LeadStatus, AiSummary, Contractor, Estimate, Photo, Payment, PaymentMethods } from "./types";
 
 export async function maybeUploadToBlob(photo: { dataUrl: string; filename: string }, leadId: string): Promise<string> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN || !photo.dataUrl.startsWith("data:")) {
+  if (!photo.dataUrl.startsWith("data:")) return photo.dataUrl;
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Photo upload unavailable: BLOB_READ_WRITE_TOKEN is not configured.");
+    }
     return photo.dataUrl;
   }
+  const { put } = await import("@vercel/blob");
+  const [meta, b64] = photo.dataUrl.split(",");
+  const mime = meta.match(/data:(.*?);/)?.[1] ?? "image/jpeg";
+  const buffer = Buffer.from(b64, "base64");
   try {
-    const { put } = await import("@vercel/blob");
-    const [meta, b64] = photo.dataUrl.split(",");
-    const mime = meta.match(/data:(.*?);/)?.[1] ?? "image/jpeg";
-    const buffer = Buffer.from(b64, "base64");
     const blob = await put(`snaplink/${leadId}/${Date.now()}-${photo.filename}`, buffer, {
       access: "public",
       contentType: mime,
     });
     return blob.url;
-  } catch {
-    // Blob upload failed — fall back to storing the data URL so no lead is lost.
+  } catch (error) {
+    // Production must not silently persist multi-MB base64 in Postgres — the
+    // exact pattern that caused the Neon egress incident. Surface the failure
+    // instead. Local dev keeps the fallback for offline/no-token convenience.
+    if (process.env.NODE_ENV === "production") throw error;
     return photo.dataUrl;
   }
 }
@@ -138,9 +145,8 @@ function rowToEstimate(row: EstimateRow): Estimate {
 async function photosForLeads(leadIds: string[]): Promise<Map<string, PhotoRow[]>> {
   const map = new Map<string, PhotoRow[]>();
   if (leadIds.length === 0) return map;
-  const rows = await db().select().from(photos);
+  const rows = await db().select().from(photos).where(inArray(photos.leadId, leadIds));
   for (const r of rows) {
-    if (!leadIds.includes(r.leadId)) continue;
     const arr = map.get(r.leadId) ?? [];
     arr.push(r);
     map.set(r.leadId, arr);

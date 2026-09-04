@@ -62,6 +62,18 @@ export const getCachedPublicAgents = () =>
     { revalidate: REVALIDATE_SECONDS, tags: [PUBLIC_CATALOG_TAGS.agents] }
   );
 
+// Distinct from getCachedPublicAgents(): that one (homepage) uses listActive()
+// (status=active only). /results and /api/southline/search use the stricter
+// listPublicActive() gate (+ is_demo=false, southlineStatus published/featured)
+// — this wrapper reuses that exact method so caching doesn't change who's
+// eligible to appear in search results.
+export const getCachedPublicActiveAgents = () =>
+  unstable_cache(
+    async (): Promise<AgentProfile[]> => agentProfileStore.listPublicActive(),
+    ["public-active-agents"],
+    { revalidate: REVALIDATE_SECONDS, tags: [PUBLIC_CATALOG_TAGS.agents] }
+  );
+
 export const getCachedFeaturedProperty = () =>
   unstable_cache(
     async (token: string, featuredPropertyId: string | null) =>

@@ -161,8 +161,11 @@ test("matchesQuery is case-insensitive and substring-based, empty query matches 
 test("/api/southline/search reuses the shared search lib and includes agents", async () => {
   const route = await source("../app/api/southline/search/route.ts");
   assert.match(route, /searchProfessionals/);
-  assert.match(route, /agentProfileStore/);
-  assert.match(route, /contractorStore/);
+  // Reads the gated agent/contractor lists through the shared public-cache
+  // wrappers (see lib/public-cache.ts) rather than the stores directly — the
+  // underlying listPublicActive()/listPublished() gate is unchanged.
+  assert.match(route, /agentProfileStore|getCachedPublicActiveAgents/);
+  assert.match(route, /contractorStore|getCachedPublishedContractors/);
   assert.match(route, /agents:/);
   assert.match(route, /category/);
 });
@@ -176,7 +179,9 @@ test("/results page uses the shared search lib and the uniform ProfessionalCard"
   assert.match(page, /listSouthlineHomeServices/);
   assert.doesNotMatch(page, /SERVICE_CATEGORIES/);
   assert.match(page, /resultsAll|resultsFilterLabel/);
-  assert.match(page, /agentProfileStore|contractorStore/);
+  // Same gate, reached via the shared public-cache wrappers — see the route
+  // test above.
+  assert.match(page, /agentProfileStore|contractorStore|getCachedPublicActiveAgents|getCachedPublishedContractors/);
 });
 
 test("SearchOverlay routes into /results and renders agents section", async () => {

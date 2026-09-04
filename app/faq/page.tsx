@@ -12,7 +12,7 @@ import Footer from "@/components/southline/Footer";
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
   const lang = ((cookieStore.get("sl_lang")?.value ?? "en") as Lang);
-  const seo = await southlineStore.getSettings().then((s) => s.seo).catch(() => null);
+  const seo = await southlineStore.getSettingsSeo().catch(() => null);
   return buildSeoMetadata({ lang, seo, pageKey: "faq" });
 }
 
@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 
 export default async function FaqPage() {
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
-  const settings = await southlineStore.getSettings().catch(() => null);
+  const settings = await southlineStore.getSettingsWithoutHeroImage().catch(() => null);
   const faq = settings?.faq;
 
   if (faq?.enabled === false) notFound();

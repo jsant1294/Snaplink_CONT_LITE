@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
   const lang = ((cookieStore.get("sl_lang")?.value ?? "en") as Lang);
 
-  const seo = await southlineStore.getSettings().then((s) => s.seo).catch(() => null);
+  const seo = await southlineStore.getSettingsSeo().catch(() => null);
 
   return buildSeoMetadata({ lang, seo, pageKey: "home" });
 }

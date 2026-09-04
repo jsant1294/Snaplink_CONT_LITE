@@ -8,9 +8,8 @@ import LucioMount from "@/components/lucio/LucioMount";
 import type { Lang } from "@/lib/southline-i18n";
 import { t } from "@/lib/southline-i18n";
 import { listSouthlineHomeServices } from "@/lib/home-service-taxonomy";
-import { contractorStore } from "@/lib/store";
-import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { southlineStore } from "@/lib/southline-store";
+import { getCachedPublishedContractors, getCachedPublicActiveAgents } from "@/lib/public-cache";
 import { searchProfessionals } from "@/lib/southline-search";
 import { orderProfessionalResults } from "@/lib/southline-professional-catalog";
 import { zipCentroidStore } from "@/lib/geo/store";
@@ -36,11 +35,14 @@ export default async function ResultsPage({
 
   // Public-discovery queries: publish gates (lifecycle + southline listing +
   // demo) are enforced in SQL, so searchProfessionals (which re-checks as
-  // defense-in-depth) only sees discoverable professionals.
+  // defense-in-depth) only sees discoverable professionals. Reuses the same
+  // 300s public-catalog cache as the homepage instead of re-querying Neon on
+  // every visit/keystroke. Settings uses the heroImage-free projection since
+  // this page only reads featuredContractorIds/featuredAgentProfileIds.
   const [contractors, agentProfiles, settings] = await Promise.all([
-    contractorStore.listPublished().catch(() => []),
-    agentProfileStore.listPublicActive().catch(() => []),
-    southlineStore.getSettings().catch(() => null),
+    getCachedPublishedContractors()().catch(() => []),
+    getCachedPublicActiveAgents()().catch(() => []),
+    southlineStore.getSettingsWithoutHeroImage().catch(() => null),
   ]);
 
   // TRUE GEO v1: a valid 5-digit ZIP is a real radius search (visitor centroid

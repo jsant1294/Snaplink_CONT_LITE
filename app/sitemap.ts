@@ -4,9 +4,9 @@ import { contractorStore } from "@/lib/store";
 import { southlineStore } from "@/lib/southline-store";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const settings = await southlineStore.getSettings().catch(() => null);
+  const seo = await southlineStore.getSettingsSeo().catch(() => null);
   const baseUrl = (
-    settings?.seo?.canonicalSiteUrl ?? process.env.APP_URL ?? "https://southlineliving.com"
+    seo?.canonicalSiteUrl ?? process.env.APP_URL ?? "https://southlineliving.com"
   ).replace(/\/+$/, "");
 
   const staticRoutes: MetadataRoute.Sitemap = [

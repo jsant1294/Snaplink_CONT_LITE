@@ -103,6 +103,17 @@ export const jsonSouthlineStore = {
     return read();
   },
 
+  // Local file store has no per-column projection cost — these just delegate
+  // to the same full read. They exist to keep the interface identical to
+  // pgSouthlineStore's egress-motivated narrow projections.
+  async getSettingsSeo(): Promise<SouthlineSettings["seo"]> {
+    return (await read()).seo;
+  },
+
+  async getSettingsWithoutHeroImage(): Promise<SouthlineSettings> {
+    return read();
+  },
+
   async updateSettings(
     patch: Partial<SouthlineSettings>
   ): Promise<SouthlineSettings> {

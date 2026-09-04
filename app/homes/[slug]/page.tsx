@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -11,9 +12,14 @@ import LucioMount from "@/components/lucio/LucioMount";
 const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 export const dynamic = "force-dynamic";
 
+// Request-scoped memoization: generateMetadata() and the page body both look
+// up the same property by slug. cache() dedupes by args for the life of one
+// render pass, so this is only fetched from Neon once per request instead of twice.
+const getProperty = cache((slug: string, tenantId: string) => findPropertyBySlugWithFallback(slug, tenantId));
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const property = await findPropertyBySlugWithFallback(slug, demoTenant.id);
+  const property = await getProperty(slug, demoTenant.id);
   if (!property) return { title: "Property not found | Southline Living", robots: { index: false, follow: false } };
   const url = `${appUrl}/homes/${property.slug}`;
   const images = property.imageUrls[0] ? [property.imageUrls[0]] : [];
@@ -28,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
-  const property = await findPropertyBySlugWithFallback((await params).slug, demoTenant.id);
+  const property = await getProperty((await params).slug, demoTenant.id);
   if (!property) notFound();
   const agent = demoAgents.find((item) => item.id === property.agentId);
   return <>

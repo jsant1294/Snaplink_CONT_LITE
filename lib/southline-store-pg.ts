@@ -4,26 +4,14 @@
 // why this is one jsonb blob instead of a relational table.
 // ---------------------------------------------------------------------------
 
-import { Pool } from "pg";
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { southlineSettings } from "./db/schema";
+import { db } from "./db/connection";
 import type { SouthlineSettings } from "./southline-types";
 import { defaultSouthlineSettings, mergeLocalDiscoveryContent, mergeSnapLinkPromoContent } from "./southline-types";
 import { mergeSeoContent } from "./southline-seo";
-import { databaseUrl, sslConfig } from "./db-url";
 
 const ROW_ID = "default";
-
-let _db: NodePgDatabase | null = null;
-
-function db(): NodePgDatabase {
-  if (!_db) {
-    const pool = new Pool({ connectionString: databaseUrl, ssl: sslConfig, max: 5 });
-    _db = drizzle(pool);
-  }
-  return _db;
-}
 
 // Mirrors jsonSouthlineStore's mergeWithDefaults — a stored row predates
 // whatever code shipped after it was written, so every read merges against
@@ -108,6 +96,38 @@ async function write(settings: SouthlineSettings): Promise<void> {
 export const pgSouthlineStore = {
   async getSettings(): Promise<SouthlineSettings> {
     return read();
+  },
+
+  // Narrow projections below exist because `data.heroImage` can be several
+  // MB (a pasted data URL or long-form asset) — see docs/architecture notes
+  // on the Neon egress audit. Sitewide callers (root layout, JSON-LD, other
+  // page metadata) only ever need a handful of small keys, so the projection
+  // happens in SQL (Postgres `->`/`-` jsonb operators) — the heroImage bytes
+  // never leave the database for these call sites, unlike a full `getSettings()`
+  // read followed by picking fields out in JS.
+
+  /** SEO fields only. For root layout / JSON-LD / per-page metadata. */
+  async getSettingsSeo(): Promise<SouthlineSettings["seo"]> {
+    const rows = await db()
+      .select({ seo: sql<SouthlineSettings["seo"] | null>`${southlineSettings.data}->'seo'` })
+      .from(southlineSettings)
+      .where(eq(southlineSettings.id, ROW_ID))
+      .limit(1);
+    return mergeSeoContent(rows[0]?.seo ?? undefined);
+  },
+
+  /**
+   * Full settings shape minus `heroImage`. For callers that need several
+   * ordinary-sized slices (contact/footer/faq/featured ids, etc.) but never
+   * render the homepage hero image.
+   */
+  async getSettingsWithoutHeroImage(): Promise<SouthlineSettings> {
+    const rows = await db()
+      .select({ data: sql<Partial<SouthlineSettings> | null>`${southlineSettings.data} - 'heroImage'` })
+      .from(southlineSettings)
+      .where(eq(southlineSettings.id, ROW_ID))
+      .limit(1);
+    return mergeWithDefaults(rows[0]?.data ?? {});
   },
 
   async updateSettings(patch: Partial<SouthlineSettings>): Promise<SouthlineSettings> {

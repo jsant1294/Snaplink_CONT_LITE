@@ -92,7 +92,10 @@ test("A D: demo agent is excluded from public search even when otherwise eligibl
 
 test("A E: public agent discovery surface (\"/agents\") filter excludes demo agents", async () => {
   const src = await source("../app/agents/page.tsx");
-  assert.match(src, /listPublicActive\(\)/, "app/agents/page.tsx must use the SQL-side public-active query (demo excluded in DB)");
+  // Reads through the shared public-cache wrapper (lib/public-cache.ts),
+  // which itself calls agentProfileStore.listPublicActive() — same SQL-side
+  // demo exclusion, now also 300s-cached instead of re-queried every request.
+  assert.match(src, /getCachedPublicActiveAgents\(\)/, "app/agents/page.tsx must use the SQL-side public-active query (demo excluded in DB)");
 });
 
 test("C: /results path must route through searchProfessionals (which excludes demo)", async () => {

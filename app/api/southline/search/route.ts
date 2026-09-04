@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { contractorStore } from "@/lib/store";
-import { agentProfileStore } from "@/lib/agent-profiles/store";
+import { getCachedPublishedContractors, getCachedPublicActiveAgents } from "@/lib/public-cache";
 import { searchProfessionals } from "@/lib/southline-search";
 import type { DIYProject } from "@/lib/southline-diy";
 import { zipCentroidStore } from "@/lib/geo/store";
@@ -28,9 +27,11 @@ export async function GET(req: NextRequest) {
     readProjects(),
     // Public-discovery queries: the publish gates are enforced in SQL, so
     // searchProfessionals (which re-checks eligibility as defense-in-depth)
-    // only ever sees discoverable professionals.
-    contractorStore.listPublished().catch(() => [] as any[]),
-    agentProfileStore.listPublicActive().catch(() => [] as any[]),
+    // only ever sees discoverable professionals. Reuses the same 300s
+    // public-catalog cache as the homepage/results instead of re-querying
+    // Neon on every typeahead keystroke.
+    getCachedPublishedContractors()().catch(() => [] as any[]),
+    getCachedPublicActiveAgents()().catch(() => [] as any[]),
   ]);
 
   // TRUE GEO v1: a valid 5-digit location is resolved to a centroid and used

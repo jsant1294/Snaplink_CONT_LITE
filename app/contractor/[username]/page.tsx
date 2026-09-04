@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -11,16 +12,23 @@ import LucioMount from "@/components/lucio/LucioMount";
 
 export const dynamic = "force-dynamic";
 
+// Request-scoped memoization: generateMetadata() and the page body both need
+// the same contractor/landing-page rows. Without this each request paid for
+// both queries twice — React's cache() dedupes by args for the life of one
+// render pass (Next.js request memoization pattern), not across requests.
+const getContractor = cache((username: string) => contractorStore.getByUsername(username));
+const getLandingPage = cache((contractorId: string) => landingPageStore.get(contractorId));
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const contractor = await contractorStore.getByUsername(username);
+  const contractor = await getContractor(username);
   if (!contractor || !isPublicContractor(contractor)) return {};
 
-  const page = await landingPageStore.get(contractor.id);
+  const page = await getLandingPage(contractor.id);
   const title = (page?.published && page.headlineEn) || `${contractor.businessName} | SnapLink Contractor`;
   const description = (page?.published && page.subheadlineEn) || contractor.tagline || contractor.serviceArea;
 
@@ -43,9 +51,9 @@ export default async function ContractorProfilePage({
   const { username } = await params;
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
-  const contractor = await contractorStore.getByUsername(username);
+  const contractor = await getContractor(username);
   if (!contractor || !isPublicContractor(contractor)) notFound();
-  const landingPage = await landingPageStore.get(contractor.id);
+  const landingPage = await getLandingPage(contractor.id);
 
   return (
     <>

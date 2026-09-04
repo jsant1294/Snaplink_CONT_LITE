@@ -12,7 +12,7 @@ import Footer from "@/components/southline/Footer";
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
   const lang = ((cookieStore.get("sl_lang")?.value ?? "en") as Lang);
-  const seo = await southlineStore.getSettings().then((s) => s.seo).catch(() => null);
+  const seo = await southlineStore.getSettingsSeo().catch(() => null);
   return buildSeoMetadata({ lang, seo, pageKey: "contact" });
 }
 
@@ -48,7 +48,7 @@ function addressLine(contact: SouthlineContactContent): string | null {
 
 export default async function ContactPage() {
   const lang = ((await cookies()).get("sl_lang")?.value ?? "en") as Lang;
-  const settings = await southlineStore.getSettings().catch(() => null);
+  const settings = await southlineStore.getSettingsWithoutHeroImage().catch(() => null);
   const contact = settings?.contact;
 
   if (contact?.enabled === false) notFound();

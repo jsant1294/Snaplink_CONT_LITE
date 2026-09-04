@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { agentProfileStore } from "@/lib/agent-profiles/store";
 import { publicAgentProfile } from "@/lib/agent-profiles/auth";
+import { getCachedPublicActiveAgents } from "@/lib/public-cache";
 import { agentProfessionTypeLabel, professionPlaceholderPhotoFor } from "@/lib/profession-types";
 import { t, type Lang } from "@/lib/southline-i18n";
 import Header from "@/components/southline/Header";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function AgentsDirectoryPage() {
   const cookieStore = await cookies();
   const lang = (cookieStore.get("sl_lang")?.value ?? "en") as Lang;
-  const profiles = (await agentProfileStore.listPublicActive()).map(publicAgentProfile);
+  const profiles = (await getCachedPublicActiveAgents()()).map(publicAgentProfile);
 
   return (
     <>

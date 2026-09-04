@@ -102,8 +102,8 @@ test("public surfaces route contractors through the lifecycle publish gate", asy
     ["../app/for-contractors/page.tsx", /listPublished\(\)/],
     ["../app/ideas/[category]/page.tsx", /listPublished\(\)/],
     ["../app/api/contractor/profiles/public/route.ts", /listPublished\(\)/],
-    ["../app/api/southline/search/route.ts", /listPublished\(\)/],
-    ["../app/results/page.tsx", /listPublished\(\)/],
+    ["../app/api/southline/search/route.ts", /getCachedPublishedContractors\(\)/],
+    ["../app/results/page.tsx", /getCachedPublishedContractors\(\)/],
   ];
   const lookupGated = [
     ["../app/contractor/[username]/page.tsx", /isPublicContractor\(contractor\)/],

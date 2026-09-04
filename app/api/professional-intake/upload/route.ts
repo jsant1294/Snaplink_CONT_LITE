@@ -43,6 +43,12 @@ export async function POST(req: NextRequest) {
     );
     return NextResponse.json({ url: blob.url });
   }
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "Image uploads are unavailable: BLOB_READ_WRITE_TOKEN is not configured." },
+      { status: 503 }
+    );
+  }
   const buffer = Buffer.from(await file.arrayBuffer());
   return NextResponse.json({ url: `data:${file.type};base64,${buffer.toString("base64")}` });
 }
